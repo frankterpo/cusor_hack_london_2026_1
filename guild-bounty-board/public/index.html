@@ -1436,18 +1436,24 @@
                         <a href="https://x.com/ericzakariasson" target="_blank" rel="noreferrer" style="color:var(--accent-green);text-decoration:none;">Eric</a> keeps tweeting things he wants built but never ships them himself. Your job is to actually build them. Here&rsquo;s what he&rsquo;s been posting:
                     </div>
                     <div class="eric-tweets">
-                        <div class="eric-tweet-link" onclick="openTweetModal('eric-tweet-1.png')">
+                        <div class="eric-tweet-link" onclick="openTweetModal('eric-tweet-1.png', 'https://x.com/ericzakariasson')">
                             <img src="eric-tweet-1.png" alt="Eric tweet" class="eric-tweet-img">
                         </div>
-                        <div class="eric-tweet-link" onclick="openTweetModal('eric-tweet-2.png')">
+                        <div class="eric-tweet-link" onclick="openTweetModal('eric-tweet-2.png', 'https://x.com/ericzakariasson')">
                             <img src="eric-tweet-2.png" alt="Eric tweet" class="eric-tweet-img">
+                        </div>
+                        <div class="eric-tweet-link" onclick="openTweetModal('eric-tweet-3.png', 'https://x.com/ericzakariasson/status/1978177556424917152')">
+                            <img src="eric-tweet-3.png" alt="Eric tweet" class="eric-tweet-img">
+                        </div>
+                        <div class="eric-tweet-link" onclick="openTweetModal('eric-tweet-4.png', 'https://x.com/ericzakariasson/status/1962573776501252145')">
+                            <img src="eric-tweet-4.png" alt="Eric tweet" class="eric-tweet-img">
                         </div>
                     </div>
 
                     <div class="tweet-modal" id="tweet-modal" onclick="if(event.target===this)closeTweetModal()">
                         <div class="tweet-modal-content">
                             <img id="tweet-modal-img" src="" alt="Tweet" class="tweet-modal-img">
-                            <a href="https://x.com/ericzakariasson" target="_blank" rel="noreferrer" class="tweet-modal-x-btn">VIEW ON X &rarr;</a>
+                            <a id="tweet-modal-x-link" href="https://x.com/ericzakariasson" target="_blank" rel="noreferrer" class="tweet-modal-x-btn">VIEW ON X &rarr;</a>
                         </div>
                     </div>
                 </div>
@@ -1578,8 +1584,9 @@
             }
         });
 
-        function openTweetModal(src) {
+        function openTweetModal(src, xUrl) {
             document.getElementById('tweet-modal-img').src = src;
+            document.getElementById('tweet-modal-x-link').href = xUrl || 'https://x.com/ericzakariasson';
             document.getElementById('tweet-modal').classList.add('is-open');
         }
         function closeTweetModal() {
