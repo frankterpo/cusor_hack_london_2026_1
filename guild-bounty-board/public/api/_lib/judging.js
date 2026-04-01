@@ -1,8 +1,33 @@
-const fs = require("fs");
-const path = require("path");
-
-const CONFIG_PATH = path.join(process.cwd(), "judge-config.json");
-const JUDGE_CONFIG = JSON.parse(fs.readFileSync(CONFIG_PATH, "utf8"));
+const JUDGE_CONFIG = {
+  "event_name": "Build Eric's Software Factory",
+  "main_tracks": [
+    { "id": "Always-On-Agents", "name": "Always-On Agents", "description": "Webhook and schedule driven agents that stay useful after the demo.", "label": "LIVE TRIGGERS + ALWAYS-ON ACTIONS" },
+    { "id": "Review-QA", "name": "Review + QA", "description": "Reliability systems, verifiers, incident responders, and evidence-driven debugging.", "label": "CHECKPOINTS + QUALITY GATES" },
+    { "id": "Agent-Runtime-Tools", "name": "Agent Runtime Tools", "description": "Skills, MCP tools, model routing, and decision systems that make agents more capable.", "label": "SKILLS + TOOLS + DECISION LAYERS" },
+    { "id": "Software-Factory", "name": "Software Factory", "description": "Systems that continuously build, test, coordinate, and improve codebases.", "label": "PIPELINES + FLEETS + CONTINUOUS IMPROVEMENT" }
+  ],
+  "rubric": {
+    "core_max_points": 100,
+    "side_bonus_cap": 30,
+    "criteria": [
+      { "id": "concrete_workflow_value", "name": "Concrete Workflow Value", "points": 30 },
+      { "id": "track_fit", "name": "Track Fit", "points": 25 },
+      { "id": "reliability_and_verification", "name": "Reliability And Verification", "points": 20 },
+      { "id": "technical_execution", "name": "Technical Execution", "points": 15 },
+      { "id": "demo_clarity", "name": "Demo Clarity", "points": 10 }
+    ]
+  },
+  "judge_bonus_bucket": { "name": "Judge Bonus Bucket", "max_points": 30 },
+  "side_quests": [
+    { "id": "best_cursor_native_workflow", "name": "Best Cursor-Native Workflow" },
+    { "id": "best_developer_tool", "name": "Best Developer Tool" },
+    { "id": "best_reliability_system", "name": "Best Reliability System" },
+    { "id": "most_technically_ambitious", "name": "Most Technically Ambitious" },
+    { "id": "best_demo", "name": "Best Demo" },
+    { "id": "best_use_of_ai_safety", "name": "Best Use of AI Safety" },
+    { "id": "best_use_of_open_claw", "name": "Best Use of Open Claw" }
+  ]
+};
 
 function clampInteger(value, minimum, maximum) {
   const parsed = Number.parseInt(String(value ?? "0"), 10);
