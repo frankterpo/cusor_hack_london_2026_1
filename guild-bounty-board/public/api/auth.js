@@ -13,7 +13,12 @@ module.exports = async (req, res) => {
     }
 
     if (req.method === "POST") {
-      const body = parseRequestBody(req) || {};
+      let body = {};
+      try {
+        body = parseRequestBody(req) || {};
+      } catch (_) {
+        return sendJson(res, 400, { ok: false, error: "Invalid JSON" });
+      }
       const password = String(body.password || "").trim();
 
       if (!password) {
