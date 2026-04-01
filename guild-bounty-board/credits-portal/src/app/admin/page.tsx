@@ -2,31 +2,21 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 
-/**
- * Admin login page with simple password authentication.
- * Uses environment variable ADMIN_PASSWORD for validation.
- */
 export default function AdminPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  // Check if already authenticated on mount
   useEffect(() => {
     const isAuthenticated = localStorage.getItem('admin_authenticated') === 'true';
     if (isAuthenticated) {
-      // Check if user has selected a project
       const selectedProject = localStorage.getItem('admin_selected_project');
       if (selectedProject) {
-        router.push('/admin/dashboard');
+        router.push('/credits/admin/dashboard');
       } else {
-        router.push('/admin/projects');
+        router.push('/credits/admin/projects');
       }
     }
   }, [router]);
@@ -37,8 +27,7 @@ export default function AdminPage() {
     setError('');
 
     try {
-      // Call API route to verify password
-      const response = await fetch('/api/admin/auth', {
+      const response = await fetch('/credits/api/admin/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password })
@@ -48,7 +37,7 @@ export default function AdminPage() {
 
       if (result.success) {
         localStorage.setItem('admin_authenticated', 'true');
-        router.push('/admin/projects');
+        router.push('/credits/admin/projects');
       } else {
         setError('Invalid password');
       }
@@ -60,45 +49,70 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Admin Access</CardTitle>
-          <CardDescription>
-            Enter the admin password to access the dashboard
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter admin password"
-                required
-                autoFocus
-              />
+    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: '#0b0b0b' }}>
+      <div className="w-full max-w-md p-8" style={{
+        border: '3px solid #3dffa3',
+        background: '#111',
+        boxShadow: '4px 4px 0 rgba(61, 255, 163, 0.15)',
+      }}>
+        <h2 className="text-lg mb-2 text-center" style={{ color: '#3dffa3', lineHeight: '1.6' }}>
+          ADMIN ACCESS
+        </h2>
+        <p className="text-center mb-6" style={{ color: '#888', fontFamily: "'VT323', monospace", fontSize: '1.15rem' }}>
+          Enter the admin password to access the dashboard
+        </p>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="password" className="block mb-2 text-xs" style={{ color: '#3dffa3', fontFamily: "'Press Start 2P', monospace" }}>
+              PASSWORD
+            </label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter admin password"
+              required
+              autoFocus
+              className="w-full px-4 py-3"
+              style={{
+                background: '#0b0b0b',
+                border: '2px solid #333',
+                color: '#e0e0e0',
+                fontFamily: "'VT323', monospace",
+                fontSize: '1.15rem',
+              }}
+            />
+          </div>
+
+          {error && (
+            <div className="p-3 text-center" style={{
+              background: 'rgba(255, 68, 68, 0.1)',
+              border: '2px solid #ff4444',
+              color: '#ff4444',
+              fontFamily: "'VT323', monospace",
+              fontSize: '1.1rem',
+            }}>
+              {error}
             </div>
-            
-            {error && (
-              <div className="text-sm text-red-600 bg-red-50 p-3 rounded">
-                {error}
-              </div>
-            )}
-            
-            <Button 
-              type="submit" 
-              className="w-full"
-              disabled={isLoading || !password.trim()}
-            >
-              {isLoading ? 'Authenticating...' : 'Access Dashboard'}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+          )}
+
+          <button
+            type="submit"
+            disabled={isLoading || !password.trim()}
+            className="w-full py-3 px-6 text-sm transition-all duration-200 hover:opacity-85 disabled:opacity-50"
+            style={{
+              background: 'linear-gradient(180deg, #3dffa3 0%, #1db86e 100%)',
+              color: '#0b0b0b',
+              fontFamily: "'Press Start 2P', monospace",
+              border: '3px solid #1a9957',
+              boxShadow: '4px 4px 0 rgba(0, 0, 0, 0.45)',
+            }}
+          >
+            {isLoading ? 'AUTHENTICATING...' : 'ACCESS DASHBOARD'}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

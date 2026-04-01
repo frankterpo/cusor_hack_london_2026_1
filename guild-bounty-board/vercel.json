@@ -1,8 +1,2 @@
 {
-  "rewrites": [
-    {
-      "source": "/credits/:path*",
-      "destination": "https://CREDITS_PORTAL_URL.vercel.app/credits/:path*"
-    }
-  ]
 }

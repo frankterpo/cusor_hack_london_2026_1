@@ -4,10 +4,6 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { RedemptionForm } from '@/features/attendees/components/RedemptionForm';
 
-/**
- * Project-specific redemption page
- * URL: /event/{project-slug}/redeem
- */
 export default function ProjectRedeemPage() {
   const params = useParams();
   const slug = params.slug as string;
@@ -21,11 +17,10 @@ export default function ProjectRedeemPage() {
 
   const fetchProjectBySlug = async () => {
     try {
-      const response = await fetch(`/api/public/projects/${slug}`);
+      const response = await fetch(`/credits/api/public/projects/${slug}`);
       if (!response.ok) {
         throw new Error('Project not found');
       }
-      
       const result = await response.json();
       setProject(result.data);
       setError('');
@@ -39,13 +34,11 @@ export default function ProjectRedeemPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+      <div className="min-h-screen" style={{ background: '#0b0b0b' }}>
         <div className="container mx-auto px-4 py-16">
-          <div className="max-w-md mx-auto">
-            <div className="text-center mb-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-              <p className="mt-2 text-sm text-gray-600">Loading event...</p>
-            </div>
+          <div className="max-w-md mx-auto text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto" style={{ borderColor: '#3dffa3' }}></div>
+            <p className="mt-4" style={{ color: '#888', fontFamily: "'VT323', monospace", fontSize: '1.15rem' }}>Loading event...</p>
           </div>
         </div>
       </div>
@@ -54,18 +47,16 @@ export default function ProjectRedeemPage() {
 
   if (error || !project) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+      <div className="min-h-screen" style={{ background: '#0b0b0b' }}>
         <div className="container mx-auto px-4 py-16">
-          <div className="max-w-md mx-auto">
-            <div className="text-center">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Event Not Found</h1>
-              <p className="text-gray-600 dark:text-gray-300 mb-4">
-                {error || 'The event you\'re looking for is not available for code redemption.'}
-              </p>
-              <a href="/" className="text-blue-600 hover:text-blue-800 underline">
-                Return to Home
-              </a>
-            </div>
+          <div className="max-w-md mx-auto text-center">
+            <h1 className="text-xl mb-3" style={{ color: '#ff4444', lineHeight: '1.6' }}>EVENT NOT FOUND</h1>
+            <p className="mb-6" style={{ color: '#d3d3d3', fontFamily: "'VT323', monospace", fontSize: '1.15rem' }}>
+              {error || 'The event you\'re looking for is not available for code redemption.'}
+            </p>
+            <a href="/credits" className="text-xs hover:underline" style={{ color: '#3dffa3', fontFamily: "'Press Start 2P', monospace" }}>
+              &larr; RETURN HOME
+            </a>
           </div>
         </div>
       </div>
@@ -73,17 +64,17 @@ export default function ProjectRedeemPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen" style={{ background: '#0b0b0b' }}>
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-md mx-auto">
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-              Claim Your Code
+            <h1 className="text-xl mb-3" style={{ color: '#3dffa3', lineHeight: '1.6' }}>
+              CLAIM YOUR CODE
             </h1>
-            <p className="text-gray-600 dark:text-gray-300">
+            <p style={{ color: '#d3d3d3', fontFamily: "'VT323', monospace", fontSize: '1.2rem' }}>
               {project.name}
             </p>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="mt-2" style={{ color: '#888', fontFamily: "'VT323', monospace", fontSize: '1.1rem' }}>
               Enter your details to receive your Cursor credits
             </p>
           </div>

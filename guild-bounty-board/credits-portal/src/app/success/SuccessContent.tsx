@@ -1,60 +1,60 @@
-/**
- * Success page content component with single CTA focus
- * 
- * Simplified to have one core action: claim credits via direct URL click.
- */
-
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { CheckCircle, ExternalLink } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 
 export function SuccessContent() {
   const searchParams = useSearchParams();
-  
-  // Get data from URL params
   const cursorUrl = searchParams.get('cursorUrl') || 'https://cursor.com/referral?code=SAMPLE-CODE';
   const name = searchParams.get('name') || 'Attendee';
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen" style={{ background: '#0b0b0b' }}>
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-lg mx-auto">
-          {/* Success Header */}
           <div className="text-center mb-8">
-            <div className="mx-auto w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-6">
-              <CheckCircle className="w-10 h-10 text-green-600 dark:text-green-400" />
+            <div className="mx-auto w-20 h-20 flex items-center justify-center mb-6" style={{
+              border: '3px solid #3dffa3',
+              borderRadius: '50%',
+              background: 'rgba(61, 255, 163, 0.1)',
+            }}>
+              <span style={{ color: '#3dffa3', fontSize: '2.5rem' }}>+</span>
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3">
-              🎉 Success, {name}!
+            <h1 className="text-xl mb-3" style={{ color: '#3dffa3', lineHeight: '1.6' }}>
+              SUCCESS, {name.toUpperCase()}!
             </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-300">
+            <p style={{ color: '#d3d3d3', fontFamily: "'VT323', monospace", fontSize: '1.3rem' }}>
               Your Cursor credits are ready to claim
             </p>
           </div>
 
-          {/* Single Core CTA */}
-          <Card className="mb-8">
-            <CardContent className="pt-10 pb-10 text-center">
-              <Button 
-                onClick={() => window.open(cursorUrl, '_blank')}
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-8 text-2xl rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
-              >
-                <ExternalLink className="w-8 h-8 mr-4" />
-                Claim Your Credits Now
-              </Button>
-              
-              <p className="text-gray-500 dark:text-gray-400 text-sm mt-6">
-                Click above to open Cursor and automatically apply your credits
-              </p>
-            </CardContent>
-          </Card>
+          <div className="mb-8 p-8 text-center" style={{
+            border: '3px solid #3dffa3',
+            background: '#111',
+            boxShadow: '4px 4px 0 rgba(61, 255, 163, 0.15)',
+          }}>
+            <button
+              onClick={() => window.open(cursorUrl, '_blank')}
+              className="w-full py-5 px-6 text-sm transition-all duration-200 hover:opacity-85 flex items-center justify-center gap-3"
+              style={{
+                background: 'linear-gradient(180deg, #3dffa3 0%, #1db86e 100%)',
+                color: '#0b0b0b',
+                fontFamily: "'Press Start 2P', monospace",
+                border: '3px solid #1a9957',
+                boxShadow: '4px 4px 0 rgba(0, 0, 0, 0.45)',
+              }}
+            >
+              <ExternalLink className="w-5 h-5" />
+              CLAIM YOUR CREDITS NOW
+            </button>
 
-          {/* Simple Help */}
+            <p className="mt-6" style={{ color: '#888', fontFamily: "'VT323', monospace", fontSize: '1.1rem' }}>
+              Click above to open Cursor and automatically apply your credits
+            </p>
+          </div>
+
           <div className="text-center">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p style={{ color: '#666', fontFamily: "'VT323', monospace", fontSize: '1rem' }}>
               Need help? Contact the event organizers
             </p>
           </div>
