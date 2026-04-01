@@ -56,7 +56,7 @@ export default function AdminProjects() {
   const loadProjects = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/admin/projects');
+      const response = await fetch('/credits/api/admin/projects');
       const result = await response.json();
 
       if (result.success) {
@@ -107,7 +107,7 @@ export default function AdminProjects() {
     setError('');
 
     try {
-      const response = await fetch('/api/admin/projects', {
+      const response = await fetch('/credits/api/admin/projects', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -162,7 +162,7 @@ export default function AdminProjects() {
     setError('');
 
     try {
-      const response = await fetch(`/api/admin/projects/${deleteConfirmation.projectId}`, {
+      const response = await fetch(`/credits/api/admin/projects/${deleteConfirmation.projectId}`, {
         method: 'DELETE',
       });
 

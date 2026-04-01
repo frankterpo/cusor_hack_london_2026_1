@@ -40,7 +40,7 @@ export default function AdminUploads() {
       formData.append('type', type);
       formData.append('projectId', selectedProject.id);
 
-      const response = await fetch('/api/admin/upload', {
+      const response = await fetch('/credits/api/admin/upload', {
         method: 'POST',
         body: formData
       });

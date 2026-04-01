@@ -63,7 +63,7 @@ export default function AdminAttendees() {
       }
 
       const selectedProject = JSON.parse(selectedProjectData);
-      const response = await fetch(`/api/admin/attendees?projectId=${selectedProject.id}`);
+      const response = await fetch(`/credits/api/admin/attendees?projectId=${selectedProject.id}`);
       if (!response.ok) throw new Error('Failed to fetch attendees');
       
       const data = await response.json();

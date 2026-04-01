@@ -26,7 +26,7 @@ export function useAttendees(projectId?: string) {
   const fetchAttendees = async () => {
     try {
       setIsLoading(true);
-      const url = projectId ? `/api/attendees?projectId=${projectId}` : '/api/attendees';
+      const url = projectId ? `/credits/api/attendees?projectId=${projectId}` : '/credits/api/attendees';
       const response = await fetch(url);
       
       if (!response.ok) {
