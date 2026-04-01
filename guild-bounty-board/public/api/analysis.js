@@ -3,12 +3,18 @@ const {
   sendJson,
   normalizeRepoUrl,
 } = require("./_lib/storage");
+const { verifyAuth } = require("./_lib/auth");
 
 const OBJECT_PATH = "analysis.json";
 
 module.exports = async (req, res) => {
   if (req.method === "OPTIONS") {
     return sendJson(res, 200, { ok: true });
+  }
+
+  const auth = verifyAuth(req);
+  if (!auth.valid) {
+    return sendJson(res, 401, { error: "Unauthorized" });
   }
 
   if (req.method !== "GET") {

@@ -2,7 +2,7 @@ let judgeConfig = null;
 let submissions = [];
 
 async function fetchJson(url) {
-  const response = await fetch(url, { cache: "no-store" });
+  const response = await fetch(url, { cache: "no-store", credentials: "same-origin" });
   if (!response.ok) {
     throw new Error(`Failed to fetch ${url}: ${response.status}`);
   }
@@ -157,6 +157,7 @@ async function submitJudgeScore() {
 
   const response = await fetch("/api/judges", {
     method: "POST",
+    credentials: "same-origin",
     headers: {
       "Content-Type": "application/json",
     },

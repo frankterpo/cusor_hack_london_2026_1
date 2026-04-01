@@ -607,6 +607,7 @@
             padding: 10px 14px 10px 10px;
             box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.45);
             min-height: 56px;
+            position: relative;
         }
 
         .coin-icon {
@@ -621,6 +622,18 @@
             font-size: 0.55rem;
             color: #6c4300;
             flex-shrink: 0;
+        }
+
+        .coin-sponsor-logo {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            object-fit: contain;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 2px;
         }
 
         .coin-copy {
@@ -1026,6 +1039,7 @@
                                 <span class="coin-value">judge bonus bucket</span>
                                 <span style="font-family:'VT323',monospace;font-size:1rem;line-height:1.1;">${esc(challenge.description)}</span>
                             </span>
+                            ${challenge.sponsor_logo ? `<img class="coin-sponsor-logo" src="${esc(challenge.sponsor_logo)}" alt="sponsor" onerror="this.style.display='none'">` : ''}
                         </div>
                     `).join('')}
                 </div>

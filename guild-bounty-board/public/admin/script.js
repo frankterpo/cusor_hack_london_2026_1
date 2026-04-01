@@ -5,13 +5,13 @@ let submissionMap = new Map();
 let analysisSettings = null;
 
 async function fetchJSONMaybe(url) {
-  const res = await fetch(url, { cache: "no-store" });
+  const res = await fetch(url, { cache: "no-store", credentials: "same-origin" });
   if (!res.ok) return null;
   return res.json();
 }
 
 async function fetchTextMaybe(url) {
-  const res = await fetch(url, { cache: "no-store" });
+  const res = await fetch(url, { cache: "no-store", credentials: "same-origin" });
   if (!res.ok) return null;
   return res.text();
 }
@@ -438,6 +438,7 @@ async function saveAnalysisSettings(event) {
 
   const response = await fetch("/api/settings", {
     method: "POST",
+    credentials: "same-origin",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
@@ -455,6 +456,7 @@ async function reanalyzeTrackedSubmissions() {
   setSettingsStatus("Reanalyzing tracked submissions...");
   const response = await fetch("/api/reanalyze", {
     method: "POST",
+    credentials: "same-origin",
     headers: { "Content-Type": "application/json" },
   });
   const payload = await response.json();

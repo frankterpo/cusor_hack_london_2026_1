@@ -81,6 +81,14 @@
     {
       "id": "best_demo",
       "name": "Best Demo"
+    },
+    {
+      "id": "best_use_of_ai_safety",
+      "name": "Best Use of AI Safety"
+    },
+    {
+      "id": "best_use_of_open_claw",
+      "name": "Best Use of Open Claw"
     }
   ]
 }

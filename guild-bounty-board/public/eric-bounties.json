@@ -60,6 +60,20 @@
         "name": "Best Demo",
         "bonus_points": 30,
         "description": "Judges can award part or all of the shared bonus pool here when the presentation quality is a standout."
+      },
+      {
+        "id": "Best-Use-of-AI-Safety",
+        "name": "Best Use of AI Safety",
+        "bonus_points": 30,
+        "description": "Judges can award part or all of the shared bonus pool here for projects that demonstrate responsible and safe AI practices.",
+        "sponsor_logo": "https://cdn-avatars.huggingface.co/v1/production/uploads/63b70085b004c84aac8d1ed8/qPB6g011-qpzt1xb9wGNQ.png"
+      },
+      {
+        "id": "Best-Use-of-Open-Claw",
+        "name": "Best Use of Open Claw",
+        "bonus_points": 30,
+        "description": "Judges can award part or all of the shared bonus pool here for projects that make excellent use of Open Claw.",
+        "sponsor_logo": "https://mintcdn.com/clawdhub/-t5HSeZ3Y_0_wH4i/assets/openclaw-logo-text-dark.png?fit=max&auto=format&n=-t5HSeZ3Y_0_wH4i&q=85&s=61797dcb0c37d6e9279b8c5ad2e850e4"
       }
     ],
     "rubric": {

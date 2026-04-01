@@ -10,12 +10,18 @@ const {
   normalizeJudgeResponse,
   aggregateJudgeResponses,
 } = require("./_lib/judging");
+const { verifyAuth } = require("./_lib/auth");
 
 const OBJECT_PATH = "judges.json";
 
 module.exports = async (req, res) => {
   if (req.method === "OPTIONS") {
     return sendJson(res, 200, { ok: true });
+  }
+
+  const auth = verifyAuth(req);
+  if (!auth.valid) {
+    return sendJson(res, 401, { error: "Unauthorized" });
   }
 
   try {

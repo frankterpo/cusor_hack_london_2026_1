@@ -112,6 +112,8 @@ def build_bonus_column_map(event_format: dict) -> Dict[str, str]:
         "best_reliability_system": "Best Reliability System Bonus (0-30)",
         "most_technically_ambitious": "Most Technically Ambitious Bonus (0-30)",
         "best_demo": "Best Demo Bonus (0-30)",
+        "best_use_of_ai_safety": "Best Use of AI Safety Bonus (0-30)",
+        "best_use_of_open_claw": "Best Use of Open Claw Bonus (0-30)",
     }
 
 

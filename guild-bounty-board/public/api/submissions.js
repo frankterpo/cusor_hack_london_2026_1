@@ -13,6 +13,8 @@ const {
   generateAiSummary,
 } = require("./_lib/ai-analysis");
 
+const { verifyAuth } = require("./_lib/auth");
+
 const OBJECT_PATH = "submissions.json";
 const ANALYSIS_OBJECT_PATH = "analysis.json";
 const TEMPLATE_REPO_KEY = "https://github.com/example/example-project";
@@ -51,6 +53,10 @@ module.exports = async (req, res) => {
     const current = await readJsonObject(OBJECT_PATH, { submissions: [] });
 
     if (req.method === "GET") {
+      const auth = verifyAuth(req);
+      if (!auth.valid) {
+        return sendJson(res, 401, { error: "Unauthorized" });
+      }
       return sendJson(res, 200, current);
     }
 

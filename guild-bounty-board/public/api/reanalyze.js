@@ -14,12 +14,19 @@ const {
   generateAiSummary,
 } = require("./_lib/ai-analysis");
 
+const { verifyAuth } = require("./_lib/auth");
+
 const SUBMISSIONS_OBJECT_PATH = "submissions.json";
 const ANALYSIS_OBJECT_PATH = "analysis.json";
 
 module.exports = async (req, res) => {
   if (req.method === "OPTIONS") {
     return sendJson(res, 200, { ok: true });
+  }
+
+  const auth = verifyAuth(req);
+  if (!auth.valid) {
+    return sendJson(res, 401, { error: "Unauthorized" });
   }
 
   if (req.method !== "POST") {

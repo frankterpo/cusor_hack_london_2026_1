@@ -7,10 +7,16 @@ const {
   getAnalysisSettings,
   saveAnalysisSettings,
 } = require("./_lib/analysis-settings");
+const { verifyAuth } = require("./_lib/auth");
 
 module.exports = async (req, res) => {
   if (req.method === "OPTIONS") {
     return sendJson(res, 200, { ok: true });
+  }
+
+  const auth = verifyAuth(req);
+  if (!auth.valid) {
+    return sendJson(res, 401, { error: "Unauthorized" });
   }
 
   try {

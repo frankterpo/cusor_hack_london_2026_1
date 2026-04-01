@@ -5,156 +5,115 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cursor Guild Admin</title>
   <link rel="stylesheet" href="/admin/style.css">
+  <style>
+    .auth-gate {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 60vh;
+      gap: 16px;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+    .auth-gate h2 {
+      font-size: 1.4rem;
+      color: #e0e0e0;
+    }
+    .auth-gate input {
+      padding: 10px 14px;
+      font-size: 1rem;
+      border: 2px solid #444;
+      border-radius: 6px;
+      background: #1a1a1a;
+      color: #e0e0e0;
+      width: 260px;
+    }
+    .auth-gate button {
+      padding: 10px 28px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 6px;
+      background: #3dffa3;
+      color: #0b0b0b;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .auth-gate button:hover { opacity: 0.85; }
+    .auth-error { color: #ff4444; font-size: 0.9rem; display: none; }
+  </style>
 </head>
 <body>
-  <header>
-    <div class="logo-block">
-      <div class="logo">Cursor Guild Admin</div>
-      <div class="meta">Submissions, judging, and repo analysis</div>
-    </div>
-    <div class="header-links">
-      <a class="board-link" href="/">Hack Board</a>
-      <a class="board-link" href="/judge">Judge Portal</a>
-    </div>
-  </header>
+  <div id="login-gate" class="auth-gate">
+    <h2>Admin Panel - Enter Password</h2>
+    <form id="auth-form" style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+      <input type="password" id="password-input" placeholder="Password" required autocomplete="current-password">
+      <button type="submit">Enter</button>
+      <p id="auth-error" class="auth-error"></p>
+    </form>
+  </div>
+  <div id="app" style="display:none;"></div>
+  <script>
+    (async function() {
+      const gate = document.getElementById('login-gate');
+      const app = document.getElementById('app');
+      const form = document.getElementById('auth-form');
+      const errorEl = document.getElementById('auth-error');
 
-  <main>
-    <section class="panel full-width">
-      <div class="panel-header">
-        <h2>Hackathon Manager</h2>
-        <div class="stats-inline">
-          <span class="stat-pill"><span id="stat-total">0</span> Submissions</span>
-          <span class="stat-pill"><span id="stat-tracked">0</span> Tracked</span>
-          <span class="stat-pill"><span id="stat-analyzed">0</span> Analyzed</span>
-          <span class="stat-pill flagged"><span id="stat-flagged">0</span> Flagged</span>
-          <span class="stat-pill clean"><span id="stat-clean">0</span> Clean</span>
-          <span class="stat-pill"><span id="stat-commits">0</span> Commits</span>
-        </div>
-      </div>
-      <div class="settings-strip">
-        <div class="settings-copy">
-          <div class="settings-title">Analysis Settings</div>
-          <div class="settings-note">Persist the live hackathon timing and flag thresholds in Supabase so future submissions and batch reanalysis use the same rules.</div>
-        </div>
-        <form id="analysis-settings-form" class="settings-form">
-          <label class="settings-field">
-            <span>T0 Start</span>
-            <input id="settings-event-t0" type="datetime-local" required>
-          </label>
-          <label class="settings-field">
-            <span>T1 End</span>
-            <input id="settings-event-t1" type="datetime-local" required>
-          </label>
-          <label class="settings-field">
-            <span>Bulk LOC Threshold</span>
-            <input id="settings-bulk-insertions" type="number" min="1" required>
-          </label>
-          <label class="settings-field">
-            <span>Bulk Files Threshold</span>
-            <input id="settings-bulk-files" type="number" min="1" required>
-          </label>
-          <label class="settings-field">
-            <span>Max Commits</span>
-            <input id="settings-max-commits" type="number" min="1" required>
-          </label>
-          <div class="settings-actions">
-            <button id="save-analysis-settings" class="settings-button" type="submit">Save Settings</button>
-            <button id="reanalyze-submissions" class="settings-button settings-button--secondary" type="button">Reanalyze Tracked Submissions</button>
-          </div>
-        </form>
-        <div id="analysis-settings-status" class="settings-status"></div>
-      </div>
-      <div class="toolbar">
-        <label><input type="checkbox" id="filter-preT0"> Pre-T0</label>
-        <label><input type="checkbox" id="filter-bulk"> Bulk</label>
-        <label><input type="checkbox" id="filter-merge"> Merge</label>
-        <select id="sort-select">
-          <option value="default">Default</option>
-          <option value="judge">Judge Total</option>
-          <option value="commits">Commits</option>
-        </select>
-      </div>
-      <div class="table-wrapper">
-        <table id="summary-table">
-          <thead>
-            <tr>
-              <th class="th-repo">Submission</th>
-              <th class="th-track">Track</th>
-              <th class="th-status">Status</th>
-              <th class="th-judge">Judge Total</th>
-              <th class="th-num">Commits</th>
-              <th class="th-num">LOC+</th>
-              <th class="th-num">LOC-</th>
-              <th class="th-flag">Pre-T0</th>
-              <th class="th-flag">Bulk</th>
-              <th class="th-flag">Init</th>
-              <th class="th-flag">Merge</th>
-              <th class="th-ai">AI Summary</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </section>
+      async function checkAuth() {
+        try {
+          const res = await fetch('/api/auth', { credentials: 'same-origin' });
+          const data = await res.json();
+          return data.authenticated === true;
+        } catch (_) {
+          return false;
+        }
+      }
 
-    <aside id="details-drawer" class="drawer hidden">
-      <div class="drawer-header">
-        <h2 id="detail-title">Repository Details</h2>
-        <button id="close-drawer" class="close-btn" aria-label="Close">&times;</button>
-      </div>
-      <div class="drawer-content">
-        <div class="section">
-          <h3>Submission</h3>
-          <div id="submission-output" class="box"></div>
-        </div>
-        <div class="section">
-          <h3>Judge Responses</h3>
-          <div id="judge-output" class="box"></div>
-        </div>
-        <div class="section">
-          <h3>AI Analysis</h3>
-          <div id="ai-output" class="box pre-wrap"></div>
-        </div>
-        <div class="metrics-grid">
-          <div class="metric-card">
-            <h4>Summary</h4>
-            <pre id="metrics-summary"></pre>
-          </div>
-          <div class="metric-card">
-            <h4>Flags</h4>
-            <pre id="metrics-flags"></pre>
-          </div>
-          <div class="metric-card">
-            <h4>Time Distribution</h4>
-            <pre id="metrics-time"></pre>
-          </div>
-        </div>
-        <div class="section">
-          <h3>Commits <span class="commit-count"></span></h3>
-          <div class="table-wrapper commits-table-wrapper">
-            <table id="commits-table">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Time</th>
-                  <th>+</th>
-                  <th>-</th>
-                  <th>Files</th>
-                  <th>Bulk</th>
-                  <th>&lt;T0</th>
-                  <th>&gt;T1</th>
-                  <th>Message</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </aside>
-    <div id="drawer-overlay" class="drawer-overlay hidden"></div>
-  </main>
+      async function loadContent() {
+        const res = await fetch('/api/page-content?page=admin', { credentials: 'same-origin' });
+        if (!res.ok) return false;
+        const data = await res.json();
+        gate.style.display = 'none';
+        app.style.display = 'block';
+        app.innerHTML = data.html;
+        if (data.scripts) {
+          for (const src of data.scripts) {
+            const s = document.createElement('script');
+            s.src = src;
+            document.body.appendChild(s);
+          }
+        }
+        return true;
+      }
 
-  <script src="/admin/script.js"></script>
+      if (await checkAuth()) {
+        await loadContent();
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        errorEl.style.display = 'none';
+        const pw = document.getElementById('password-input').value;
+        try {
+          const res = await fetch('/api/auth', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ password: pw })
+          });
+          const data = await res.json();
+          if (data.ok) {
+            await loadContent();
+          } else {
+            errorEl.textContent = data.error || 'Wrong password';
+            errorEl.style.display = 'block';
+          }
+        } catch (err) {
+          errorEl.textContent = 'Connection error. Please try again.';
+          errorEl.style.display = 'block';
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
