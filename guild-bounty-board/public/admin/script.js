@@ -270,8 +270,7 @@ async function renderSummaryTable(rows) {
     const repoId = row.repo_id || row.submission_id;
     const displayName = submission?.project_name || row.project_name || repoId;
     const teamName = submission?.team_name || row.team_name || "";
-    const liveAnalysis = await fetchJSONMaybe(`/api/analysis?repo_url=${encodeURIComponent(row?.repo || submission?.repo_url || "")}`);
-    const aiText = submission?.ai_text || row.ai_text || liveAnalysis?.analysis?.ai_text || await fetchTextMaybe(`${DATA_BASE}/ai/${repoId}.txt`);
+    const aiText = submission?.ai_text || row.ai_text || "";
 
     const tr = document.createElement("tr");
     tr.innerHTML = `
