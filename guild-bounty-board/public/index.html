@@ -714,34 +714,27 @@
 
         .partner-notice {
             display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            border: 2px solid var(--accent-green);
-            background: rgba(61, 255, 163, 0.06);
-            padding: 10px 12px;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: 1px dashed var(--accent-green);
+            background: rgba(61, 255, 163, 0.04);
+            padding: 8px 14px;
             font-family: 'VT323', monospace;
-            font-size: 1.05rem;
-            line-height: 1.3;
+            font-size: 1rem;
+            line-height: 1.2;
             color: var(--accent-green);
+            text-align: center;
         }
 
         .partner-notice--gold {
             border-color: var(--gold);
-            background: rgba(241, 196, 15, 0.06);
+            background: rgba(241, 196, 15, 0.04);
             color: var(--gold);
         }
 
         .notice-icon {
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            border: 2px solid currentColor;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.45rem;
-            flex-shrink: 0;
-            margin-top: 2px;
+            display: none;
         }
 
         .partner-link {
