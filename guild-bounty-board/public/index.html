@@ -854,8 +854,8 @@
             justify-content: center;
             font-size: 24px;
             opacity: 0.04;
-            transition: none;
             will-change: transform;
+            transform-origin: bottom center;
         }
 
         .page-shell, .modal-shell {
@@ -1368,25 +1368,30 @@
                 spans.push(s);
             }
 
-            let lastScroll = 0;
+            function updatePinch() {
+                const scrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
+                const maxRotation = 30;
+                for (let i = 0; i < spans.length; i++) {
+                    const row = Math.floor(i / cols);
+                    const col = i % cols;
+                    const phase = (row * 3 + col * 7) * 0.5;
+                    const angle = Math.sin((scrollY * 0.015) + phase) * maxRotation;
+                    spans[i].style.transform = 'rotate(' + angle + 'deg)';
+                }
+            }
             let ticking = false;
-            window.addEventListener('scroll', () => {
+            function onScroll() {
                 if (!ticking) {
                     ticking = true;
                     requestAnimationFrame(() => {
-                        const scrollY = window.scrollY;
-                        const maxRotation = 20;
-                        for (let i = 0; i < spans.length; i++) {
-                            const row = Math.floor(i / cols);
-                            const col = i % cols;
-                            const offset = (row + col) * 12;
-                            const angle = Math.sin((scrollY + offset) * 0.008) * maxRotation;
-                            spans[i].style.transform = `rotate(${angle}deg)`;
-                        }
+                        updatePinch();
                         ticking = false;
                     });
                 }
-            });
+            }
+            window.addEventListener('scroll', onScroll, { passive: true });
+            document.addEventListener('scroll', onScroll, { passive: true });
+            updatePinch();
         })();
     </script>
 </body>
