@@ -837,14 +837,25 @@
         }
 
         /* 8-bit pinched fingers wallpaper */
-        body::after {
-            content: "";
+        .pinch-grid {
             position: fixed;
             inset: 0;
             pointer-events: none;
             z-index: 0;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-size='24' opacity='0.04' style='image-rendering:pixelated'%3E%F0%9F%A4%8C%3C/text%3E%3C/svg%3E");
-            background-size: 80px 80px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, 80px);
+            grid-auto-rows: 80px;
+            overflow: hidden;
+        }
+
+        .pinch-grid span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            opacity: 0.04;
+            transition: none;
+            will-change: transform;
         }
 
         .page-shell, .modal-shell {
@@ -943,6 +954,7 @@
 </head>
 
 <body>
+    <div class="pinch-grid" id="pinch-grid"></div>
     <div class="header">
         <div class="logo-row">
             <img src="cursor-cube.png" class="logo-cube" alt="Cursor Cube">
@@ -1341,6 +1353,41 @@
         });
 
         loadBounties();
+
+        // Pinch fingers grid + scroll animation
+        (function() {
+            const grid = document.getElementById('pinch-grid');
+            const cols = Math.ceil(window.innerWidth / 80);
+            const rows = Math.ceil(window.innerHeight / 80);
+            const total = cols * rows;
+            const spans = [];
+            for (let i = 0; i < total; i++) {
+                const s = document.createElement('span');
+                s.textContent = '\u{1F90C}';
+                grid.appendChild(s);
+                spans.push(s);
+            }
+
+            let lastScroll = 0;
+            let ticking = false;
+            window.addEventListener('scroll', () => {
+                if (!ticking) {
+                    ticking = true;
+                    requestAnimationFrame(() => {
+                        const scrollY = window.scrollY;
+                        const maxRotation = 20;
+                        for (let i = 0; i < spans.length; i++) {
+                            const row = Math.floor(i / cols);
+                            const col = i % cols;
+                            const offset = (row + col) * 12;
+                            const angle = Math.sin((scrollY + offset) * 0.008) * maxRotation;
+                            spans[i].style.transform = `rotate(${angle}deg)`;
+                        }
+                        ticking = false;
+                    });
+                }
+            });
+        })();
     </script>
 </body>
 
