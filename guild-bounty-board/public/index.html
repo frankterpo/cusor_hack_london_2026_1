@@ -763,6 +763,69 @@
             color: #0b0b0b;
         }
 
+        /* Eric section */
+        .eric-section {
+            margin-top: 24px;
+            border-top: 2px solid #222;
+            padding-top: 20px;
+        }
+
+        .eric-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .eric-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            font-size: 0.55rem;
+            color: #0b0b0b;
+            background: var(--accent-green);
+            letter-spacing: 2px;
+            box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.4);
+        }
+
+        .eric-subtitle {
+            font-family: 'VT323', monospace;
+            font-size: 1.2rem;
+            color: #999;
+            font-style: italic;
+        }
+
+        .eric-desc {
+            font-family: 'VT323', monospace;
+            font-size: 1.1rem;
+            line-height: 1.4;
+            color: #aaa;
+            margin-bottom: 18px;
+        }
+
+        .eric-tweets {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        .eric-tweet-link {
+            display: block;
+            border: 2px solid #333;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.4);
+        }
+
+        .eric-tweet-link:hover {
+            border-color: var(--accent-green);
+            box-shadow: 4px 4px 0 rgba(61, 255, 163, 0.15);
+        }
+
+        .eric-tweet-img {
+            width: 100%;
+            display: block;
+            image-rendering: auto;
+        }
+
         /* Prizes */
         .prizes-grid {
             display: grid;
@@ -1224,6 +1287,24 @@
                     Side quests are optional bonus coins layered on top of that main entry.
                     <br><br>
                     The four roads below are intentionally distinct. If a project bleeds across multiple roads, judges will score it on the road it fits best, so teams should choose their route clearly.
+                </div>
+
+                <div class="eric-section">
+                    <div class="eric-header">
+                        <span class="eric-tag">ERIC</span>
+                        <span class="eric-subtitle">The ideas that never shipped &mdash; until now.</span>
+                    </div>
+                    <div class="eric-desc">
+                        <a href="https://x.com/ericzakariasson" target="_blank" rel="noreferrer" style="color:var(--accent-green);text-decoration:none;">Eric Zakariasson</a>, Cursor&rsquo;s CEO, has been publicly sketching features, side projects, and wild ideas he never got around to building. This hackathon is your chance to make them real. Here&rsquo;s a taste of what&rsquo;s been living in his head:
+                    </div>
+                    <div class="eric-tweets">
+                        <a href="https://x.com/ericzakariasson" target="_blank" rel="noreferrer" class="eric-tweet-link">
+                            <img src="eric-tweet-1.png" alt="Eric tweet: this could have been real - cursor.com/glass" class="eric-tweet-img">
+                        </a>
+                        <a href="https://x.com/ericzakariasson" target="_blank" rel="noreferrer" class="eric-tweet-link">
+                            <img src="eric-tweet-2.png" alt="Eric tweet: should we ship this in cursor" class="eric-tweet-img">
+                        </a>
+                    </div>
                 </div>
             `;
         }
