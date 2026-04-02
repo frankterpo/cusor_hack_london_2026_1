@@ -7,6 +7,7 @@ module.exports = `
     <div class="header-links">
       <a class="board-link" href="/">Hack Board</a>
       <a class="board-link" href="/judge">Judge Portal</a>
+      <button class="board-link" id="open-demos-modal" type="button" style="cursor:pointer;background:none;border:1px solid #3dffa3;color:#3dffa3;padding:6px 12px;font-family:inherit;font-size:inherit;">DEMOS</button>
     </div>
   </header>
 
@@ -146,4 +147,14 @@ module.exports = `
     </aside>
     <div id="drawer-overlay" class="drawer-overlay hidden"></div>
   </main>
+
+  <div id="demos-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:3000;align-items:flex-start;justify-content:center;overflow-y:auto;padding:40px 20px;">
+    <div style="width:min(900px,100%);background:#101010;border:3px solid #3dffa3;box-shadow:8px 8px 0 rgba(0,0,0,0.5);padding:24px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+        <h2 style="color:#3dffa3;font-size:0.8rem;margin:0;">ALL DEMOS</h2>
+        <button id="close-demos-modal" style="background:none;border:2px solid #555;color:#ccc;padding:4px 12px;cursor:pointer;font-family:inherit;">CLOSE</button>
+      </div>
+      <div id="demos-list" style="display:flex;flex-direction:column;gap:12px;"></div>
+    </div>
+  </div>
 `;

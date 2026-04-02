@@ -483,8 +483,61 @@ function initPage() {
   });
 }
 
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initPage);
-} else {
+function openDemosModal() {
+  const modal = document.getElementById("demos-modal");
+  const list = document.getElementById("demos-list");
+  const subs = [...submissionMap.values()];
+
+  list.innerHTML = subs.map((s) => {
+    const repoKey = normalizeRepoKey(s.repo_url || "");
+    const judgeInfo = judgeMap.get(repoKey);
+    const avg = judgeInfo && judgeInfo.averages ? Number(judgeInfo.averages.grand_total || 0).toFixed(1) : "-";
+    const judgeCount = judgeInfo ? judgeInfo.responses.length : 0;
+    const judgeNames = judgeInfo ? judgeInfo.responses.map(r => escapeHtml(r.judge_name || "?")).join(", ") : "";
+    const demoUrl = s.demo_url || "";
+
+    return `<div style="border:2px solid #282828;padding:12px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:180px;">
+        <div style="color:#3dffa3;font-size:0.55rem;font-family:'Press Start 2P',monospace;margin-bottom:4px;">${escapeHtml(s.project_name || "Untitled")}</div>
+        <div style="color:#888;font-size:0.85rem;">Team ${escapeHtml(s.team_name || "?")}</div>
+      </div>
+      <div style="flex:0 0 auto;">
+        ${demoUrl ? `<a href="${escapeHtml(demoUrl)}" target="_blank" rel="noreferrer" style="color:#3dffa3;border:1px solid #3dffa3;padding:4px 10px;text-decoration:none;font-size:0.8rem;font-family:'VT323',monospace;">DEMO &rarr;</a>` : '<span style="color:#555;font-size:0.8rem;">No demo</span>'}
+      </div>
+      <div style="flex:0 0 auto;text-align:center;min-width:100px;">
+        <div style="color:#f1c40f;font-size:1.1rem;font-family:'VT323',monospace;">${avg}/130</div>
+        <div style="color:#666;font-size:0.75rem;">${judgeCount} judge${judgeCount !== 1 ? "s" : ""}</div>
+        ${judgeNames ? `<div style="color:#555;font-size:0.65rem;margin-top:2px;">${judgeNames}</div>` : ""}
+      </div>
+      <div style="flex:0 0 auto;">
+        <a href="/judge" style="color:#888;border:1px solid #444;padding:4px 10px;text-decoration:none;font-size:0.8rem;font-family:'VT323',monospace;">SCORE</a>
+      </div>
+    </div>`;
+  }).join("");
+
+  modal.style.display = "flex";
+}
+
+function closeDemosModal() {
+  document.getElementById("demos-modal").style.display = "none";
+}
+
+function initDemosModal() {
+  const openBtn = document.getElementById("open-demos-modal");
+  const closeBtn = document.getElementById("close-demos-modal");
+  const modal = document.getElementById("demos-modal");
+  if (openBtn) openBtn.addEventListener("click", openDemosModal);
+  if (closeBtn) closeBtn.addEventListener("click", closeDemosModal);
+  if (modal) modal.addEventListener("click", (e) => { if (e.target === modal) closeDemosModal(); });
+}
+
+function initPageAndDemos() {
   initPage();
+  initDemosModal();
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initPageAndDemos);
+} else {
+  initPageAndDemos();
 }
