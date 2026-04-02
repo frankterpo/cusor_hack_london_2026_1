@@ -1,11 +1,6 @@
-const {
-  readJsonObject,
-  sendJson,
-  normalizeRepoUrl,
-} = require("./_lib/storage");
+const { sendJson, normalizeRepoUrl } = require("./_lib/storage");
 const { verifyAuth } = require("./_lib/auth");
-
-const OBJECT_PATH = "analysis.json";
+const { getAnalysis } = require("./_lib/db");
 
 module.exports = async (req, res) => {
   if (req.method === "OPTIONS") {
@@ -25,15 +20,13 @@ module.exports = async (req, res) => {
     const requestUrl = new URL(req.url, "http://localhost");
     const repoUrl = requestUrl.searchParams.get("repo_url") || requestUrl.searchParams.get("repo") || "";
     const repoKey = normalizeRepoUrl(repoUrl);
+
     if (!repoKey) {
-      return sendJson(res, 400, { error: "Missing repo_url query parameter" });
+      return sendJson(res, 400, { error: "Missing repo_url parameter" });
     }
 
-    const current = await readJsonObject(OBJECT_PATH, { by_repo: {} });
-    return sendJson(res, 200, {
-      repo_key: repoKey,
-      analysis: current.by_repo?.[repoKey] || null,
-    });
+    const analysis = await getAnalysis(repoKey);
+    return sendJson(res, 200, { repo_key: repoKey, analysis: analysis || null });
   } catch (error) {
     return sendJson(res, 500, { error: error.message || "Unknown error" });
   }

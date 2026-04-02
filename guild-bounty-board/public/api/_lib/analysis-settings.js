@@ -1,9 +1,4 @@
-const {
-  readJsonObject,
-  writeJsonObject,
-} = require("./storage");
-
-const ANALYSIS_SETTINGS_OBJECT_PATH = "analysis-settings.json";
+const db = require("./db");
 
 const DEFAULT_ANALYSIS_SETTINGS = {
   event_t0: "2025-11-29T06:00:00Z",
@@ -55,18 +50,17 @@ function normalizeAnalysisSettings(input = {}) {
 }
 
 async function getAnalysisSettings() {
-  const current = await readJsonObject(ANALYSIS_SETTINGS_OBJECT_PATH, DEFAULT_ANALYSIS_SETTINGS);
+  const current = await db.getAnalysisSettings();
   return normalizeAnalysisSettings({ ...DEFAULT_ANALYSIS_SETTINGS, ...current });
 }
 
 async function saveAnalysisSettings(input) {
   const settings = normalizeAnalysisSettings(input);
-  await writeJsonObject(ANALYSIS_SETTINGS_OBJECT_PATH, settings);
+  await db.upsertAnalysisSettings(settings);
   return settings;
 }
 
 module.exports = {
-  ANALYSIS_SETTINGS_OBJECT_PATH,
   DEFAULT_ANALYSIS_SETTINGS,
   normalizeAnalysisSettings,
   getAnalysisSettings,

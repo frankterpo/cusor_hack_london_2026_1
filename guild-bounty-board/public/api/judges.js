@@ -1,6 +1,4 @@
 const {
-  readJsonObject,
-  writeJsonObject,
   parseRequestBody,
   sendJson,
   normalizeRepoUrl,
@@ -11,8 +9,7 @@ const {
   aggregateJudgeResponses,
 } = require("./_lib/judging");
 const { verifyAuth } = require("./_lib/auth");
-
-const OBJECT_PATH = "judges.json";
+const { getJudgeResponses, upsertJudgeResponse } = require("./_lib/db");
 
 module.exports = async (req, res) => {
   if (req.method === "OPTIONS") {
@@ -25,10 +22,8 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const current = await readJsonObject(OBJECT_PATH, { responses: [] });
-    const responses = Array.isArray(current.responses) ? current.responses : [];
-
     if (req.method === "GET") {
+      const responses = await getJudgeResponses();
       return sendJson(res, 200, aggregateJudgeResponses(responses));
     }
 
@@ -50,16 +45,12 @@ module.exports = async (req, res) => {
       repo_key: repoKey,
     });
 
-    const nextResponses = responses.filter((response) => {
-      return !(response.repo_key === repoKey && String(response.judge_name || "").trim().toLowerCase() === judgeName.toLowerCase());
-    });
-    nextResponses.push(normalized);
-
-    await writeJsonObject(OBJECT_PATH, { responses: nextResponses });
+    await upsertJudgeResponse(normalized);
+    const allResponses = await getJudgeResponses();
     return sendJson(res, 200, {
       ok: true,
       response: normalized,
-      ...aggregateJudgeResponses(nextResponses),
+      ...aggregateJudgeResponses(allResponses),
       rubric: JUDGE_CONFIG,
     });
   } catch (error) {
