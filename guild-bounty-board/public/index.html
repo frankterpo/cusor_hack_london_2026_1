@@ -1280,6 +1280,10 @@
                     <input class="modal-input" id="submission-demo-url" name="demo_url" type="url" placeholder="https://..." required>
                 </div>
                 <div class="modal-field modal-field--full">
+                    <label class="modal-label" for="submission-description">ONE-LINE DESCRIPTION</label>
+                    <input class="modal-input" id="submission-description" name="description" type="text" placeholder="What does your project do in one sentence?" required maxlength="200">
+                </div>
+                <div class="modal-field modal-field--full">
                     <label class="modal-label" for="submission-team-members">TEAM MEMBERS</label>
                     <input class="modal-input" id="submission-team-members" name="team_members" type="text" placeholder="Optional">
                 </div>
@@ -1371,6 +1375,7 @@
                 repo_url: String(formData.get('repo_url') || '').trim(),
                 chosen_track: String(formData.get('chosen_track') || '').trim(),
                 demo_url: String(formData.get('demo_url') || '').trim(),
+                description: String(formData.get('description') || '').trim(),
                 team_members: String(formData.get('team_members') || '').trim(),
                 notes: String(formData.get('notes') || '').trim()
             };

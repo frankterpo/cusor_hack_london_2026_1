@@ -40,6 +40,7 @@ async function upsertSubmission(row) {
     project_name: row.project_name || "",
     chosen_track: row.chosen_track || "",
     demo_url: row.demo_url || "",
+    description: row.description || "",
     team_members: row.team_members || "",
     notes: row.notes || "",
     submitted_at: row.timestamp || row.submitted_at || new Date().toISOString(),

@@ -500,6 +500,7 @@ function openDemosModal() {
       <div style="flex:1;min-width:180px;">
         <div style="color:#3dffa3;font-size:0.55rem;font-family:'Press Start 2P',monospace;margin-bottom:4px;">${escapeHtml(s.project_name || "Untitled")}</div>
         <div style="color:#888;font-size:0.85rem;">Team ${escapeHtml(s.team_name || "?")}</div>
+        ${s.description ? `<div style="color:#aaa;font-size:0.8rem;font-style:italic;margin-top:2px;">${escapeHtml(s.description)}</div>` : ""}
       </div>
       <div style="flex:0 0 auto;">
         ${demoUrl ? `<a href="${escapeHtml(demoUrl)}" target="_blank" rel="noreferrer" style="color:#3dffa3;border:1px solid #3dffa3;padding:4px 10px;text-decoration:none;font-size:0.8rem;font-family:'VT323',monospace;">DEMO &rarr;</a>` : '<span style="color:#555;font-size:0.8rem;">No demo</span>'}
@@ -509,13 +510,59 @@ function openDemosModal() {
         <div style="color:#666;font-size:0.75rem;">${judgeCount} judge${judgeCount !== 1 ? "s" : ""}</div>
         ${judgeNames ? `<div style="color:#555;font-size:0.65rem;margin-top:2px;">${judgeNames}</div>` : ""}
       </div>
-      <div style="flex:0 0 auto;">
-        <a href="/judge" style="color:#888;border:1px solid #444;padding:4px 10px;text-decoration:none;font-size:0.8rem;font-family:'VT323',monospace;">SCORE</a>
+      <div style="flex:0 0 auto;display:flex;align-items:center;gap:6px;">
+        <input type="number" min="0" max="130" placeholder="0-130" data-repo-key="${escapeHtml(repoKey)}" class="demo-score-input" style="width:65px;padding:4px 6px;background:#0b0b0b;border:1px solid #444;color:#f1c40f;font-family:'VT323',monospace;font-size:1rem;text-align:center;">
+        <button onclick="submitDemoScore(this)" data-repo-key="${escapeHtml(repoKey)}" data-project-name="${escapeHtml(s.project_name || '')}" data-chosen-track="${escapeHtml(s.chosen_track || '')}" data-repo-url="${escapeHtml(s.repo_url || '')}" style="background:#3dffa3;color:#0b0b0b;border:none;padding:4px 10px;cursor:pointer;font-family:'VT323',monospace;font-size:0.9rem;">GO</button>
       </div>
     </div>`;
   }).join("");
 
   modal.style.display = "flex";
+}
+
+async function submitDemoScore(btn) {
+  const repoUrl = btn.dataset.repoUrl;
+  const projectName = btn.dataset.projectName;
+  const chosenTrack = btn.dataset.chosenTrack;
+  const input = btn.parentElement.querySelector(".demo-score-input");
+  const score = parseInt(input.value, 10);
+  if (isNaN(score) || score < 0 || score > 130) {
+    input.style.borderColor = "#ff4444";
+    return;
+  }
+  const judgeName = prompt("Your judge name:");
+  if (!judgeName || !judgeName.trim()) return;
+
+  btn.textContent = "...";
+  try {
+    const coreTotal = Math.min(score, 100);
+    const bonusRaw = Math.max(0, score - 100);
+    const res = await fetch("/api/judges", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        judge_name: judgeName.trim(),
+        repo_url: repoUrl,
+        project_name: projectName,
+        chosen_track: chosenTrack,
+        scored_track: chosenTrack,
+        core_total: coreTotal,
+        notes: "Scored via demos panel",
+        bonus_bucket_scores: bonusRaw > 0 ? { best_demo: bonusRaw } : {},
+      }),
+    });
+    if (!res.ok) throw new Error("Failed");
+    btn.textContent = "OK";
+    btn.style.background = "#f1c40f";
+    input.value = "";
+    // Reload judge data to update display
+    await loadJudgeData();
+    openDemosModal();
+  } catch (e) {
+    btn.textContent = "ERR";
+    btn.style.background = "#ff4444";
+  }
 }
 
 function closeDemosModal() {

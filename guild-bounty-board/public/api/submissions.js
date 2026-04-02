@@ -34,6 +34,7 @@ function normalizeSubmission(input) {
     project_name: String(input.project_name || input["Project Name"] || "").trim(),
     chosen_track: String(input.chosen_track || input["Chosen Track"] || "").trim(),
     demo_url: String(input.demo_url || input["Demo URL"] || "").trim(),
+    description: String(input.description || "").trim(),
     team_members: String(input.team_members || input["Team Members"] || "").trim(),
     notes: String(input.notes || input["Notes"] || "").trim(),
     timestamp: new Date().toISOString(),
