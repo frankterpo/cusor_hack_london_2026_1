@@ -277,11 +277,33 @@ function buildSummaryRow(repoId, repoUrl, defaultBranch, metrics, t0, t1) {
 
 async function searchRepoForWhiteCircle(owner, repo) {
   try {
-    const query = `whitecircle+repo:${owner}/${repo}`;
-    const response = await fetch(`https://api.github.com/search/code?q=${query}`, { headers: getGitHubHeaders() });
-    if (!response.ok) return false;
-    const data = await response.json();
-    return (data.total_count || 0) > 0;
+    // Fetch full tree recursively
+    const treeRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/trees/HEAD?recursive=1`, { headers: getGitHubHeaders() });
+    if (!treeRes.ok) return false;
+    const treeData = await treeRes.json();
+    const files = (treeData.tree || []).filter(t => t.type === "blob").map(t => t.path);
+
+    // Check filenames (cheap)
+    for (const f of files) {
+      if (/whitecircle|white[_-]circle/i.test(f)) return true;
+    }
+
+    // Check contents of likely files
+    const codeExts = /\.(py|js|ts|tsx|jsx|md|json|yml|yaml|env|toml|txt|sh)$/i;
+    const toCheck = files.filter(f => codeExts.test(f)).slice(0, 50);
+
+    for (const path of toCheck) {
+      try {
+        const fileRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`, { headers: getGitHubHeaders() });
+        if (!fileRes.ok) continue;
+        const fileData = await fileRes.json();
+        if (fileData.content) {
+          const content = Buffer.from(fileData.content, "base64").toString("utf-8").toLowerCase();
+          if (/whitecircle|white[_-]circle/i.test(content)) return true;
+        }
+      } catch (_) {}
+    }
+    return false;
   } catch (_) {
     return false;
   }
