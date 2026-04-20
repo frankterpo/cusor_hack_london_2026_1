@@ -1,25 +1,16 @@
 {
-  "event_name": "Build Eric's Software Factory",
+  "event_name": "Build Finance Agents · London 2026",
+  "event_tagline": "AI-native agents for the modern finance stack",
   "main_tracks": [
     {
-      "id": "Always-On-Agents",
-      "name": "Always-On Agents",
-      "description": "Webhook and schedule driven agents that stay useful after the demo."
+      "id": "Reactive-Finance-Agents",
+      "name": "Reactive Finance Agents",
+      "description": "Agents triggered by user intent or inbound events — answer ledger questions, triage invoices, reconcile on demand, co-pilot bookkeeping workflows."
     },
     {
-      "id": "Review-QA",
-      "name": "Review + QA",
-      "description": "Reliability systems, verifiers, incident responders, and evidence-driven debugging."
-    },
-    {
-      "id": "Agent-Runtime-Tools",
-      "name": "Agent Runtime Tools",
-      "description": "Skills, MCP tools, model routing, and decision systems that make agents more capable."
-    },
-    {
-      "id": "Software-Factory",
-      "name": "Software Factory",
-      "description": "Systems that continuously build, test, coordinate, and improve codebases."
+      "id": "Proactive-Finance-Agents",
+      "name": "Proactive Finance Agents",
+      "description": "Always-on agents that monitor, anticipate, and act — continuous VAT/audit checks, anomaly detection, receipt capture, cash-flow foresight, closes on schedule."
     }
   ],
   "rubric": {
