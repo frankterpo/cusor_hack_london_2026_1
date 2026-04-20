@@ -127,33 +127,38 @@
   ],
   "judges": [
     {
-      "name": "Daniel Gimpelevich",
-      "role": "CEO · Briefcase",
+      "name": "Ján Stehlík",
+      "role": "Briefcase",
       "focus": "Accounting automation",
+      "linkedin": "https://www.linkedin.com/in/jan-stehlik-5855aa123/",
       "avatar_color": "#429aaa"
     },
     {
-      "name": "Aurélien Nioche",
-      "role": "Founding Eng · Pennylane",
-      "focus": "Ledger infra at scale",
-      "avatar_color": "#6dc9db"
-    },
-    {
-      "name": "Harjas Singh",
-      "role": "Partner · LocalGlobe",
-      "focus": "Fintech investor lens",
+      "name": "Alec Barber",
+      "role": "OpenAI",
+      "focus": "Frontier agents",
+      "linkedin": "https://www.linkedin.com/in/alec-barber/",
       "avatar_color": "#32737f"
     },
     {
-      "name": "Isabel Chen",
-      "role": "Director of AI · Sage",
-      "focus": "Deploying AI at accounting firms",
+      "name": "Umberto Belluzzo",
+      "role": "Earlybird Venture Capital",
+      "focus": "Early-stage fintech investor",
+      "linkedin": "https://www.linkedin.com/in/umberto-belluzzo/",
+      "avatar_color": "#6dc9db"
+    },
+    {
+      "name": "David Gelberg",
+      "role": "10 Downing Street",
+      "focus": "UK gov · policy",
+      "linkedin": "https://www.linkedin.com/in/davidgelberg/",
       "avatar_color": "#214d55"
     },
     {
-      "name": "Eric Mallon",
-      "role": "Host · Cursor",
-      "focus": "Agent ergonomics",
+      "name": "Jamesin Seidel",
+      "role": "Chapter One",
+      "focus": "Seed investor",
+      "linkedin": "https://www.linkedin.com/in/jamesin-seidel-5325b147/",
       "avatar_color": "#53c0d4"
     }
   ],

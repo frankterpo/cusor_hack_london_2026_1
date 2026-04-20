@@ -705,16 +705,19 @@ function renderJudges() {
       .join("")
       .toUpperCase();
     const color = j.avatar_color || "#429aaa";
-    return `
-      <li class="judge-card">
-        <span class="judge-avatar" style="background:${escapeAttr(color)}">${escapeHtml(initials)}</span>
-        <div>
-          <span class="judge-name">${escapeHtml(j.name)}</span>
-          <span class="judge-role">${escapeHtml(j.role || "")}</span>
-          <span class="judge-focus">${escapeHtml(j.focus || "")}</span>
-        </div>
-      </li>
+    const inner = `
+      <span class="judge-avatar" style="background:${escapeAttr(color)}">${escapeHtml(initials)}</span>
+      <div class="judge-body">
+        <span class="judge-name">${escapeHtml(j.name)}</span>
+        <span class="judge-role">${escapeHtml(j.role || "")}</span>
+        <span class="judge-focus">${escapeHtml(j.focus || "")}</span>
+      </div>
+      ${j.linkedin ? '<span class="judge-linkedin" aria-hidden="true">in →</span>' : ''}
     `;
+    if (j.linkedin) {
+      return `<li><a class="judge-card judge-card--link" href="${escapeAttr(j.linkedin)}" target="_blank" rel="noreferrer noopener" aria-label="${escapeAttr(j.name)} on LinkedIn">${inner}</a></li>`;
+    }
+    return `<li class="judge-card">${inner}</li>`;
   }).join("");
 }
 
