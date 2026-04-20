@@ -635,8 +635,30 @@ function renderCommits(rows) {
 // ================================================================
 
 let eventFormat = null;
+let hacksIndex = { hacks: [], active_hack_id: null };
 const LOCAL_SUBMISSIONS_KEY = "bfa-london-2026-submissions";
 const LOCAL_SCORES_KEY = "bfa-london-2026-scores";
+
+function getActiveHackId() {
+  return (
+    hacksIndex.active_hack_id ||
+    (eventFormat && eventFormat.hack_id) ||
+    "cursor-briefcase-london-2026"
+  );
+}
+
+function getActiveHack() {
+  const id = getActiveHackId();
+  return (hacksIndex.hacks || []).find((h) => h.id === id) || null;
+}
+
+async function loadHacks() {
+  try {
+    hacksIndex = await fetchJSON("/api/hacks");
+  } catch (e) {
+    hacksIndex = { hacks: [], active_hack_id: null };
+  }
+}
 
 async function loadEventFormat() {
   try {
@@ -736,9 +758,31 @@ function setLocalList(key, value) {
 
 // ---------- Modal infra ----------
 let lastFocusedBeforeModal = null;
+const GATED_MODALS = new Set(["judge-modal", "manager-modal"]);
+const AUTH_KEY = "bfa_auth";
+const AUTH_CODE = "BCFTW123!";
+let pendingGatedModalId = null;
+
+function isAuthed() {
+  try { return sessionStorage.getItem(AUTH_KEY) === AUTH_CODE; }
+  catch { return false; }
+}
+
+function applyAuthState() {
+  const authed = isAuthed();
+  document.body.classList.toggle("is-authed", authed);
+  const main = document.getElementById("submissions");
+  if (main) main.hidden = !authed;
+}
+
 function openModal(id) {
   const modal = document.getElementById(id);
   if (!modal) return;
+  if (GATED_MODALS.has(id) && !isAuthed()) {
+    pendingGatedModalId = id;
+    openModal("password-modal");
+    return;
+  }
   lastFocusedBeforeModal = document.activeElement;
   modal.classList.remove("hidden");
   const firstInput = modal.querySelector("input, select, textarea, button");
@@ -763,6 +807,7 @@ function handleSubmitForm(e) {
   const entry = {
     submission_id: `local-${Date.now()}`,
     submitted_at: new Date().toISOString(),
+    hack_id: getActiveHackId(),
     team_name: data.team_name || "",
     project_name: data.project_name || "",
     repo_url: data.github_url || "",
@@ -844,25 +889,96 @@ function sumScoreInputs(group) {
   return sum;
 }
 
+const LOCAL_JUDGE_NAME_KEY = "bfa-london-2026-judge-name";
+
+function scoredIdsForJudge(judgeName) {
+  const trimmed = (judgeName || "").trim().toLowerCase();
+  if (!trimmed) return new Set();
+  const scores = getLocalList(LOCAL_SCORES_KEY);
+  return new Set(
+    scores
+      .filter((s) => (s.judge_name || "").trim().toLowerCase() === trimmed)
+      .map((s) => s.submission_id)
+  );
+}
+
 function refreshJudgeSubmissionSelect() {
   const select = document.getElementById("judge-submission-select");
   if (!select) return;
+  const previous = select.value;
   const rows = window.__summaryRows || [];
   const local = getLocalList(LOCAL_SUBMISSIONS_KEY);
-  const options = [];
-  options.push('<option value="">— pick a submission —</option>');
+  const nameInput = document.getElementById("judge-name-input");
+  const cachedName = (nameInput && nameInput.value) || "";
+  const scored = scoredIdsForJudge(cachedName);
+  const options = ['<option value="">— pick a submission —</option>'];
+
   rows.forEach((r) => {
     const sub = getSubmissionInfoForRow(r);
     const name = sub?.project_name || r.repo_id || extractRepoName(r.repo);
-    options.push(`<option value="${escapeAttr(r.repo_id || name)}">${escapeHtml(name)} · ${escapeHtml(sub?.chosen_track || r.chosen_track || "unassigned")}</option>`);
+    const id = r.repo_id || name;
+    const suffix = scored.has(id) ? " [SCORED]" : "";
+    const track = sub?.chosen_track || r.chosen_track || "unassigned";
+    options.push(`<option value="${escapeAttr(id)}">${escapeHtml(name)} · ${escapeHtml(track)}${escapeHtml(suffix)}</option>`);
   });
   if (local.length) {
     options.push('<option disabled>── Local (this browser) ──</option>');
     local.forEach((s) => {
-      options.push(`<option value="${escapeAttr(s.submission_id)}">${escapeHtml(s.project_name)} · ${escapeHtml(s.chosen_track || "unassigned")}</option>`);
+      const suffix = scored.has(s.submission_id) ? " [SCORED]" : "";
+      options.push(`<option value="${escapeAttr(s.submission_id)}">${escapeHtml(s.project_name)} · ${escapeHtml(s.chosen_track || "unassigned")}${escapeHtml(suffix)}</option>`);
     });
   }
   select.innerHTML = options.join("");
+  if (previous && Array.from(select.options).some((o) => o.value === previous)) {
+    select.value = previous;
+  }
+  renderJudgeSubmissionSummary();
+}
+
+function findSubmissionById(id) {
+  if (!id) return null;
+  const rows = window.__summaryRows || [];
+  for (const r of rows) {
+    const sub = getSubmissionInfoForRow(r);
+    const rid = r.repo_id || sub?.project_name || extractRepoName(r.repo);
+    if (rid === id) return { row: r, sub: sub || null };
+  }
+  const local = getLocalList(LOCAL_SUBMISSIONS_KEY).find((s) => s.submission_id === id);
+  if (local) return { row: null, sub: local };
+  return null;
+}
+
+function renderJudgeSubmissionSummary() {
+  const target = document.getElementById("judge-submission-summary");
+  if (!target) return;
+  const select = document.getElementById("judge-submission-select");
+  const id = select?.value || "";
+  if (!id) { target.innerHTML = ""; target.classList.remove("is-visible"); return; }
+  const found = findSubmissionById(id);
+  if (!found) { target.innerHTML = ""; target.classList.remove("is-visible"); return; }
+  const { row, sub } = found;
+  const project = sub?.project_name || row?.repo_id || extractRepoName(row?.repo || "");
+  const team = sub?.team_name || "—";
+  const track = sub?.chosen_track || row?.chosen_track || "unassigned";
+  const repoUrl = sub?.repo_url || row?.repo || "";
+  const demoUrl = sub?.demo_url || "";
+  const judgeInfo = row ? getJudgeInfoForRow(row) : null;
+  const responses = judgeInfo?.responses?.length || 0;
+  const avg = judgeInfo ? Number((judgeInfo.averages?.grand_total) ?? judgeInfo.average_score ?? 0).toFixed(1) : null;
+  const priorLine = responses > 0 ? `<span class="judge-sub-prior">${responses} prior score${responses === 1 ? "" : "s"} · avg ${avg}</span>` : "";
+  target.innerHTML = `
+    <div class="judge-sub-head">
+      <span class="judge-sub-project">${escapeHtml(project)}</span>
+      <span class="judge-sub-track track-chip">${escapeHtml(track)}</span>
+    </div>
+    <div class="judge-sub-meta">Team ${escapeHtml(team)}</div>
+    <div class="judge-sub-links">
+      ${repoUrl ? `<a href="${escapeAttr(repoUrl)}" target="_blank" rel="noreferrer noopener" class="repo-link">Repo ↗</a>` : ""}
+      ${demoUrl ? `<a href="${escapeAttr(demoUrl)}" target="_blank" rel="noreferrer noopener" class="repo-link">Demo ↗</a>` : ""}
+      ${priorLine}
+    </div>
+  `;
+  target.classList.add("is-visible");
 }
 
 function handleJudgeForm(e) {
@@ -871,6 +987,7 @@ function handleJudgeForm(e) {
   const data = Object.fromEntries(new FormData(form).entries());
   if (!data.submission_id) { toast("Pick a submission first"); return; }
   if (!data.judge_name)    { toast("Judge name is required"); return; }
+  try { localStorage.setItem(LOCAL_JUDGE_NAME_KEY, data.judge_name); } catch {}
 
   const coreScores = {};
   let coreTotal = 0;
@@ -892,6 +1009,7 @@ function handleJudgeForm(e) {
 
   const entry = {
     scored_at: new Date().toISOString(),
+    hack_id: getActiveHackId(),
     judge_name: data.judge_name,
     submission_id: data.submission_id,
     core_scores: coreScores,
@@ -905,14 +1023,31 @@ function handleJudgeForm(e) {
   const list = getLocalList(LOCAL_SCORES_KEY);
   list.push(entry);
   setLocalList(LOCAL_SCORES_KEY, list);
-  form.reset();
+
+  // Reset scores only — keep judge name cached for next submission
+  const scoredId = entry.submission_id;
   form.querySelectorAll("input[type=range]").forEach((i) => {
     i.value = "0";
-    i.closest(".score-row").querySelector(".score-row-value").textContent = "0";
+    const row = i.closest(".score-row");
+    if (row) row.querySelector(".score-row-value").textContent = "0";
   });
+  const notes = form.querySelector("textarea[name=thoughts]");
+  if (notes) notes.value = "";
   updateJudgeRunningTotal();
-  closeModal("judge-modal");
-  toast(`Scored ${entry.submission_id}: ${grandTotal}/130`);
+
+  // Refresh select so this submission shows [SCORED], then auto-advance.
+  refreshJudgeSubmissionSelect();
+  const select = document.getElementById("judge-submission-select");
+  if (select) {
+    const idx = Array.from(select.options).findIndex((o) => o.value === scoredId);
+    const nextIdx = idx >= 0 && idx < select.options.length - 1 ? idx + 1 : 0;
+    for (let i = nextIdx; i < select.options.length; i++) {
+      const opt = select.options[i];
+      if (opt.value && !opt.disabled) { select.value = opt.value; break; }
+    }
+    renderJudgeSubmissionSummary();
+  }
+  toast(`Scored ${scoredId}: ${grandTotal}/130 — pick next submission`);
 }
 
 // ---------- Manager ----------
@@ -1083,6 +1218,47 @@ document.addEventListener("DOMContentLoaded", () => {
   const judgeForm = document.getElementById("judge-form");
   if (judgeForm) judgeForm.addEventListener("submit", handleJudgeForm);
 
+  // Restore cached judge name + react to select/name changes in judge modal
+  const nameInput = document.getElementById("judge-name-input");
+  if (nameInput) {
+    try {
+      const cached = localStorage.getItem(LOCAL_JUDGE_NAME_KEY);
+      if (cached) nameInput.value = cached;
+    } catch {}
+    nameInput.addEventListener("input", () => {
+      try { localStorage.setItem(LOCAL_JUDGE_NAME_KEY, nameInput.value); } catch {}
+      refreshJudgeSubmissionSelect();
+    });
+  }
+  const judgeSelect = document.getElementById("judge-submission-select");
+  if (judgeSelect) judgeSelect.addEventListener("change", renderJudgeSubmissionSummary);
+
+  // Password gate
+  applyAuthState();
+  const passwordForm = document.getElementById("password-form");
+  if (passwordForm) {
+    passwordForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const input = passwordForm.querySelector("input[name=password]");
+      const errorEl = document.getElementById("password-error");
+      const value = (input && input.value) || "";
+      if (value === AUTH_CODE) {
+        try { sessionStorage.setItem(AUTH_KEY, AUTH_CODE); } catch {}
+        passwordForm.reset();
+        if (errorEl) errorEl.textContent = "";
+        applyAuthState();
+        closeModal("password-modal");
+        const next = pendingGatedModalId;
+        pendingGatedModalId = null;
+        if (next) setTimeout(() => openModal(next), 80);
+        toast("Unlocked — judge + manager panels available");
+      } else {
+        if (errorEl) errorEl.textContent = "Wrong code. Try again.";
+        if (input) { input.value = ""; input.focus(); }
+      }
+    });
+  }
+
   // Drawer "Score this" button opens the judge modal pre-populated
   const drawerJudgeBtn = document.getElementById("drawer-judge-btn");
   if (drawerJudgeBtn) {
@@ -1131,7 +1307,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Load event format + data
+  // Load event format + hacks + data
+  loadHacks();
   loadEventFormat();
   loadSummary().then(() => {
     updateSubmissionsCount(window.__summaryRows || []);

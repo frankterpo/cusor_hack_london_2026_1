@@ -1,0 +1,23 @@
+{
+  "active_hack_id": "cursor-briefcase-london-2026",
+  "hacks": [
+    {
+      "id": "cursor-hcmc-2025",
+      "name": "Cursor Hackathon · HCMC 2025",
+      "short_name": "HCMC 2025",
+      "location": "Ho Chi Minh City",
+      "dates": "2025-11-29",
+      "status": "ended",
+      "description": "Original in-person Cursor hackathon in Ho Chi Minh City. 47 submissions, legacy-format judge responses — archived here for reference."
+    },
+    {
+      "id": "cursor-briefcase-london-2026",
+      "name": "Cursor x Briefcase London hackathon",
+      "short_name": "London 2026",
+      "location": "London",
+      "dates": "2026-05-17 → 2026-05-18",
+      "status": "active",
+      "description": "Two-track finance-agents hackathon co-hosted by Cursor and Briefcase. All new submissions land here."
+    }
+  ]
+}

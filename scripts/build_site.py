@@ -21,6 +21,10 @@ DATA_DIR = APP_DIR / "data"
 WORK_DIR = APP_DIR / "work"
 DIST = ROOT / "dist"
 
+# All historical data belongs to the first hack; new activity gets stamped with
+# the currently-active hack_id by the client at submit time.
+LEGACY_HACK_ID = "cursor-hcmc-2025"
+
 
 def write_json(path: Path, payload) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -37,21 +41,40 @@ def build_summary() -> list[dict]:
     if not summary_path.exists():
         return []
     with summary_path.open(newline="", encoding="utf-8") as f:
-        return list(csv.DictReader(f))
+        rows = list(csv.DictReader(f))
+    for row in rows:
+        row.setdefault("hack_id", LEGACY_HACK_ID)
+    return rows
 
 
 def build_submissions() -> dict:
     submissions_path = DATA_DIR / "submissions-normalized.json"
     if not submissions_path.exists():
         return {"submissions": []}
-    return json.loads(submissions_path.read_text(encoding="utf-8"))
+    payload = json.loads(submissions_path.read_text(encoding="utf-8"))
+    for sub in payload.get("submissions", []) or []:
+        sub.setdefault("hack_id", LEGACY_HACK_ID)
+    return payload
 
 
 def build_judges() -> dict:
     judges_path = DATA_DIR / "judge-responses-normalized.json"
     if not judges_path.exists():
         return {"judges": []}
-    return json.loads(judges_path.read_text(encoding="utf-8"))
+    payload = json.loads(judges_path.read_text(encoding="utf-8"))
+    by_repo = payload.get("by_repo") or {}
+    for entry in by_repo.values():
+        entry.setdefault("hack_id", LEGACY_HACK_ID)
+        for response in entry.get("responses", []) or []:
+            response.setdefault("hack_id", LEGACY_HACK_ID)
+    return payload
+
+
+def build_hacks() -> dict:
+    hacks_path = DATA_DIR / "hacks.json"
+    if not hacks_path.exists():
+        return {"hacks": [], "active_hack_id": None}
+    return json.loads(hacks_path.read_text(encoding="utf-8"))
 
 
 def collect_repo_ids() -> set[str]:
@@ -106,6 +129,7 @@ def main() -> None:
     write_json(DIST / "api" / "summary", {"rows": build_summary()})
     write_json(DIST / "api" / "submissions", build_submissions())
     write_json(DIST / "api" / "judges", build_judges())
+    write_json(DIST / "api" / "hacks", build_hacks())
     # Also expose the event format so future clients can read tracks directly.
     event_format_path = DATA_DIR / "event-format.json"
     if event_format_path.exists():

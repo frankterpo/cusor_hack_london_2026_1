@@ -1,8 +1,9 @@
 {
-  "event_name": "Build Finance Agents · London 2026",
+  "event_name": "Cursor x Briefcase London hackathon",
   "event_tagline": "AI-native agents for the modern finance stack",
   "event_dates": "2026-05-17 → 2026-05-18",
   "event_location": "London",
+  "hack_id": "cursor-briefcase-london-2026",
   "timeline": {
     "t0": "2026-05-17T10:00:00+01:00",
     "t1": "2026-05-18T16:00:00+01:00",
@@ -103,6 +104,18 @@
       "id": "best_demo",
       "name": "Best Demo",
       "blurb": "The demo that makes a judge lean forward."
+    },
+    {
+      "id": "best_use_of_ai_safety",
+      "name": "Best Use of AI Safety",
+      "sponsor": "White Circle",
+      "blurb": "Safety-first finance agents — evals for hallucination, PII leakage, prompt injection, and audit-grade reasoning traces."
+    },
+    {
+      "id": "best_use_of_openai",
+      "name": "Best Use of OpenAI",
+      "sponsor": "OpenAI",
+      "blurb": "Sharpest use of the OpenAI model family — reasoning, tool use, Codex, Realtime, Responses API."
     }
   ],
   "prizes": [
@@ -146,6 +159,7 @@
     },
     {
       "name": "Umberto Belluzzo",
+      "title": "Investor",
       "role": "Earlybird Venture Capital",
       "focus": "AI compute · deeptech VC",
       "linkedin": "https://www.linkedin.com/in/umberto-belluzzo/",
@@ -172,9 +186,11 @@
     }
   ],
   "sponsors": [
-    { "name": "Cursor",   "tier": "host" },
-    { "name": "Briefcase", "tier": "design-partner" },
-    { "name": "Vercel",   "tier": "infra" },
-    { "name": "Anthropic","tier": "models" }
+    { "name": "Cursor",       "tier": "host" },
+    { "name": "Briefcase",    "tier": "design-partner" },
+    { "name": "White Circle", "tier": "ai-safety" },
+    { "name": "OpenAI",       "tier": "models" },
+    { "name": "Vercel",       "tier": "infra" },
+    { "name": "Anthropic",    "tier": "models" }
   ]
 }
