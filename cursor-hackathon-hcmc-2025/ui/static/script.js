@@ -45,13 +45,18 @@ function updateStats(rows) {
   const totalLocDeleted = rows.reduce((sum, r) => sum + (Number(r.total_loc_deleted) || 0), 0);
   const totalLoc = totalLocAdded + totalLocDeleted;
 
-  document.getElementById("stat-total").textContent = total;
-  document.getElementById("stat-tracked").textContent = tracked;
-  document.getElementById("stat-analyzed").textContent = analyzed;
-  document.getElementById("stat-flagged").textContent = flagged;
-  document.getElementById("stat-clean").textContent = clean;
-  document.getElementById("stat-commits").textContent = formatNumber(totalCommits);
-  document.getElementById("stat-loc").textContent = formatNumber(totalLoc);
+  const setText = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+  };
+  setText("stat-total", total);
+  setText("stat-tracked", tracked);
+  setText("stat-analyzed", analyzed);
+  setText("stat-flagged", flagged);
+  setText("stat-clean", clean);
+  setText("stat-commits", formatNumber(totalCommits));
+  setText("stat-loc", formatNumber(totalLoc));
+  setText("submissions-count", total);
 }
 
 function extractRepoName(repoUrl) {
@@ -191,8 +196,17 @@ function analysisStatusChip(row) {
 }
 
 function trackChip(track) {
-  if (!track) return '<span class="track-chip track-chip--empty">Unassigned</span>';
+  if (!track) return '<span class="track-chip track-chip--empty" aria-label="Unassigned track">—</span>';
   return `<span class="track-chip">${escapeHtml(track)}</span>`;
+}
+
+function trackMatchesCategory(track, category) {
+  if (!category) return true;
+  if (!track) return false;
+  const t = String(track).toLowerCase();
+  if (category === 'reactive')  return t.includes('reactive');
+  if (category === 'proactive') return t.includes('proactive');
+  return true;
 }
 
 function demoLink(submission) {
@@ -280,10 +294,16 @@ async function renderSummaryTable(rows) {
   const filterMerge = document.querySelector("#filter-merge").checked;
   const sortMode = document.querySelector("#sort-select").value;
 
+  const trackFilter = window.__trackFilter || null;
   const filteredRows = rows.filter((r) => {
     if (filterPre && Number(r.has_commits_before_t0) === 0) return false;
     if (filterBulk && Number(r.has_bulk_commits) === 0) return false;
     if (filterMerge && Number(r.has_merge_commits) === 0) return false;
+    if (trackFilter) {
+      const sub = getSubmissionInfoForRow(r);
+      const track = sub?.chosen_track || r.chosen_track || "";
+      if (!trackMatchesCategory(track, trackFilter)) return false;
+    }
     return true;
   });
 
@@ -350,10 +370,17 @@ async function renderSummaryTable(rows) {
       <td class="ai-cell"><span class="ai-preview no-data">Loading...</span></td>
     `;
     tr.dataset.repoId = repoId;
-    tr.addEventListener("click", () => {
+    tr.tabIndex = 0;
+    tr.setAttribute("role", "button");
+    tr.setAttribute("aria-label", `Open details for ${displayName}`);
+    const openRow = () => {
       document.querySelectorAll("#summary-table tbody tr").forEach((r) => r.classList.remove("selected"));
       tr.classList.add("selected");
       openDrawer(repoId);
+    };
+    tr.addEventListener("click", openRow);
+    tr.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openRow(); }
     });
     tbody.appendChild(tr);
 
@@ -603,6 +630,423 @@ function renderCommits(rows) {
   });
 }
 
+// ================================================================
+// Event format (rubric / side quests / judges / prizes) + modals
+// ================================================================
+
+let eventFormat = null;
+const LOCAL_SUBMISSIONS_KEY = "bfa-london-2026-submissions";
+const LOCAL_SCORES_KEY = "bfa-london-2026-scores";
+
+async function loadEventFormat() {
+  try {
+    eventFormat = await fetchJSON("/api/event-format");
+  } catch (e) {
+    eventFormat = null;
+  }
+  renderRubric();
+  renderSideQuests();
+  renderPrizes();
+  renderJudges();
+  buildJudgeFormSkeleton();
+}
+
+function renderRubric() {
+  const ol = document.getElementById("rubric-criteria");
+  if (!ol) return;
+  const criteria = eventFormat?.rubric?.criteria || [];
+  ol.innerHTML = criteria.map((c) => `
+    <li>
+      <div class="rubric-criterion-body">
+        <span class="rubric-criterion-name">${escapeHtml(c.name)}</span>
+        <span class="rubric-criterion-desc">${escapeHtml(c.description || "")}</span>
+      </div>
+      <span class="rubric-criterion-pts">${c.points} pts</span>
+    </li>
+  `).join("");
+}
+
+function renderSideQuests() {
+  const ul = document.getElementById("side-quests");
+  if (!ul) return;
+  const quests = eventFormat?.side_quests || [];
+  ul.innerHTML = quests.map((q) => `
+    <li>
+      <span class="sq-name">${escapeHtml(q.name)}</span>
+      <span class="sq-blurb">${escapeHtml(q.blurb || "")}</span>
+    </li>
+  `).join("");
+}
+
+function renderPrizes() {
+  const ul = document.getElementById("prize-grid");
+  if (!ul) return;
+  const prizes = eventFormat?.prizes || [];
+  ul.innerHTML = prizes.map((p) => `
+    <li class="prize-card tier-${escapeAttr(p.tier || "default")}">
+      <span class="prize-tier">${escapeHtml(p.tier || "prize")}</span>
+      <span class="prize-name">${escapeHtml(p.name)}</span>
+      <span class="prize-value">${escapeHtml(p.value || "")}</span>
+      <span class="prize-desc">${escapeHtml(p.description || "")}</span>
+    </li>
+  `).join("");
+}
+
+function renderJudges() {
+  const ul = document.getElementById("judge-grid");
+  if (!ul) return;
+  const judges = eventFormat?.judges || [];
+  ul.innerHTML = judges.map((j) => {
+    const initials = (j.name || "?")
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((p) => p[0])
+      .join("")
+      .toUpperCase();
+    const color = j.avatar_color || "#429aaa";
+    return `
+      <li class="judge-card">
+        <span class="judge-avatar" style="background:${escapeAttr(color)}">${escapeHtml(initials)}</span>
+        <div>
+          <span class="judge-name">${escapeHtml(j.name)}</span>
+          <span class="judge-role">${escapeHtml(j.role || "")}</span>
+          <span class="judge-focus">${escapeHtml(j.focus || "")}</span>
+        </div>
+      </li>
+    `;
+  }).join("");
+}
+
+function getLocalList(key) {
+  try { return JSON.parse(localStorage.getItem(key) || "[]"); }
+  catch { return []; }
+}
+function setLocalList(key, value) {
+  try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
+}
+
+// ---------- Modal infra ----------
+let lastFocusedBeforeModal = null;
+function openModal(id) {
+  const modal = document.getElementById(id);
+  if (!modal) return;
+  lastFocusedBeforeModal = document.activeElement;
+  modal.classList.remove("hidden");
+  const firstInput = modal.querySelector("input, select, textarea, button");
+  if (firstInput) setTimeout(() => firstInput.focus(), 60);
+  if (id === "manager-modal") renderManagerPanel();
+  if (id === "judge-modal") refreshJudgeSubmissionSelect();
+}
+function closeModal(id) {
+  const modal = document.getElementById(id);
+  if (!modal) return;
+  modal.classList.add("hidden");
+  if (lastFocusedBeforeModal && typeof lastFocusedBeforeModal.focus === "function") {
+    lastFocusedBeforeModal.focus();
+  }
+}
+
+// ---------- Submit form ----------
+function handleSubmitForm(e) {
+  e.preventDefault();
+  const form = e.target;
+  const data = Object.fromEntries(new FormData(form).entries());
+  const entry = {
+    submission_id: `local-${Date.now()}`,
+    submitted_at: new Date().toISOString(),
+    team_name: data.team_name || "",
+    project_name: data.project_name || "",
+    repo_url: data.github_url || "",
+    chosen_track: data.chosen_track || "",
+    demo_url: data.demo_url || "",
+    team_members: data.team_members || "",
+    description: data.description || "",
+    notes: data.notes || "",
+    source: "local-modal"
+  };
+  const list = getLocalList(LOCAL_SUBMISSIONS_KEY);
+  list.push(entry);
+  setLocalList(LOCAL_SUBMISSIONS_KEY, list);
+  form.reset();
+  closeModal("submit-modal");
+  toast(`Submission saved — ${entry.project_name || "project"} (${entry.chosen_track || "no track"})`);
+}
+
+// ---------- Judge form ----------
+function buildJudgeFormSkeleton() {
+  const core = document.getElementById("judge-core-inputs");
+  const bonus = document.getElementById("judge-bonus-inputs");
+  if (!core || !bonus) return;
+  const criteria = eventFormat?.rubric?.criteria || [];
+  core.innerHTML = criteria.map((c) => scoreRow({
+    key: c.id,
+    name: c.name,
+    hint: `max ${c.points}`,
+    max: c.points,
+    group: "core"
+  })).join("");
+  const quests = eventFormat?.side_quests || [];
+  bonus.innerHTML = quests.map((q) => scoreRow({
+    key: q.id,
+    name: q.name,
+    hint: `up to 30 total across bucket`,
+    max: 30,
+    group: "bonus"
+  })).join("");
+  attachScoreInputListeners();
+}
+
+function scoreRow({ key, name, hint, max, group }) {
+  return `
+    <label class="score-row" data-score-group="${escapeAttr(group)}">
+      <span class="score-row-name">${escapeHtml(name)}<small>${escapeHtml(hint)}</small></span>
+      <input type="range" min="0" max="${max}" step="1" value="0" name="${escapeAttr(group)}_${escapeAttr(key)}" data-max="${max}">
+      <span class="score-row-value">0</span>
+    </label>
+  `;
+}
+
+function attachScoreInputListeners() {
+  document.querySelectorAll("#judge-modal .score-row input[type=range]").forEach((input) => {
+    input.addEventListener("input", () => {
+      const row = input.closest(".score-row");
+      const out = row.querySelector(".score-row-value");
+      if (out) out.textContent = input.value;
+      updateJudgeRunningTotal();
+    });
+  });
+}
+
+function updateJudgeRunningTotal() {
+  const coreSum = sumScoreInputs("core");
+  let bonusSum = sumScoreInputs("bonus");
+  const bonusCap = Number(eventFormat?.judge_bonus_bucket?.max_points ?? 30);
+  bonusSum = Math.min(bonusSum, bonusCap);
+  const total = coreSum + bonusSum;
+  const el = document.getElementById("judge-running-total");
+  if (el) el.textContent = String(total);
+}
+
+function sumScoreInputs(group) {
+  let sum = 0;
+  document.querySelectorAll(`#judge-modal .score-row[data-score-group="${group}"] input[type=range]`).forEach((input) => {
+    sum += Number(input.value) || 0;
+  });
+  return sum;
+}
+
+function refreshJudgeSubmissionSelect() {
+  const select = document.getElementById("judge-submission-select");
+  if (!select) return;
+  const rows = window.__summaryRows || [];
+  const local = getLocalList(LOCAL_SUBMISSIONS_KEY);
+  const options = [];
+  options.push('<option value="">— pick a submission —</option>');
+  rows.forEach((r) => {
+    const sub = getSubmissionInfoForRow(r);
+    const name = sub?.project_name || r.repo_id || extractRepoName(r.repo);
+    options.push(`<option value="${escapeAttr(r.repo_id || name)}">${escapeHtml(name)} · ${escapeHtml(sub?.chosen_track || r.chosen_track || "unassigned")}</option>`);
+  });
+  if (local.length) {
+    options.push('<option disabled>── Local (this browser) ──</option>');
+    local.forEach((s) => {
+      options.push(`<option value="${escapeAttr(s.submission_id)}">${escapeHtml(s.project_name)} · ${escapeHtml(s.chosen_track || "unassigned")}</option>`);
+    });
+  }
+  select.innerHTML = options.join("");
+}
+
+function handleJudgeForm(e) {
+  e.preventDefault();
+  const form = e.target;
+  const data = Object.fromEntries(new FormData(form).entries());
+  if (!data.submission_id) { toast("Pick a submission first"); return; }
+  if (!data.judge_name)    { toast("Judge name is required"); return; }
+
+  const coreScores = {};
+  let coreTotal = 0;
+  (eventFormat?.rubric?.criteria || []).forEach((c) => {
+    const v = Number(data[`core_${c.id}`] ?? 0);
+    coreScores[c.id] = v;
+    coreTotal += v;
+  });
+  const bonusScores = {};
+  let bonusTotal = 0;
+  (eventFormat?.side_quests || []).forEach((q) => {
+    const v = Number(data[`bonus_${q.id}`] ?? 0);
+    bonusScores[q.id] = v;
+    bonusTotal += v;
+  });
+  const bonusCap = Number(eventFormat?.judge_bonus_bucket?.max_points ?? 30);
+  const bonusCapped = Math.min(bonusTotal, bonusCap);
+  const grandTotal = coreTotal + bonusCapped;
+
+  const entry = {
+    scored_at: new Date().toISOString(),
+    judge_name: data.judge_name,
+    submission_id: data.submission_id,
+    core_scores: coreScores,
+    core_total: coreTotal,
+    bonus_bucket_scores: bonusScores,
+    bonus_total: bonusTotal,
+    bonus_total_capped: bonusCapped,
+    total_score: grandTotal,
+    thoughts: data.thoughts || ""
+  };
+  const list = getLocalList(LOCAL_SCORES_KEY);
+  list.push(entry);
+  setLocalList(LOCAL_SCORES_KEY, list);
+  form.reset();
+  form.querySelectorAll("input[type=range]").forEach((i) => {
+    i.value = "0";
+    i.closest(".score-row").querySelector(".score-row-value").textContent = "0";
+  });
+  updateJudgeRunningTotal();
+  closeModal("judge-modal");
+  toast(`Scored ${entry.submission_id}: ${grandTotal}/130`);
+}
+
+// ---------- Manager ----------
+function renderManagerPanel() {
+  const stats = document.getElementById("manager-stats");
+  const rows = window.__summaryRows || [];
+  const local = getLocalList(LOCAL_SUBMISSIONS_KEY);
+  const scores = getLocalList(LOCAL_SCORES_KEY);
+  const tracked = rows.length + local.length;
+  const reactive = rows.filter((r) => trackMatchesCategory(getSubmissionInfoForRow(r)?.chosen_track || r.chosen_track, "reactive")).length;
+  const proactive = rows.filter((r) => trackMatchesCategory(getSubmissionInfoForRow(r)?.chosen_track || r.chosen_track, "proactive")).length;
+  const flagged = rows.filter((r) => hasAnyFlag(r)).length;
+
+  stats.innerHTML = `
+    <div class="manager-stat"><span class="manager-stat-num">${tracked}</span><span class="manager-stat-lbl">Total submissions</span></div>
+    <div class="manager-stat"><span class="manager-stat-num">${reactive}</span><span class="manager-stat-lbl">Reactive track</span></div>
+    <div class="manager-stat"><span class="manager-stat-num">${proactive}</span><span class="manager-stat-lbl">Proactive track</span></div>
+    <div class="manager-stat"><span class="manager-stat-num">${flagged}</span><span class="manager-stat-lbl">Flagged</span></div>
+    <div class="manager-stat"><span class="manager-stat-num">${scores.length}</span><span class="manager-stat-lbl">Local scores</span></div>
+    <div class="manager-stat"><span class="manager-stat-num">${local.length}</span><span class="manager-stat-lbl">Local submissions</span></div>
+  `;
+
+  renderLeaderboard("reactive", "leaderboard-reactive");
+  renderLeaderboard("proactive", "leaderboard-proactive");
+  renderFlaggedList();
+  renderLocalSubmissions();
+}
+
+function renderLeaderboard(category, listId) {
+  const list = document.getElementById(listId);
+  if (!list) return;
+  const rows = window.__summaryRows || [];
+  const ranked = rows
+    .filter((r) => trackMatchesCategory(getSubmissionInfoForRow(r)?.chosen_track || r.chosen_track, category))
+    .map((r) => {
+      const info = getJudgeInfoForRow(r);
+      const score = Number((info?.averages?.grand_total) ?? info?.average_score ?? 0);
+      const sub = getSubmissionInfoForRow(r);
+      return {
+        name: sub?.project_name || r.repo_id || extractRepoName(r.repo),
+        score,
+      };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 5);
+  if (ranked.length === 0) {
+    list.innerHTML = '<li style="justify-content:center;color:var(--muted);font-style:italic">No submissions yet in this track</li>';
+    return;
+  }
+  list.innerHTML = ranked.map((r) => `
+    <li>
+      <span class="lb-name">${escapeHtml(r.name)}</span>
+      <span class="lb-score">${r.score > 0 ? r.score.toFixed(1) : "—"}</span>
+    </li>
+  `).join("");
+}
+
+function renderFlaggedList() {
+  const ul = document.getElementById("flagged-list");
+  if (!ul) return;
+  const rows = window.__summaryRows || [];
+  const flagged = rows.filter((r) => hasAnyFlag(r)).slice(0, 30);
+  if (flagged.length === 0) {
+    ul.innerHTML = '<li style="justify-content:center;color:var(--muted);font-style:italic">No flags raised</li>';
+    return;
+  }
+  ul.innerHTML = flagged.map((r) => {
+    const tags = [];
+    if (Number(r.has_commits_before_t0) > 0) tags.push("pre-T0");
+    if (Number(r.has_bulk_commits) > 0) tags.push("bulk");
+    if (Number(r.has_large_initial_commit_after_t0) > 0) tags.push("big-init");
+    if (Number(r.has_merge_commits) > 0) tags.push("merge");
+    const sub = getSubmissionInfoForRow(r);
+    const name = sub?.project_name || r.repo_id;
+    return `
+      <li>
+        <span class="flagged-name">${escapeHtml(name)}</span>
+        <span class="flagged-tags">${escapeHtml(tags.join(" · "))}</span>
+      </li>
+    `;
+  }).join("");
+}
+
+function renderLocalSubmissions() {
+  const ul = document.getElementById("local-submissions");
+  if (!ul) return;
+  const local = getLocalList(LOCAL_SUBMISSIONS_KEY);
+  if (local.length === 0) {
+    ul.innerHTML = '<li style="justify-content:center;color:var(--muted);font-style:italic">None yet — try the Submit modal</li>';
+    return;
+  }
+  ul.innerHTML = local.map((s) => `
+    <li>
+      <span class="flagged-name">${escapeHtml(s.project_name)} · ${escapeHtml(s.team_name)}</span>
+      <span class="flagged-tags">${escapeHtml(s.chosen_track || "unassigned")}</span>
+    </li>
+  `).join("");
+}
+
+function exportSubmissionsJSON() {
+  const local = getLocalList(LOCAL_SUBMISSIONS_KEY);
+  const scores = getLocalList(LOCAL_SCORES_KEY);
+  const payload = {
+    exported_at: new Date().toISOString(),
+    event: eventFormat?.event_name || "Build Finance Agents · London 2026",
+    local_submissions: local,
+    local_scores: scores,
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `bfa-london-2026-export-${Date.now()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  toast(`Exported ${local.length} submissions, ${scores.length} scores`);
+}
+
+// ---------- Toasts ----------
+function toast(message) {
+  let el = document.getElementById("toast-stack");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "toast-stack";
+    el.style.cssText = "position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;";
+    document.body.appendChild(el);
+  }
+  const pill = document.createElement("div");
+  pill.textContent = message;
+  pill.style.cssText = "background:#1f2937;color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;font-weight:500;box-shadow:0 10px 25px rgba(17,24,39,.25);animation:modal-in .18s ease-out;";
+  el.appendChild(pill);
+  setTimeout(() => pill.remove(), 3500);
+}
+
+// ---------- Update submissions count after load ----------
+function updateSubmissionsCount(rows) {
+  const el = document.getElementById("submissions-count");
+  if (el) el.textContent = rows.length;
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   // Filter handlers
   ["filter-preT0", "filter-bulk", "filter-merge"].forEach((id) => {
@@ -613,16 +1057,77 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("sort-select").addEventListener("change", () => {
     renderSummaryTable(window.__summaryRows || []);
   });
-  
+
+  // Modal open triggers
+  document.querySelectorAll("[data-open-modal]").forEach((btn) => {
+    btn.addEventListener("click", () => openModal(btn.dataset.openModal));
+  });
+  document.querySelectorAll("[data-close-modal]").forEach((el) => {
+    el.addEventListener("click", () => {
+      const modal = el.closest(".modal");
+      if (modal) closeModal(modal.id);
+    });
+  });
+
+  // Submit + Judge forms
+  const submitForm = document.getElementById("submit-form");
+  if (submitForm) submitForm.addEventListener("submit", handleSubmitForm);
+  const judgeForm = document.getElementById("judge-form");
+  if (judgeForm) judgeForm.addEventListener("submit", handleJudgeForm);
+
+  // Drawer "Score this" button opens the judge modal pre-populated
+  const drawerJudgeBtn = document.getElementById("drawer-judge-btn");
+  if (drawerJudgeBtn) {
+    drawerJudgeBtn.addEventListener("click", () => {
+      const title = document.getElementById("detail-title").textContent.trim();
+      closeDrawer();
+      openModal("judge-modal");
+      const select = document.getElementById("judge-submission-select");
+      if (select) {
+        const opt = Array.from(select.options).find((o) => o.value === title || o.textContent.startsWith(title));
+        if (opt) select.value = opt.value;
+      }
+    });
+  }
+
+  const exportBtn = document.getElementById("export-submissions-btn");
+  if (exportBtn) exportBtn.addEventListener("click", exportSubmissionsJSON);
+
+  // Track cards act as filters — click Reactive / Proactive to filter the table
+  const trackCards = Array.from(document.querySelectorAll(".track-card"));
+  const submissionsPanel = document.querySelector(".panel.full-width");
+  trackCards.forEach((card) => {
+    card.addEventListener("click", () => {
+      const category = card.dataset.track || null;
+      const isActive = window.__trackFilter === category;
+      window.__trackFilter = isActive ? null : category;
+      trackCards.forEach((c) => {
+        const active = c.dataset.track === window.__trackFilter;
+        c.classList.toggle("is-active", active);
+        c.setAttribute("aria-pressed", active ? "true" : "false");
+      });
+      renderSummaryTable(window.__summaryRows || []);
+      if (!isActive && submissionsPanel) {
+        submissionsPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
+  });
+
   // Drawer close handlers
   document.getElementById("close-drawer").addEventListener("click", closeDrawer);
   document.getElementById("drawer-overlay").addEventListener("click", closeDrawer);
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeDrawer();
+    if (e.key === "Escape") {
+      closeDrawer();
+      document.querySelectorAll(".modal:not(.hidden)").forEach((m) => closeModal(m.id));
+    }
   });
-  
-  // Load data
-  loadSummary().catch((err) => {
+
+  // Load event format + data
+  loadEventFormat();
+  loadSummary().then(() => {
+    updateSubmissionsCount(window.__summaryRows || []);
+  }).catch((err) => {
     const tbody = document.querySelector("#summary-table tbody");
     tbody.innerHTML = `
       <tr>

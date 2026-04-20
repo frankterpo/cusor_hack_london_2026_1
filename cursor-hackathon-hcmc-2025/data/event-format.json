@@ -1,46 +1,75 @@
 {
   "event_name": "Build Finance Agents · London 2026",
   "event_tagline": "AI-native agents for the modern finance stack",
+  "event_dates": "2026-05-17 → 2026-05-18",
+  "event_location": "London",
+  "timeline": {
+    "t0": "2026-05-17T10:00:00+01:00",
+    "t1": "2026-05-18T16:00:00+01:00",
+    "submissions_close": "2026-05-18T16:00:00+01:00",
+    "judging_closes": "2026-05-18T19:30:00+01:00",
+    "winners_announced": "2026-05-18T20:00:00+01:00"
+  },
   "main_tracks": [
     {
       "id": "Reactive-Finance-Agents",
       "name": "Reactive Finance Agents",
-      "description": "Agents triggered by user intent or inbound events — answer ledger questions, triage invoices, reconcile on demand, co-pilot bookkeeping workflows."
+      "short": "Reactive",
+      "summary": "Triggered by user intent or inbound events.",
+      "description": "Agents triggered by user intent or inbound events — answer ledger questions, triage invoices, reconcile on demand, co-pilot bookkeeping workflows.",
+      "examples": [
+        "Slack bot that answers \"what's our cash runway?\"",
+        "Email parser that triages AP invoices into Xero",
+        "Reconciliation copilot for bank feeds"
+      ]
     },
     {
       "id": "Proactive-Finance-Agents",
       "name": "Proactive Finance Agents",
-      "description": "Always-on agents that monitor, anticipate, and act — continuous VAT/audit checks, anomaly detection, receipt capture, cash-flow foresight, closes on schedule."
+      "short": "Proactive",
+      "summary": "Always-on. Monitors, anticipates, acts.",
+      "description": "Always-on agents that monitor, anticipate, and act — continuous VAT & audit checks, anomaly detection, receipt capture, cash-flow foresight, closes on schedule.",
+      "examples": [
+        "Continuous VAT validator that flags filings before HMRC does",
+        "Anomaly detector scanning the ledger every 10 minutes",
+        "Auto-close agent that books recurring journals on schedule"
+      ]
     }
   ],
   "rubric": {
     "core_max_points": 100,
     "side_bonus_cap": 30,
+    "total_cap": 130,
     "criteria": [
       {
         "id": "concrete_workflow_value",
         "name": "Concrete Workflow Value",
-        "points": 30
+        "points": 30,
+        "description": "Does it replace or compress a real finance workflow a human does today?"
       },
       {
         "id": "track_fit",
         "name": "Track Fit",
-        "points": 25
+        "points": 25,
+        "description": "How purely does the submission embody its chosen track (reactive vs proactive)?"
       },
       {
         "id": "reliability_and_verification",
-        "name": "Reliability And Verification",
-        "points": 20
+        "name": "Reliability & Verification",
+        "points": 20,
+        "description": "Evals, guardrails, audit trails, human-in-the-loop checkpoints."
       },
       {
         "id": "technical_execution",
         "name": "Technical Execution",
-        "points": 15
+        "points": 15,
+        "description": "Architecture quality, tool design, latency, integrations that actually work."
       },
       {
         "id": "demo_clarity",
         "name": "Demo Clarity",
-        "points": 10
+        "points": 10,
+        "description": "Can the judge, in 90 seconds, see exactly what this agent does and why it matters?"
       }
     ]
   },
@@ -52,23 +81,98 @@
   "side_quests": [
     {
       "id": "best_cursor_native_workflow",
-      "name": "Best Cursor-Native Workflow"
+      "name": "Best Cursor-Native Workflow",
+      "blurb": "The cleanest end-to-end Cursor → code → agent pipeline."
     },
     {
       "id": "best_developer_tool",
-      "name": "Best Developer Tool"
+      "name": "Best Developer Tool",
+      "blurb": "Something accountants or devs on finance teams would actually install."
     },
     {
       "id": "best_reliability_system",
-      "name": "Best Reliability System"
+      "name": "Best Reliability System",
+      "blurb": "Evals, traces, fallbacks, repro tests — reliability as first-class design."
     },
     {
       "id": "most_technically_ambitious",
-      "name": "Most Technically Ambitious"
+      "name": "Most Technically Ambitious",
+      "blurb": "Hardest thing attempted — bonus for nailing it."
     },
     {
       "id": "best_demo",
-      "name": "Best Demo"
+      "name": "Best Demo",
+      "blurb": "The demo that makes a judge lean forward."
     }
+  ],
+  "prizes": [
+    {
+      "tier": "grand",
+      "name": "Grand Prize",
+      "value": "£25,000",
+      "description": "Top score across both tracks. Cash + Cursor Business seats + intro to target design partners."
+    },
+    {
+      "tier": "track",
+      "name": "Best Reactive Finance Agent",
+      "value": "£10,000",
+      "description": "Top score within Track 01 — Reactive."
+    },
+    {
+      "tier": "track",
+      "name": "Best Proactive Finance Agent",
+      "value": "£10,000",
+      "description": "Top score within Track 02 — Proactive."
+    },
+    {
+      "tier": "side",
+      "name": "Side-Quest Pool",
+      "value": "£5,000 × 5",
+      "description": "One winner per side quest category."
+    },
+    {
+      "tier": "honorable",
+      "name": "Design Partner Fast-Track",
+      "value": "Warm intros",
+      "description": "Top 3 submissions per track get warm intros to Briefcase, Pennylane, and Klarity teams."
+    }
+  ],
+  "judges": [
+    {
+      "name": "Daniel Gimpelevich",
+      "role": "CEO · Briefcase",
+      "focus": "Accounting automation",
+      "avatar_color": "#429aaa"
+    },
+    {
+      "name": "Aurélien Nioche",
+      "role": "Founding Eng · Pennylane",
+      "focus": "Ledger infra at scale",
+      "avatar_color": "#6dc9db"
+    },
+    {
+      "name": "Harjas Singh",
+      "role": "Partner · LocalGlobe",
+      "focus": "Fintech investor lens",
+      "avatar_color": "#32737f"
+    },
+    {
+      "name": "Isabel Chen",
+      "role": "Director of AI · Sage",
+      "focus": "Deploying AI at accounting firms",
+      "avatar_color": "#214d55"
+    },
+    {
+      "name": "Eric Mallon",
+      "role": "Host · Cursor",
+      "focus": "Agent ergonomics",
+      "avatar_color": "#53c0d4"
+    }
+  ],
+  "sponsors": [
+    { "name": "Cursor",   "tier": "host" },
+    { "name": "Briefcase", "tier": "design-partner" },
+    { "name": "Vercel",   "tier": "infra" },
+    { "name": "Anthropic","tier": "models" }
   ]
 }
