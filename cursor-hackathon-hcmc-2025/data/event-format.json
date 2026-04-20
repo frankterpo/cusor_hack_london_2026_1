@@ -107,34 +107,10 @@
   ],
   "prizes": [
     {
-      "tier": "grand",
-      "name": "Grand Prize",
-      "value": "£25,000",
-      "description": "Top score across both tracks. Cash + Cursor Business seats + intro to target design partners."
-    },
-    {
-      "tier": "track",
-      "name": "Best Reactive Finance Agent",
-      "value": "£10,000",
-      "description": "Top score within Track 01 — Reactive."
-    },
-    {
-      "tier": "track",
-      "name": "Best Proactive Finance Agent",
-      "value": "£10,000",
-      "description": "Top score within Track 02 — Proactive."
-    },
-    {
-      "tier": "side",
-      "name": "Side-Quest Pool",
-      "value": "£5,000 × 5",
-      "description": "One winner per side quest category."
-    },
-    {
-      "tier": "honorable",
-      "name": "Design Partner Fast-Track",
-      "value": "Warm intros",
-      "description": "Top 3 submissions per track get warm intros to Briefcase, Pennylane, and Klarity teams."
+      "tier": "winner",
+      "name": "Winner",
+      "value": "£2,000",
+      "description": "Single £2,000 cash prize to the top-scoring submission across both tracks."
     }
   ],
   "judges": [

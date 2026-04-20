@@ -1498,6 +1498,29 @@ html { scrollbar-width: thin; scrollbar-color: #e5e7eb var(--bg-subtle); }
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 18px;
 }
+
+/* When there's a single prize, let it breathe as a hero card */
+.prize-grid:has(> :only-child) {
+  grid-template-columns: minmax(0, 520px);
+  justify-content: center;
+}
+.prize-grid:has(> :only-child) .prize-card {
+  padding: 32px 32px 28px;
+  text-align: center;
+  align-items: center;
+  background: linear-gradient(160deg, var(--primary-50), #fff 70%);
+  border-color: var(--primary-100);
+}
+.prize-grid:has(> :only-child) .prize-value {
+  font-size: 2.6rem;
+  margin-top: 4px;
+}
+.prize-grid:has(> :only-child) .prize-name {
+  font-size: 1.5rem;
+}
+.prize-grid:has(> :only-child) .prize-desc {
+  max-width: 380px;
+}
 .prize-card {
   position: relative;
   background: #fff;
