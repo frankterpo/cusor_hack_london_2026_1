@@ -1538,9 +1538,47 @@ html { scrollbar-width: thin; scrollbar-color: #e5e7eb var(--bg-subtle); }
   transform: translateY(-1px);
   border-color: var(--primary-200);
 }
-.prize-card.tier-grand {
+.prize-card.tier-grand,
+.prize-card.tier-first {
   background: linear-gradient(160deg, var(--primary-50), #fff 70%);
-  border-color: var(--primary-100);
+  border-color: var(--primary-200);
+  box-shadow: 0 2px 0 var(--primary-100), var(--shadow-sm);
+}
+.prize-card.tier-first::before {
+  content: '🥇';
+  position: absolute;
+  top: -12px;
+  right: 18px;
+  font-size: 1.4rem;
+  background: #fff;
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--primary-100);
+  box-shadow: var(--shadow-xs);
+}
+.prize-card.tier-second::before {
+  content: '🥈';
+  position: absolute;
+  top: -12px;
+  right: 18px;
+  font-size: 1.3rem;
+  background: #fff;
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-xs);
+}
+.prize-card.tier-third::before {
+  content: '🥉';
+  position: absolute;
+  top: -12px;
+  right: 18px;
+  font-size: 1.3rem;
+  background: #fff;
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-xs);
 }
 .prize-tier {
   font-family: var(--font-mono);

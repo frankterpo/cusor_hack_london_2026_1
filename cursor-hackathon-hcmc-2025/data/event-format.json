@@ -107,10 +107,22 @@
   ],
   "prizes": [
     {
-      "tier": "winner",
-      "name": "Winner",
-      "value": "£2,000",
-      "description": "Single £2,000 cash prize to the top-scoring submission across both tracks."
+      "tier": "first",
+      "name": "1st place",
+      "value": "£2,000 + 6 months Cursor Ultra",
+      "description": "Top-scoring submission across both tracks. Cash and half a year on Cursor's top tier."
+    },
+    {
+      "tier": "second",
+      "name": "2nd place",
+      "value": "4 months Cursor Ultra",
+      "description": "Runner-up across both tracks."
+    },
+    {
+      "tier": "third",
+      "name": "3rd place",
+      "value": "3 months Cursor Ultra",
+      "description": "Third highest score across both tracks."
     }
   ],
   "judges": [
