@@ -705,11 +705,16 @@ function renderJudges() {
       .join("")
       .toUpperCase();
     const color = j.avatar_color || "#429aaa";
+    const avatar = j.photo_url
+      ? `<img class="judge-avatar judge-avatar--img" src="${escapeAttr(j.photo_url)}" alt="" loading="lazy" onerror="this.outerHTML='<span class=&quot;judge-avatar&quot; style=&quot;background:${escapeAttr(color)}&quot;>${escapeHtml(initials)}</span>'">`
+      : `<span class="judge-avatar" style="background:${escapeAttr(color)}">${escapeHtml(initials)}</span>`;
+    const roleLine = j.title
+      ? `<span class="judge-name">${escapeHtml(j.name)}</span><span class="judge-role">${escapeHtml(j.title)} · ${escapeHtml(j.role || "")}</span>`
+      : `<span class="judge-name">${escapeHtml(j.name)}</span><span class="judge-role">${escapeHtml(j.role || "")}</span>`;
     const inner = `
-      <span class="judge-avatar" style="background:${escapeAttr(color)}">${escapeHtml(initials)}</span>
+      ${avatar}
       <div class="judge-body">
-        <span class="judge-name">${escapeHtml(j.name)}</span>
-        <span class="judge-role">${escapeHtml(j.role || "")}</span>
+        ${roleLine}
         <span class="judge-focus">${escapeHtml(j.focus || "")}</span>
       </div>
       ${j.linkedin ? '<span class="judge-linkedin" aria-hidden="true">in →</span>' : ''}

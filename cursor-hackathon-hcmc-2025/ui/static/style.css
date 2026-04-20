@@ -1618,7 +1618,7 @@ html { scrollbar-width: thin; scrollbar-color: #e5e7eb var(--bg-subtle); }
 .judge-grid {
   list-style: none;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 16px;
 }
 .judge-card {
@@ -1657,7 +1657,7 @@ html { scrollbar-width: thin; scrollbar-color: #e5e7eb var(--bg-subtle); }
 .judge-card--link:hover .judge-linkedin,
 .judge-card--link:focus-visible .judge-linkedin { opacity: 1; }
 .judge-avatar {
-  width: 46px; height: 46px;
+  width: 48px; height: 48px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
@@ -1669,19 +1669,27 @@ html { scrollbar-width: thin; scrollbar-color: #e5e7eb var(--bg-subtle); }
   letter-spacing: -0.01em;
   flex-shrink: 0;
   box-shadow: 0 1px 0 rgba(255,255,255,0.25) inset;
+  object-fit: cover;
+  background-color: var(--primary-100);
+}
+.judge-avatar--img {
+  border: 1px solid var(--primary-100);
+  box-shadow: var(--shadow-xs);
 }
 .judge-name {
   font-weight: 600;
   color: var(--text-strong);
-  font-size: 0.92rem;
+  font-size: 0.94rem;
   display: block;
   line-height: 1.2;
+  letter-spacing: -0.005em;
 }
 .judge-role {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   color: var(--text-secondary);
   display: block;
-  margin-top: 2px;
+  margin-top: 3px;
+  line-height: 1.35;
 }
 .judge-focus {
   font-family: var(--font-script);

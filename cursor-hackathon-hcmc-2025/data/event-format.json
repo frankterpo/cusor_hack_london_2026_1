@@ -128,37 +128,45 @@
   "judges": [
     {
       "name": "Ján Stehlík",
+      "title": "Co-Founder & CTO",
       "role": "Briefcase",
-      "focus": "Accounting automation",
+      "focus": "AI accounting automation",
       "linkedin": "https://www.linkedin.com/in/jan-stehlik-5855aa123/",
+      "photo_url": "/judges/jan.jpg",
       "avatar_color": "#429aaa"
     },
     {
       "name": "Alec Barber",
+      "title": "Member of Technical Staff",
       "role": "OpenAI",
-      "focus": "Frontier agents",
+      "focus": "LLM evals · agents",
       "linkedin": "https://www.linkedin.com/in/alec-barber/",
+      "photo_url": "/judges/alec.jpg",
       "avatar_color": "#32737f"
     },
     {
       "name": "Umberto Belluzzo",
       "role": "Earlybird Venture Capital",
-      "focus": "Early-stage fintech investor",
+      "focus": "AI compute · deeptech VC",
       "linkedin": "https://www.linkedin.com/in/umberto-belluzzo/",
       "avatar_color": "#6dc9db"
     },
     {
       "name": "David Gelberg",
+      "title": "No10 Innovation Fellow",
       "role": "10 Downing Street",
-      "focus": "UK gov · policy",
+      "focus": "Gov AI deployment",
       "linkedin": "https://www.linkedin.com/in/davidgelberg/",
+      "photo_url": "/judges/david.jpg",
       "avatar_color": "#214d55"
     },
     {
       "name": "Jamesin Seidel",
+      "title": "General Partner",
       "role": "Chapter One",
-      "focus": "Seed investor",
+      "focus": "Pre-seed AI · infra",
       "linkedin": "https://www.linkedin.com/in/jamesin-seidel-5325b147/",
+      "photo_url": "/judges/jamesin.png",
       "avatar_color": "#53c0d4"
     }
   ],
