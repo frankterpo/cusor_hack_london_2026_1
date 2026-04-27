@@ -90,4 +90,8 @@
   .eyebrow-event {
     @apply text-xs font-semibold uppercase tracking-widest text-primary;
   }
+  /* Match HCMC luminous teal on cube line-art until PNGs are regenerated */
+  .cursor-cube-luminous {
+    filter: drop-shadow(0 0 5px hsl(var(--primary) / 0.45)) brightness(1.08) saturate(1.2);
+  }
 }

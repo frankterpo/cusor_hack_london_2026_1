@@ -16,7 +16,7 @@ export default function Home() {
               alt="Cursor"
               width={96}
               height={96}
-              className="h-24 w-24 object-contain"
+              className="cursor-cube-luminous h-24 w-24 object-contain"
               priority
             />
           </div>

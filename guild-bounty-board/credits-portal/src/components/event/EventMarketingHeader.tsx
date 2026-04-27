@@ -20,7 +20,7 @@ export function EventMarketingHeader() {
             alt=""
             width={32}
             height={32}
-            className="h-8 w-8 object-contain"
+            className="cursor-cube-luminous h-8 w-8 object-contain"
           />
           <div>
             <div className="font-display text-base font-semibold tracking-tight text-foreground">Cursor × Briefcase</div>

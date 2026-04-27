@@ -1648,6 +1648,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  const brandVideo = document.querySelector(".brand-cursor-video");
+  if (brandVideo) {
+    const reveal = () => brandVideo.classList.add("is-visible");
+    brandVideo.addEventListener("canplay", reveal, { once: true });
+    brandVideo.addEventListener("loadeddata", reveal, { once: true });
+    window.setTimeout(reveal, 4500);
+  }
+
   // Load event format + hacks + data
   loadHacks();
   loadEventFormat();

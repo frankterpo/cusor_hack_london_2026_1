@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Recolor cursor-cube.png to Briefcase brand teal (#6497A4), keep alpha and shape.
+"""Recolor cursor-cube.png to Briefcase luminous teal (aligns with --primary-400 / #87d3e1).
 
 Writes:
   - cursor-cube-briefcase.png (full res, UI / header)
@@ -17,8 +17,8 @@ OUT_DIR = ROOT / "public"
 CREDITS_PUBLIC = ROOT / "credits-portal" / "public"
 HCMC_STATIC = ROOT.parent / "cursor-hackathon-hcmc-2025" / "ui" / "static"
 
-# Briefcase mark teal (user reference)
-TR, TG, TB = 100, 151, 164
+# Matches HCMC / Briefcase CSS --primary-400 (#87d3e1) for line-art that reads luminous on dark.
+TR, TG, TB = 135, 211, 225
 
 
 def tint_rgba(r: int, g: int, b: int, a: int) -> tuple[int, int, int, int]:
@@ -26,12 +26,12 @@ def tint_rgba(r: int, g: int, b: int, a: int) -> tuple[int, int, int, int]:
         return (0, 0, 0, 0)
     # Perceived luminance 0..1
     y = (0.299 * r + 0.587 * g + 0.114 * b) / 255.0
-    # Lift mids for a more vibrant read (line art reads brighter on dark UI)
-    y_v = min(1.0, max(0.0, y**0.52))
-    k = 0.22 + 0.88 * y_v
-    nr = int(min(255, TR * k * 1.06))
-    ng = int(min(255, TG * k * 1.06))
-    nb = int(min(255, TB * k * 1.06))
+    # Lift mids so strokes read closer to primary-300/400 accents on the page
+    y_v = min(1.0, max(0.0, y**0.45))
+    k = 0.28 + 0.92 * y_v
+    nr = int(min(255, TR * k * 1.08))
+    ng = int(min(255, TG * k * 1.08))
+    nb = int(min(255, TB * k * 1.08))
     return (nr, ng, nb, a)
 
 
