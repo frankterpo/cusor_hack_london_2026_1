@@ -193,7 +193,8 @@ header {
   max-width: min(112px, 32vw);
   object-fit: contain;
   opacity: 1;
-  filter: saturate(1.08) brightness(1.04);
+  filter: sepia(0.75) saturate(2.2) hue-rotate(145deg) brightness(0.9)
+    drop-shadow(0 0 4px rgba(160, 220, 231, 0.45));
 }
 .brand-mark.brand-mark--video.brand-mark--footer .brand-cursor-video-tint {
   height: 14px;
@@ -257,7 +258,7 @@ header {
   align-items: center;
   image-rendering: pixelated;
   /* Nudge below cap line so logo center matches location text + clears title above */
-  transform: translateY(7px);
+  transform: translateY(3px);
 }
 .brand-halkin-svg {
   display: block;
