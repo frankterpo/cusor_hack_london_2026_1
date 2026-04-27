@@ -8,11 +8,17 @@ export async function POST(request: NextRequest) {
   try {
     const { password } = await request.json();
 
-    // Get admin password from environment
-    const adminPassword = process.env.ADMIN_PASSWORD;
+    // Prefer ADMIN_PASSWORD; fall back to site gate password (Vercel often sets SITE_PASSWORD / site_password only).
+    const adminPassword = (
+      process.env.ADMIN_PASSWORD ||
+      process.env.admin_password ||
+      process.env.SITE_PASSWORD ||
+      process.env.site_password ||
+      ''
+    ).trim();
 
     if (!adminPassword) {
-      console.error('ADMIN_PASSWORD not configured in environment');
+      console.error('ADMIN_PASSWORD or SITE_PASSWORD not configured in environment');
       return NextResponse.json(
         { success: false, error: 'Admin authentication not configured' },
         { status: 500 }

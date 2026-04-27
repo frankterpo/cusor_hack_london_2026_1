@@ -31,12 +31,29 @@ module.exports = async (req, res) => {
         return sendJson(res, 400, { ok: false, error: "Password required" });
       }
 
-      const sitePassword = getSitePassword();
+      let sitePassword;
+      try {
+        sitePassword = getSitePassword();
+      } catch (_) {
+        return sendJson(res, 503, {
+          ok: false,
+          error: "Server not configured: set SITE_PASSWORD or site_password in Vercel env.",
+        });
+      }
+
       if (password !== sitePassword) {
         return sendJson(res, 401, { ok: false, error: "Invalid password" });
       }
 
-      const token = createToken();
+      let token;
+      try {
+        token = createToken();
+      } catch (_) {
+        return sendJson(res, 503, {
+          ok: false,
+          error: "Server not configured: set SITE_PASSWORD (or AUTH_SECRET) in Vercel env.",
+        });
+      }
       setAuthCookie(res, token);
       return sendJson(res, 200, { ok: true, token });
     }

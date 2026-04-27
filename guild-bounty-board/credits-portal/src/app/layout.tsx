@@ -19,8 +19,11 @@ export const metadata: Metadata = {
   description: "Cursor credits redemption and London 2026 hackathon hub",
   themeColor: "#111827",
   icons: {
-    icon: "/cursor-cube-briefcase.png",
-    apple: "/cursor-cube-briefcase.png",
+    icon: [
+      { url: "/cursor-cube-briefcase-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/cursor-cube-briefcase-16.png", sizes: "16x16", type: "image/png" },
+    ],
+    apple: [{ url: "/cursor-cube-briefcase-32.png", sizes: "32x32", type: "image/png" }],
   },
 };
 

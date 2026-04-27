@@ -9,3 +9,4 @@ dist/
 .env.local
 vendor/
 .gstack/
+guild-bounty-board/.tmp_pillow/

@@ -2,24 +2,37 @@ const crypto = require("crypto");
 
 const TOKEN_MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
 
+function getSitePasswordRaw() {
+  return (
+    process.env.SITE_PASSWORD ||
+    process.env.site_password ||
+    process.env.Site_Password ||
+    ""
+  ).trim();
+}
+
+/** Stable signing secret: explicit AUTH_SECRET, else derived from site password (single-env deploys). */
 function getAuthSecret() {
-  const secret = process.env.AUTH_SECRET;
-  if (!secret) {
-    throw new Error("Missing environment variable: AUTH_SECRET");
-  }
-  return secret;
+  const explicit = (process.env.AUTH_SECRET || process.env.auth_secret || "").trim();
+  if (explicit) return explicit;
+  const sitePw = getSitePasswordRaw();
+  if (!sitePw) return "";
+  return crypto.createHash("sha256").update(`guild-bounty-board:auth:v1:${sitePw}`, "utf8").digest("hex");
 }
 
 function getSitePassword() {
-  const password = process.env.SITE_PASSWORD;
+  const password = getSitePasswordRaw();
   if (!password) {
-    throw new Error("Missing environment variable: SITE_PASSWORD");
+    throw new Error("Missing environment variable: SITE_PASSWORD (or site_password)");
   }
   return password;
 }
 
 function createToken() {
   const secret = getAuthSecret();
+  if (!secret) {
+    throw new Error("Missing AUTH_SECRET / SITE_PASSWORD for token signing");
+  }
   const timestamp = Date.now().toString();
   const hmac = crypto.createHmac("sha256", secret).update(timestamp).digest("hex");
   return `${timestamp}.${hmac}`;
@@ -37,6 +50,9 @@ function verifyToken(token) {
 
   const [timestamp, providedHmac] = parts;
   const secret = getAuthSecret();
+  if (!secret) {
+    return { valid: false, error: "Server not configured" };
+  }
   const expectedHmac = crypto.createHmac("sha256", secret).update(timestamp).digest("hex");
 
   if (!crypto.timingSafeEqual(Buffer.from(providedHmac, "hex"), Buffer.from(expectedHmac, "hex"))) {
@@ -92,6 +108,7 @@ function setAuthCookie(res, token) {
 
 module.exports = {
   getSitePassword,
+  getAuthSecret,
   createToken,
   verifyToken,
   verifyAuth,
