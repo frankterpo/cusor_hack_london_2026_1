@@ -1,36 +1,31 @@
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Cursor × Briefcase · London 2026 — aligned with cursor-hackathon-hcmc-2025/ui/static */
+
 @layer base {
   :root {
-    --background: 0 0% 4.3%;
-    --foreground: 0 0% 90%;
-    --card: 0 0% 7%;
-    --card-foreground: 0 0% 90%;
-    --popover: 0 0% 7%;
-    --popover-foreground: 0 0% 90%;
-    --primary: 152 100% 62%;
-    --primary-foreground: 0 0% 4.3%;
-    --secondary: 0 0% 12%;
-    --secondary-foreground: 0 0% 90%;
-    --muted: 0 0% 12%;
-    --muted-foreground: 0 0% 60%;
-    --accent: 48 88% 58%;
-    --accent-foreground: 0 0% 4.3%;
+    --background: 220 39% 11%;
+    --foreground: 210 20% 98%;
+    --card: 217 19% 27%;
+    --card-foreground: 210 20% 98%;
+    --popover: 217 19% 27%;
+    --popover-foreground: 210 20% 98%;
+    --primary: 189 58% 58%;
+    --primary-foreground: 220 39% 11%;
+    --secondary: 217 19% 22%;
+    --secondary-foreground: 210 20% 98%;
+    --muted: 217 19% 27%;
+    --muted-foreground: 218 11% 65%;
+    --accent: 189 40% 24%;
+    --accent-foreground: 189 70% 88%;
     --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 90%;
-    --border: 0 0% 18%;
-    --input: 0 0% 18%;
-    --ring: 152 100% 62%;
-    --radius: 0rem;
-    --chart-1: 152 100% 62%;
-    --chart-2: 48 88% 58%;
-    --chart-3: 0 72% 51%;
-    --chart-4: 200 60% 50%;
-    --chart-5: 280 65% 60%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 215 16% 34%;
+    --input: 215 16% 34%;
+    --ring: 189 58% 58%;
+    --radius: 0.625rem;
   }
 }
 
@@ -38,19 +33,61 @@
   * {
     @apply border-border;
   }
+  html {
+    @apply scroll-smooth;
+    font-size: 15px;
+  }
   body {
-    @apply bg-background text-foreground;
-    font-family: 'VT323', monospace;
-    font-size: 1.15rem;
+    @apply bg-background text-foreground antialiased min-h-screen;
+    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+    font-feature-settings: "cv01", "cv02", "cv03", "cv04", "tnum";
   }
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Press Start 2P', monospace;
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-bricolage), var(--font-inter), sans-serif;
+    letter-spacing: -0.02em;
   }
-  button, a.btn, [role="button"] {
-    font-family: 'Press Start 2P', monospace;
+}
+
+/* Event page backdrop — teal washes + faint grid */
+.event-canvas {
+  position: relative;
+  min-height: 100vh;
+}
+
+.event-canvas::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(1200px 500px at 90% -10%, rgba(109, 201, 219, 0.1), transparent 60%),
+    radial-gradient(900px 400px at 0% 0%, rgba(66, 154, 170, 0.06), transparent 60%),
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: auto, auto, 44px 44px, 44px 44px;
+  pointer-events: none;
+}
+
+@layer components {
+  .btn-event-primary {
+    @apply inline-flex items-center justify-center rounded-[var(--radius)] px-5 py-2.5 text-sm font-semibold transition-opacity;
+    @apply bg-primary text-primary-foreground shadow-md;
+    box-shadow: 0 4px 14px rgba(109, 201, 219, 0.25);
   }
-  input, textarea, select {
-    font-family: 'VT323', monospace;
-    font-size: 1.15rem;
+  .btn-event-primary:hover {
+    @apply opacity-90;
+  }
+  .btn-event-ghost {
+    @apply inline-flex items-center justify-center rounded-[var(--radius)] px-4 py-2 text-sm font-medium transition-colors;
+    @apply border border-border bg-card/60 text-foreground hover:bg-muted;
+  }
+  .panel-event {
+    @apply rounded-xl border border-border bg-card/90 p-6 shadow-lg backdrop-blur-sm;
+    box-shadow: var(--shadow-md, 0 6px 16px -4px rgba(0, 0, 0, 0.45));
+  }
+  .eyebrow-event {
+    @apply text-xs font-semibold uppercase tracking-widest text-primary;
   }
 }

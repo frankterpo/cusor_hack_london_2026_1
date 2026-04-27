@@ -3,11 +3,13 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { RedemptionForm } from '@/features/attendees/components/RedemptionForm';
+import { EventMarketingHeader } from '@/components/event/EventMarketingHeader';
+import Link from 'next/link';
 
 export default function ProjectRedeemPage() {
   const params = useParams();
   const slug = params.slug as string;
-  const [project, setProject] = useState<{id: string; name: string; slug: string} | null>(null);
+  const [project, setProject] = useState<{ id: string; name: string; slug: string } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -34,12 +36,11 @@ export default function ProjectRedeemPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen" style={{ background: '#0b0b0b' }}>
-        <div className="container mx-auto px-4 py-16">
-          <div className="max-w-md mx-auto text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto" style={{ borderColor: '#3dffa3' }}></div>
-            <p className="mt-4" style={{ color: '#888', fontFamily: "'VT323', monospace", fontSize: '1.15rem' }}>Loading event...</p>
-          </div>
+      <div className="min-h-screen">
+        <EventMarketingHeader />
+        <div className="mx-auto max-w-md px-4 py-20 text-center">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <p className="mt-4 text-sm text-muted-foreground">Loading event…</p>
         </div>
       </div>
     );
@@ -47,37 +48,32 @@ export default function ProjectRedeemPage() {
 
   if (error || !project) {
     return (
-      <div className="min-h-screen" style={{ background: '#0b0b0b' }}>
-        <div className="container mx-auto px-4 py-16">
-          <div className="max-w-md mx-auto text-center">
-            <h1 className="text-xl mb-3" style={{ color: '#ff4444', lineHeight: '1.6' }}>EVENT NOT FOUND</h1>
-            <p className="mb-6" style={{ color: '#d3d3d3', fontFamily: "'VT323', monospace", fontSize: '1.15rem' }}>
-              {error || 'The event you\'re looking for is not available for code redemption.'}
-            </p>
-            <a href="/credits" className="text-xs hover:underline" style={{ color: '#3dffa3', fontFamily: "'Press Start 2P', monospace" }}>
-              &larr; RETURN HOME
-            </a>
-          </div>
+      <div className="min-h-screen">
+        <EventMarketingHeader />
+        <div className="mx-auto max-w-md px-4 py-20 text-center">
+          <h1 className="font-display text-xl font-semibold text-destructive">Event not found</h1>
+          <p className="mt-3 text-sm text-muted-foreground">
+            {error || 'The event you are looking for is not available for code redemption.'}
+          </p>
+          <Link href="/credits" className="mt-6 inline-block text-sm font-medium text-primary hover:underline">
+            ← Back to credits home
+          </Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen" style={{ background: '#0b0b0b' }}>
-      <div className="container mx-auto px-4 py-16">
-        <div className="max-w-md mx-auto">
-          <div className="text-center mb-8">
-            <h1 className="text-xl mb-3" style={{ color: '#3dffa3', lineHeight: '1.6' }}>
-              CLAIM YOUR CODE
-            </h1>
-            <p style={{ color: '#d3d3d3', fontFamily: "'VT323', monospace", fontSize: '1.2rem' }}>
-              {project.name}
-            </p>
-            <p className="mt-2" style={{ color: '#888', fontFamily: "'VT323', monospace", fontSize: '1.1rem' }}>
-              Enter your details to receive your Cursor credits
-            </p>
-          </div>
+    <div className="min-h-screen pb-16">
+      <EventMarketingHeader />
+      <div className="mx-auto max-w-lg px-4 py-12">
+        <div className="mb-8 text-center">
+          <p className="eyebrow-event">Redeem</p>
+          <h1 className="font-display mt-2 text-2xl font-semibold text-foreground">Claim your code</h1>
+          <p className="mt-2 text-lg text-foreground/90">{project.name}</p>
+          <p className="mt-2 text-sm text-muted-foreground">Enter your details to receive your Cursor credits.</p>
+        </div>
+        <div className="panel-event">
           <RedemptionForm projectId={project.id} />
         </div>
       </div>

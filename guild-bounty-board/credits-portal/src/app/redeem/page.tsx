@@ -1,22 +1,18 @@
-/**
- * Code redemption page
- */
-
 import { RedemptionForm } from '@/features/attendees/components/RedemptionForm';
+import { EventMarketingHeader } from '@/components/event/EventMarketingHeader';
 
+/** Legacy sample redeem route — prefer `/credits/event/[slug]/redeem`. */
 export default function RedeemPage() {
   return (
-    <div className="min-h-screen" style={{ background: '#0b0b0b' }}>
-      <div className="container mx-auto px-4 py-16">
-        <div className="max-w-md mx-auto">
-          <div className="text-center mb-8">
-            <h1 className="text-xl mb-3" style={{ color: '#3dffa3', lineHeight: '1.6' }}>
-              CLAIM YOUR CODE
-            </h1>
-            <p style={{ color: '#d3d3d3', fontFamily: "'VT323', monospace", fontSize: '1.2rem' }}>
-              Enter your details to receive your Cursor credits
-            </p>
-          </div>
+    <div className="min-h-screen pb-16">
+      <EventMarketingHeader />
+      <div className="mx-auto max-w-md px-4 py-12">
+        <div className="mb-8 text-center">
+          <p className="eyebrow-event">Sample flow</p>
+          <h1 className="font-display mt-2 text-2xl font-semibold text-foreground">Claim your code</h1>
+          <p className="mt-2 text-sm text-muted-foreground">Demo project — use event slug URLs in production.</p>
+        </div>
+        <div className="panel-event">
           <RedemptionForm projectId="4ULX4IY2qIMwnKe7x1LK" />
         </div>
       </div>

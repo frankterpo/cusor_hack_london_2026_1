@@ -81,7 +81,7 @@ export default function AdminProjects() {
     }));
 
     // Navigate to dashboard
-    router.push('/admin/dashboard');
+    router.push('/credits/admin/dashboard');
   };
 
   const generateSlug = (name: string) => {
@@ -129,7 +129,7 @@ export default function AdminProjects() {
           slug: result.data.slug
         }));
 
-        router.push('/admin/dashboard');
+        router.push('/credits/admin/dashboard');
       } else {
         setError(result.error || 'Failed to create project');
       }
@@ -204,12 +204,12 @@ export default function AdminProjects() {
   const handleLogout = () => {
     localStorage.removeItem('admin_authenticated');
     localStorage.removeItem('admin_selected_project');
-    router.push('/admin');
+    router.push('/credits/admin');
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
           <p className="mt-2 text-sm text-gray-600">Loading projects...</p>
