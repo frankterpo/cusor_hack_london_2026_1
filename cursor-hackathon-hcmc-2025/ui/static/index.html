@@ -1,463 +1,771 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cursor × Briefcase · London 2026</title>
-  <meta name="description" content="Cursor x Briefcase London hackathon — two tracks, 130 points, five judges. AI-native agents for the modern finance stack.">
-  <link rel="stylesheet" href="style.css?v=10">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Caveat:wght@500;600;700&family=JetBrains+Mono:wght@500;600&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23429aaa' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='7' width='18' height='13' rx='2' transform='rotate(-8 12 13.5)'/%3E%3Cpath d='M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2' transform='rotate(-8 12 13.5)'/%3E%3C/svg%3E">
-</head>
-<body>
-  <a class="skip-link" href="#tracks">Skip to content</a>
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#111827" />
+    <title>Cursor × Briefcase · London 2026</title>
+    <meta
+      name="description"
+      content="Cursor x Briefcase London hackathon — two tracks, 130 points, five judges. AI-native agents for the modern finance stack."
+    />
+    <link rel="stylesheet" href="style.css?v=11" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Caveat:wght@500;600;700&family=JetBrains+Mono:wght@500;600&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap"
+    />
+    <link rel="icon" type="image/png" href="briefcase-logo.png" />
+  </head>
+  <body>
+    <a class="skip-link" href="#tracks">Skip to content</a>
 
-  <header>
-    <div class="brand">
-      <span class="brand-mark" aria-hidden="true">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
-          <g transform="rotate(-8 12 13.5)">
-            <rect x="3" y="7" width="18" height="13" rx="2.2"/>
-            <path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/>
-            <path d="M3 12h18"/>
-          </g>
-        </svg>
-      </span>
-      <div class="brand-text">
-        <div class="brand-title">Cursor × Briefcase</div>
-        <div class="brand-subtitle">
-          <span class="brand-location">London · 2026</span>
-          <span class="brand-annotation">hack HQ</span>
-        </div>
-      </div>
-    </div>
-    <nav class="site-nav" aria-label="Primary">
-      <a href="#tracks">Tracks</a>
-      <a href="#rubric">Rubric</a>
-      <a href="#prizes">Prizes</a>
-      <a href="#judges">Judges</a>
-    </nav>
-    <div class="header-right">
-      <button type="button" class="btn btn-ghost" data-open-modal="judge-modal">Judge panel</button>
-      <button type="button" class="btn btn-primary" data-open-modal="submit-modal">Submit project</button>
-      <button type="button" class="btn btn-chip manager-btn" data-open-modal="manager-modal" aria-label="Hackathon manager">Manager</button>
-    </div>
-  </header>
-
-  <section id="tracks" class="tracks">
-    <div class="tracks-header">
-      <span class="eyebrow">London · May 17–18 · 2026</span>
-      <h1 class="tracks-title">
-        Two tracks.
-        <span class="tracks-title-accent">One finance stack.</span>
-      </h1>
-      <p class="tracks-sub">Ship an agent that genuinely changes how numbers get closed. 24 hours. 130-point rubric. Five judges. £2k + a year-plus of Cursor Ultra on the podium.</p>
-      <div class="tracks-stats" aria-label="Event stats at a glance">
-        <div class="tstat"><span class="tstat-num">2</span><span class="tstat-lbl">tracks</span></div>
-        <div class="tstat"><span class="tstat-num">130</span><span class="tstat-lbl">max score</span></div>
-        <div class="tstat"><span class="tstat-num">3</span><span class="tstat-lbl">podium places</span></div>
-        <div class="tstat"><span class="tstat-num">5</span><span class="tstat-lbl">judges</span></div>
-      </div>
-    </div>
-    <div class="tracks-grid" role="group" aria-label="Filter submissions by track">
-      <button type="button" class="track-card" data-track="reactive" aria-pressed="false">
-        <div class="track-card-head">
-          <span class="track-card-eyebrow">Track 01</span>
-          <span class="track-card-badge">Reactive</span>
-        </div>
-        <h2 class="track-card-title">Reactive Finance Agents</h2>
-        <p class="track-card-desc">Agents triggered by user intent or inbound events — answer ledger questions, triage invoices, reconcile on demand, co-pilot bookkeeping workflows.</p>
-        <ul class="track-card-tags">
-          <li>chat-first</li>
-          <li>on-demand</li>
-          <li>copilot</li>
-        </ul>
-        <ul class="track-card-examples" aria-label="Reactive examples">
-          <li>Slack bot answering "what's our cash runway?"</li>
-          <li>Email parser triaging AP invoices into Xero</li>
-          <li>Reconciliation copilot for bank feeds</li>
-        </ul>
-        <span class="track-card-cta">Filter submissions →</span>
-      </button>
-      <button type="button" class="track-card" data-track="proactive" aria-pressed="false">
-        <div class="track-card-head">
-          <span class="track-card-eyebrow">Track 02</span>
-          <span class="track-card-badge badge-accent">Proactive</span>
-        </div>
-        <h2 class="track-card-title">Proactive Finance Agents</h2>
-        <p class="track-card-desc">Always-on agents that monitor, anticipate, and act — continuous VAT &amp; audit checks, anomaly detection, receipt capture, cash-flow foresight, closes on schedule.</p>
-        <ul class="track-card-tags">
-          <li>always-on</li>
-          <li>webhook / cron</li>
-          <li>autonomous</li>
-        </ul>
-        <ul class="track-card-examples" aria-label="Proactive examples">
-          <li>Continuous VAT validator flagging filings pre-HMRC</li>
-          <li>Ledger anomaly detector scanning every 10 min</li>
-          <li>Auto-close agent booking recurring journals</li>
-        </ul>
-        <span class="track-card-cta">Filter submissions →</span>
-      </button>
-    </div>
-  </section>
-
-  <section id="rubric" class="rubric-section">
-    <div class="section-header">
-      <span class="eyebrow">How you win</span>
-      <h2 class="section-title">The <span class="accent-script">130-point</span> rubric</h2>
-      <p class="section-sub">100 core points from five criteria, plus up to 30 bonus points judges allocate across seven side quests.</p>
-    </div>
-    <div class="rubric-grid">
-      <div class="rubric-core" aria-label="Core rubric — 100 points">
-        <div class="rubric-core-head">
-          <span class="rubric-core-label">Core score</span>
-          <span class="rubric-core-total">/ 100</span>
-        </div>
-        <ol id="rubric-criteria" class="rubric-criteria"></ol>
-      </div>
-      <aside class="rubric-bonus" aria-label="Bonus bucket — 30 points">
-        <div class="rubric-bonus-head">
-          <span class="rubric-bonus-label">Judge bonus bucket</span>
-          <span class="rubric-bonus-total">+ 30</span>
-        </div>
-        <p class="rubric-bonus-desc">Judges allocate up to 30 bonus points across any mix of the side quests below.</p>
-        <ul id="side-quests" class="side-quests"></ul>
-      </aside>
-    </div>
-  </section>
-
-  <section id="prizes" class="prizes-section">
-    <div class="section-header">
-      <span class="eyebrow">What you win</span>
-      <h2 class="section-title">Podium</h2>
-      <p class="section-sub">Three places, across both tracks. £2,000 cash for 1st, plus Cursor Ultra seats for the top three.</p>
-    </div>
-    <ul id="prize-grid" class="prize-grid"></ul>
-  </section>
-
-  <section id="judges" class="judges-section">
-    <div class="section-header">
-      <span class="eyebrow">Who decides</span>
-      <h2 class="section-title">Judges</h2>
-      <p class="section-sub">Operators and investors who have shipped finance agents at scale.</p>
-    </div>
-    <ul id="judge-grid" class="judge-grid"></ul>
-  </section>
-
-  <main id="submissions" class="requires-auth" hidden>
-    <section class="panel full-width">
-      <div class="panel-header">
-        <div class="panel-header-text">
-          <h2>Submissions</h2>
-          <p class="panel-sub"><span id="submissions-count">—</span> projects · live dashboard</p>
-        </div>
-        <div class="filters">
-          <label><input type="checkbox" id="filter-preT0"> Pre-T0</label>
-          <label><input type="checkbox" id="filter-bulk"> Bulk</label>
-          <label><input type="checkbox" id="filter-merge"> Merge</label>
-          <div class="sorter">
-            <span>Sort by</span>
-            <select id="sort-select" aria-label="Sort submissions">
-              <option value="default">Default</option>
-              <option value="judge">Judge total</option>
-              <option value="commits">Commits</option>
-            </select>
+    <header>
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <img src="briefcase-logo.png" alt="" width="28" height="28" />
+        </span>
+        <div class="brand-text">
+          <div class="brand-title">Cursor × Briefcase</div>
+          <div class="brand-subtitle">
+            <span class="brand-location">London · 2026</span>
+            <span class="brand-annotation">hack HQ</span>
           </div>
         </div>
       </div>
-      <div class="table-wrapper">
-        <table id="summary-table">
-          <caption class="sr-only">Hackathon submissions, integrity flags, and judge scores</caption>
-          <thead>
-            <tr>
-              <th scope="col" class="th-repo">Submission</th>
-              <th scope="col" class="th-track">Track</th>
-              <th scope="col" class="th-status">Status</th>
-              <th scope="col" class="th-judge" data-tooltip="Average total score using the 100 core + 30 judge bonus bucket model">Judge Total</th>
-              <th scope="col" class="th-num" data-tooltip="Total number of commits in the repository">Commits</th>
-              <th scope="col" class="th-num" data-tooltip="Lines of code added across all commits">LOC+</th>
-              <th scope="col" class="th-num" data-tooltip="Lines of code deleted across all commits">LOC−</th>
-              <th scope="col" class="th-flag" data-tooltip="Commits made before the hackathon start time (T0)">Pre-T0</th>
-              <th scope="col" class="th-flag" data-tooltip="Contains bulk commits with unusually large changes">Bulk</th>
-              <th scope="col" class="th-flag" data-tooltip="Large initial commit after T0 (potential pre-work)">Init</th>
-              <th scope="col" class="th-flag" data-tooltip="Contains merge commits (may indicate external collaboration)">Merge</th>
-              <th scope="col" class="th-verdict" data-tooltip="AI assessment of project authenticity">Assessment</th>
-              <th scope="col" class="th-ai">AI Summary</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="#tracks">Tracks</a>
+        <a href="#rubric">Rubric</a>
+        <a href="#prizes">Prizes</a>
+        <a href="#judges">Judges</a>
+      </nav>
+      <div class="header-right">
+        <button
+          type="button"
+          class="btn btn-ghost"
+          data-open-modal="judge-modal"
+        >
+          Judge panel
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-open-modal="submit-modal"
+        >
+          Submit project
+        </button>
+        <button
+          type="button"
+          class="btn btn-chip manager-btn"
+          data-open-modal="manager-modal"
+          aria-label="Hackathon manager"
+        >
+          Manager
+        </button>
+      </div>
+    </header>
+
+    <section id="tracks" class="tracks">
+      <div class="tracks-header">
+        <span class="eyebrow">London · April 30 · 2026</span>
+        <h1 class="tracks-title">
+          Two tracks.
+          <span class="tracks-title-accent">One finance stack.</span>
+        </h1>
+        <p class="tracks-sub">
+          Human out of the loop in high risk financial workflows
+        </p>
+        <div class="tracks-stats" aria-label="Event stats at a glance">
+          <div class="tstat">
+            <span class="tstat-num">2</span
+            ><span class="tstat-lbl">tracks</span>
+          </div>
+          <div class="tstat">
+            <span class="tstat-num">130</span
+            ><span class="tstat-lbl">max score</span>
+          </div>
+          <div class="tstat">
+            <span class="tstat-num">3</span
+            ><span class="tstat-lbl">podium places</span>
+          </div>
+          <div class="tstat">
+            <span class="tstat-num">5</span
+            ><span class="tstat-lbl">judges</span>
+          </div>
+        </div>
+      </div>
+      <div
+        class="tracks-grid"
+        role="group"
+        aria-label="Filter submissions by track"
+      >
+        <button
+          type="button"
+          class="track-card"
+          data-track="money-movement"
+          aria-pressed="false"
+        >
+          <div class="track-card-head">
+            <span class="track-card-eyebrow">Track 01</span>
+            <span class="track-card-badge badge-accent">Money Movement</span>
+          </div>
+          <h2 class="track-card-title">Money Movement</h2>
+          <p class="track-card-desc">
+            Agents that actually move money — paying invoices, running payroll,
+            sending refunds, transferring between accounts. The risk is direct:
+            get it wrong and the money is gone. The human-in-the-loop question:
+            how big is too big to act alone, what counts as suspicious, and who
+            can the agent trust?
+          </p>
+          <ul class="track-card-examples" aria-label="Money Movement examples">
+            <li>Auto-pays small invoices, escalates the rest</li>
+            <li>Runs payroll, pauses when something looks off</li>
+            <li>Sweeps idle cash within set rails</li>
+          </ul>
+          <span class="track-card-cta">Filter submissions →</span>
+        </button>
+        <button
+          type="button"
+          class="track-card"
+          data-track="financial-intelligence"
+          aria-pressed="false"
+        >
+          <div class="track-card-head">
+            <span class="track-card-eyebrow">Track 02</span>
+            <span class="track-card-badge badge-accent"
+              >Financial Intelligence</span
+            >
+          </div>
+          <h2 class="track-card-title">Financial Intelligence</h2>
+          <p class="track-card-desc">
+            Agents that read and interpret money — categorising transactions,
+            spotting fraud, explaining bank lines, answering "what is this
+            charge for?". The risk is indirect: a wrong answer becomes a wrong
+            decision downstream. The human-in-the-loop question: how confident
+            is the agent really, and which edge cases deserve a human eye?
+          </p>
+          <ul
+            class="track-card-examples"
+            aria-label="Financial Intelligence examples"
+          >
+            <li>Categorises transactions, flags the uncertain</li>
+            <li>Detects fraud, asks when the signal is mixed</li>
+            <li>Explains bank lines, escalates the weird ones</li>
+          </ul>
+          <span class="track-card-cta">Filter submissions →</span>
+        </button>
       </div>
     </section>
 
-    <!-- Slide-out details panel -->
-    <aside id="details-drawer" class="drawer hidden" role="dialog" aria-modal="true" aria-labelledby="detail-title" tabindex="-1">
-      <div class="drawer-header">
-        <h2 id="detail-title">Repository Details</h2>
-        <div class="drawer-actions">
-          <button type="button" class="btn btn-ghost btn-small" id="drawer-judge-btn">Score this</button>
-          <button id="close-drawer" class="close-btn" aria-label="Close details">&times;</button>
-        </div>
+    <section id="rubric" class="rubric-section">
+      <div class="section-header">
+        <span class="eyebrow">How you win</span>
+        <h2 class="section-title">
+          The <span class="accent-script">130-point</span> rubric
+        </h2>
+        <p class="section-sub">
+          100 core points from five criteria, plus up to 30 bonus points judges
+          allocate across three side quests.
+        </p>
       </div>
-      <div class="drawer-content">
-        <div class="ai-section">
-          <h3>AI Analysis</h3>
-          <div id="ai-output" class="ai-output"></div>
-        </div>
-        <div class="judge-section">
-          <h3>Submission</h3>
-          <div id="submission-output" class="judge-output"></div>
-        </div>
-        <div class="judge-section">
-          <h3>Judge Responses</h3>
-          <div id="judge-output" class="judge-output"></div>
-        </div>
-        <div class="metrics-grid">
-          <div class="metric-card">
-            <h4>Summary</h4>
-            <pre id="metrics-summary"></pre>
+      <div class="rubric-grid">
+        <div class="rubric-core" aria-label="Core rubric — 100 points">
+          <div class="rubric-core-head">
+            <span class="rubric-core-label">Core score</span>
+            <span class="rubric-core-total">/ 100</span>
           </div>
-          <div class="metric-card">
-            <h4>Flags</h4>
-            <pre id="metrics-flags"></pre>
-          </div>
-          <div class="metric-card">
-            <h4>Time Distribution</h4>
-            <pre id="metrics-time"></pre>
-          </div>
+          <ol id="rubric-criteria" class="rubric-criteria"></ol>
         </div>
-        <div class="commits-section">
-          <h3>Commits <span class="commit-count"></span></h3>
-          <div class="table-wrapper commits-table-wrapper">
-            <table id="commits-table">
-              <thead>
-                <tr>
-                  <th scope="col">#</th>
-                  <th scope="col">Time</th>
-                  <th scope="col">+</th>
-                  <th scope="col">−</th>
-                  <th scope="col">Files</th>
-                  <th scope="col">Bulk</th>
-                  <th scope="col">&lt;T0</th>
-                  <th scope="col">&gt;T1</th>
-                  <th scope="col">Message</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
+        <aside class="rubric-bonus" aria-label="Bonus bucket — 30 points">
+          <div class="rubric-bonus-head">
+            <span class="rubric-bonus-label">Judge bonus bucket</span>
+            <span class="rubric-bonus-total">+ 30</span>
           </div>
-        </div>
+          <p class="rubric-bonus-desc">
+            Three side quests, 10 points each. Judges score every quest
+            independently — up to 30 bonus.
+          </p>
+          <ul id="side-quests" class="side-quests"></ul>
+        </aside>
       </div>
-    </aside>
-    <div id="drawer-overlay" class="drawer-overlay hidden"></div>
-  </main>
+    </section>
 
-  <footer class="site-footer">
-    <div class="footer-left">
-      <span class="brand-mark small" aria-hidden="true">📎</span>
-      <span>Cursor × Briefcase · London 2026</span>
-    </div>
-    <div class="footer-right">
-      <span>Inspired by the shape of <a href="https://briefcase.so" target="_blank" rel="noreferrer noopener">briefcase.so</a>.</span>
-      <span>Questions? Ping the Cursor team in <code>#finance-agents-2026</code>.</span>
-    </div>
-  </footer>
+    <section id="prizes" class="prizes-section">
+      <div class="section-header">
+        <span class="eyebrow">What you win</span>
+        <h2 class="section-title">Podium</h2>
+        <p class="section-sub">
+          Three places, across both tracks. £2,000 cash for 1st, plus Cursor
+          Ultra seats for the top three.
+        </p>
+      </div>
+      <ul id="prize-grid" class="prize-grid"></ul>
+    </section>
 
-  <!-- Submit modal -->
-  <div class="modal hidden" id="submit-modal" role="dialog" aria-modal="true" aria-labelledby="submit-modal-title">
-    <div class="modal-backdrop" data-close-modal></div>
-    <div class="modal-card" role="document">
-      <header class="modal-head">
-        <div>
-          <span class="eyebrow">Submit your project</span>
-          <h2 id="submit-modal-title" class="modal-title">Drop your repo in the ring</h2>
-        </div>
-        <button type="button" class="close-btn" data-close-modal aria-label="Close submit modal">&times;</button>
-      </header>
-      <form id="submit-form" class="modal-body" novalidate>
-        <div class="form-row two">
-          <label class="field">
-            <span class="field-label">Team name <em>*</em></span>
-            <input name="team_name" required placeholder="e.g. Ledger Labs">
-          </label>
-          <label class="field">
-            <span class="field-label">Project name <em>*</em></span>
-            <input name="project_name" required placeholder="e.g. VATwatch">
-          </label>
-        </div>
-        <label class="field">
-          <span class="field-label">GitHub URL <em>*</em></span>
-          <input name="github_url" type="url" required placeholder="https://github.com/team/project">
-        </label>
-        <div class="form-row two">
-          <div class="field">
-            <span class="field-label">Track <em>*</em></span>
-            <div class="track-picker" role="radiogroup" aria-label="Choose track">
-              <label class="track-pick">
-                <input type="radio" name="chosen_track" value="Reactive Finance Agents" required>
-                <span>Reactive</span>
-              </label>
-              <label class="track-pick">
-                <input type="radio" name="chosen_track" value="Proactive Finance Agents">
-                <span>Proactive</span>
-              </label>
+    <section id="judges" class="judges-section">
+      <div class="section-header">
+        <span class="eyebrow">Who decides</span>
+        <h2 class="section-title">Judges</h2>
+        <p class="section-sub">
+          Operators and investors who have shipped finance agents at scale.
+        </p>
+      </div>
+      <ul id="judge-grid" class="judge-grid"></ul>
+    </section>
+
+    <main id="submissions" class="requires-auth" hidden>
+      <section class="panel full-width">
+        <div class="panel-header">
+          <div class="panel-header-text">
+            <h2>Submissions</h2>
+            <p class="panel-sub">
+              <span id="submissions-count">—</span> projects · live dashboard
+            </p>
+          </div>
+          <div class="filters">
+            <label><input type="checkbox" id="filter-preT0" /> Pre-T0</label>
+            <label><input type="checkbox" id="filter-bulk" /> Bulk</label>
+            <label><input type="checkbox" id="filter-merge" /> Merge</label>
+            <div class="sorter">
+              <span>Sort by</span>
+              <select id="sort-select" aria-label="Sort submissions">
+                <option value="default">Default</option>
+                <option value="judge">Judge total</option>
+                <option value="commits">Commits</option>
+              </select>
             </div>
           </div>
-          <label class="field">
-            <span class="field-label">Demo URL</span>
-            <input name="demo_url" type="url" placeholder="https://youtu.be/…">
-          </label>
         </div>
-        <label class="field">
-          <span class="field-label">Team members <em>*</em></span>
-          <input name="team_members" required placeholder="Alice, Bob, Charlie">
-        </label>
-        <label class="field">
-          <span class="field-label">One-line description <em>*</em></span>
-          <input name="description" required maxlength="140" placeholder="What does the agent do in one sentence?">
-        </label>
-        <label class="field">
-          <span class="field-label">Notes (optional)</span>
-          <textarea name="notes" rows="3" placeholder="Anything judges should know — architecture, integrations, known gaps"></textarea>
-        </label>
-        <footer class="modal-foot">
-          <p class="form-help">Submissions are stored locally in your browser for the demo. Real events write to <code>data/submissions-raw.csv</code>.</p>
-          <div class="modal-actions">
-            <button type="button" class="btn btn-ghost" data-close-modal>Cancel</button>
-            <button type="submit" class="btn btn-primary">Submit project</button>
+        <div class="table-wrapper">
+          <table id="summary-table">
+            <caption class="sr-only">
+              Hackathon submissions, integrity flags, and judge scores
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col" class="th-repo">Submission</th>
+                <th scope="col" class="th-track">Track</th>
+                <th scope="col" class="th-status">Status</th>
+                <th
+                  scope="col"
+                  class="th-judge"
+                  data-tooltip="Average total score using the 100 core + 30 judge bonus bucket model"
+                >
+                  Judge Total
+                </th>
+                <th
+                  scope="col"
+                  class="th-num"
+                  data-tooltip="Total number of commits in the repository"
+                >
+                  Commits
+                </th>
+                <th
+                  scope="col"
+                  class="th-num"
+                  data-tooltip="Lines of code added across all commits"
+                >
+                  LOC+
+                </th>
+                <th
+                  scope="col"
+                  class="th-num"
+                  data-tooltip="Lines of code deleted across all commits"
+                >
+                  LOC−
+                </th>
+                <th
+                  scope="col"
+                  class="th-flag"
+                  data-tooltip="Commits made before the hackathon start time (T0)"
+                >
+                  Pre-T0
+                </th>
+                <th
+                  scope="col"
+                  class="th-flag"
+                  data-tooltip="Contains bulk commits with unusually large changes"
+                >
+                  Bulk
+                </th>
+                <th
+                  scope="col"
+                  class="th-flag"
+                  data-tooltip="Large initial commit after T0 (potential pre-work)"
+                >
+                  Init
+                </th>
+                <th
+                  scope="col"
+                  class="th-flag"
+                  data-tooltip="Contains merge commits (may indicate external collaboration)"
+                >
+                  Merge
+                </th>
+                <th
+                  scope="col"
+                  class="th-verdict"
+                  data-tooltip="AI assessment of project authenticity"
+                >
+                  Assessment
+                </th>
+                <th scope="col" class="th-ai">AI Summary</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Slide-out details panel -->
+      <aside
+        id="details-drawer"
+        class="drawer hidden"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="detail-title"
+        tabindex="-1"
+      >
+        <div class="drawer-header">
+          <h2 id="detail-title">Repository Details</h2>
+          <div class="drawer-actions">
+            <button
+              type="button"
+              class="btn btn-ghost btn-small"
+              id="drawer-judge-btn"
+            >
+              Score this
+            </button>
+            <button
+              id="close-drawer"
+              class="close-btn"
+              aria-label="Close details"
+            >
+              &times;
+            </button>
           </div>
-        </footer>
-      </form>
-    </div>
-  </div>
-
-  <!-- Judge modal -->
-  <div class="modal hidden" id="judge-modal" role="dialog" aria-modal="true" aria-labelledby="judge-modal-title">
-    <div class="modal-backdrop" data-close-modal></div>
-    <div class="modal-card judge-card" role="document">
-      <header class="modal-head">
-        <div>
-          <span class="eyebrow">Judge panel</span>
-          <h2 id="judge-modal-title" class="modal-title">Score a submission</h2>
         </div>
-        <button type="button" class="close-btn" data-close-modal aria-label="Close judge modal">&times;</button>
-      </header>
-      <form id="judge-form" class="modal-body" novalidate>
-        <div class="form-row two">
-          <label class="field">
-            <span class="field-label">Judge name <em>*</em></span>
-            <input name="judge_name" id="judge-name-input" required placeholder="e.g. Ján Stehlík">
-          </label>
-          <label class="field">
-            <span class="field-label">Submission <em>*</em></span>
-            <select name="submission_id" id="judge-submission-select" required></select>
-          </label>
-        </div>
-        <div id="judge-submission-summary" class="judge-submission-summary" aria-live="polite"></div>
-        <fieldset class="score-group">
-          <legend>Core score <span class="score-group-cap">/ 100</span></legend>
-          <div id="judge-core-inputs" class="score-inputs"></div>
-        </fieldset>
-        <fieldset class="score-group">
-          <legend>Bonus bucket <span class="score-group-cap">up to / 30</span></legend>
-          <div id="judge-bonus-inputs" class="score-inputs"></div>
-        </fieldset>
-        <label class="field">
-          <span class="field-label">Notes for the record</span>
-          <textarea name="thoughts" rows="3" placeholder="What did this submission nail? Where did it cut corners?"></textarea>
-        </label>
-        <footer class="modal-foot">
-          <div class="score-running"><span class="score-running-label">Running total</span><span id="judge-running-total" class="score-running-num">0</span> / 130</div>
-          <div class="modal-actions">
-            <button type="button" class="btn btn-ghost" data-close-modal>Cancel</button>
-            <button type="submit" class="btn btn-primary">Save score</button>
+        <div class="drawer-content">
+          <div class="ai-section">
+            <h3>AI Analysis</h3>
+            <div id="ai-output" class="ai-output"></div>
           </div>
-        </footer>
-      </form>
-    </div>
-  </div>
-
-  <!-- Manager modal -->
-  <div class="modal hidden" id="manager-modal" role="dialog" aria-modal="true" aria-labelledby="manager-modal-title">
-    <div class="modal-backdrop" data-close-modal></div>
-    <div class="modal-card manager-card" role="document">
-      <header class="modal-head">
-        <div>
-          <span class="eyebrow">Hackathon manager</span>
-          <h2 id="manager-modal-title" class="modal-title">Organizer cockpit</h2>
-        </div>
-        <button type="button" class="close-btn" data-close-modal aria-label="Close manager modal">&times;</button>
-      </header>
-      <div class="modal-body">
-        <div class="manager-stats" id="manager-stats"></div>
-
-        <section class="manager-section">
-          <h3>Leaderboard · by track</h3>
-          <div class="leaderboards">
-            <div class="leaderboard">
-              <h4>Reactive</h4>
-              <ol id="leaderboard-reactive"></ol>
+          <div class="judge-section">
+            <h3>Submission</h3>
+            <div id="submission-output" class="judge-output"></div>
+          </div>
+          <div class="judge-section">
+            <h3>Judge Responses</h3>
+            <div id="judge-output" class="judge-output"></div>
+          </div>
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <h4>Summary</h4>
+              <pre id="metrics-summary"></pre>
             </div>
-            <div class="leaderboard">
-              <h4>Proactive</h4>
-              <ol id="leaderboard-proactive"></ol>
+            <div class="metric-card">
+              <h4>Flags</h4>
+              <pre id="metrics-flags"></pre>
+            </div>
+            <div class="metric-card">
+              <h4>Time Distribution</h4>
+              <pre id="metrics-time"></pre>
             </div>
           </div>
-        </section>
-
-        <section class="manager-section">
-          <h3>Integrity watchlist</h3>
-          <p class="manager-hint">Projects with one or more integrity flags raised.</p>
-          <ul id="flagged-list" class="flagged-list"></ul>
-        </section>
-
-        <section class="manager-section">
-          <h3>Locally-submitted projects</h3>
-          <p class="manager-hint">Submissions entered through the Submit modal this session.</p>
-          <ul id="local-submissions" class="flagged-list"></ul>
-        </section>
-
-        <footer class="modal-foot">
-          <p class="form-help">Exports are stubs for the demo; in production the manager panel writes back to <code>data/</code> and rebuilds on next deploy.</p>
-          <div class="modal-actions">
-            <button type="button" class="btn btn-ghost" id="export-submissions-btn">Export submissions JSON</button>
-            <button type="button" class="btn btn-primary" data-close-modal>Close</button>
+          <div class="commits-section">
+            <h3>Commits <span class="commit-count"></span></h3>
+            <div class="table-wrapper commits-table-wrapper">
+              <table id="commits-table">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Time</th>
+                    <th scope="col">+</th>
+                    <th scope="col">−</th>
+                    <th scope="col">Files</th>
+                    <th scope="col">Bulk</th>
+                    <th scope="col">&lt;T0</th>
+                    <th scope="col">&gt;T1</th>
+                    <th scope="col">Message</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
           </div>
-        </footer>
+        </div>
+      </aside>
+      <div id="drawer-overlay" class="drawer-overlay hidden"></div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-left">
+        <span class="brand-mark small" aria-hidden="true">
+          <img src="briefcase-logo.png" alt="" width="16" height="16" />
+        </span>
+        <span>Cursor × Briefcase · London 2026</span>
+      </div>
+    </footer>
+
+    <!-- Submit modal -->
+    <div
+      class="modal hidden"
+      id="submit-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="submit-modal-title"
+    >
+      <div class="modal-backdrop" data-close-modal></div>
+      <div class="modal-card" role="document">
+        <header class="modal-head">
+          <div>
+            <span class="eyebrow">Submit your project</span>
+            <h2 id="submit-modal-title" class="modal-title">
+              Drop your repo in the ring
+            </h2>
+          </div>
+          <button
+            type="button"
+            class="close-btn"
+            data-close-modal
+            aria-label="Close submit modal"
+          >
+            &times;
+          </button>
+        </header>
+        <form id="submit-form" class="modal-body" novalidate>
+          <div class="form-row two">
+            <label class="field">
+              <span class="field-label">Team name <em>*</em></span>
+              <input
+                name="team_name"
+                required
+                placeholder="e.g. Loop Engineers"
+              />
+            </label>
+            <label class="field">
+              <span class="field-label">Project name <em>*</em></span>
+              <input name="project_name" required placeholder="e.g. PayPause" />
+            </label>
+          </div>
+          <label class="field">
+            <span class="field-label">GitHub URL <em>*</em></span>
+            <input
+              name="github_url"
+              type="url"
+              required
+              placeholder="https://github.com/team/project"
+            />
+          </label>
+          <div class="form-row two">
+            <div class="field">
+              <span class="field-label">Track <em>*</em></span>
+              <div
+                class="track-picker"
+                role="radiogroup"
+                aria-label="Choose track"
+              >
+                <label class="track-pick">
+                  <input
+                    type="radio"
+                    name="chosen_track"
+                    value="Money Movement"
+                    required
+                  />
+                  <span>Money Movement</span>
+                </label>
+                <label class="track-pick">
+                  <input
+                    type="radio"
+                    name="chosen_track"
+                    value="Financial Intelligence"
+                  />
+                  <span>Financial Intelligence</span>
+                </label>
+              </div>
+            </div>
+            <label class="field">
+              <span class="field-label">Demo URL</span>
+              <input
+                name="demo_url"
+                type="url"
+                placeholder="https://youtu.be/…"
+              />
+            </label>
+          </div>
+          <label class="field">
+            <span class="field-label">Team members <em>*</em></span>
+            <input
+              name="team_members"
+              required
+              placeholder="Alice, Bob, Charlie"
+            />
+          </label>
+          <label class="field">
+            <span class="field-label">One-line description <em>*</em></span>
+            <input
+              name="description"
+              required
+              maxlength="140"
+              placeholder="What does the agent do in one sentence?"
+            />
+          </label>
+          <label class="field">
+            <span class="field-label">Notes (optional)</span>
+            <textarea
+              name="notes"
+              rows="3"
+              placeholder="Anything judges should know — architecture, integrations, known gaps"
+            ></textarea>
+          </label>
+          <footer class="modal-foot">
+            <p class="form-help">
+              Submissions are stored locally in your browser for the demo. Real
+              events write to <code>data/submissions-raw.csv</code>.
+            </p>
+            <div class="modal-actions">
+              <button type="button" class="btn btn-ghost" data-close-modal>
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary">
+                Submit project
+              </button>
+            </div>
+          </footer>
+        </form>
       </div>
     </div>
-  </div>
 
-  <!-- Password gate (judges + organizers) -->
-  <div class="modal hidden" id="password-modal" role="dialog" aria-modal="true" aria-labelledby="password-modal-title">
-    <div class="modal-backdrop" data-close-modal></div>
-    <div class="modal-card password-card" role="document">
-      <header class="modal-head">
-        <div>
-          <span class="eyebrow">Restricted</span>
-          <h2 id="password-modal-title" class="modal-title">Enter access code</h2>
-        </div>
-        <button type="button" class="close-btn" data-close-modal aria-label="Close password prompt">&times;</button>
-      </header>
-      <form id="password-form" class="modal-body" novalidate>
-        <p class="form-help" style="margin-top:0">Judge &amp; Hack Manager panels are password-protected. Ask the organizers for the code.</p>
-        <label class="field">
-          <span class="field-label">Access code <em>*</em></span>
-          <input name="password" type="password" autocomplete="off" required placeholder="••••••••">
-        </label>
-        <p id="password-error" class="form-help" role="alert" style="color:var(--danger);min-height:1.2em;margin-top:-4px"></p>
-        <footer class="modal-foot">
-          <div class="modal-actions">
-            <button type="button" class="btn btn-ghost" data-close-modal>Cancel</button>
-            <button type="submit" class="btn btn-primary">Unlock</button>
+    <!-- Judge modal -->
+    <div
+      class="modal hidden"
+      id="judge-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="judge-modal-title"
+    >
+      <div class="modal-backdrop" data-close-modal></div>
+      <div class="modal-card judge-card" role="document">
+        <header class="modal-head">
+          <div>
+            <span class="eyebrow">Judge panel</span>
+            <h2 id="judge-modal-title" class="modal-title">
+              Score a submission
+            </h2>
           </div>
-        </footer>
-      </form>
+          <button
+            type="button"
+            class="close-btn"
+            data-close-modal
+            aria-label="Close judge modal"
+          >
+            &times;
+          </button>
+        </header>
+        <form id="judge-form" class="modal-body" novalidate>
+          <div class="form-row two">
+            <label class="field">
+              <span class="field-label">Judge name <em>*</em></span>
+              <input
+                name="judge_name"
+                id="judge-name-input"
+                required
+                placeholder="e.g. Ján Stehlík"
+              />
+            </label>
+            <label class="field">
+              <span class="field-label">Submission <em>*</em></span>
+              <select
+                name="submission_id"
+                id="judge-submission-select"
+                required
+              ></select>
+            </label>
+          </div>
+          <div
+            id="judge-submission-summary"
+            class="judge-submission-summary"
+            aria-live="polite"
+          ></div>
+          <fieldset class="score-group">
+            <legend>
+              Core score <span class="score-group-cap">/ 100</span>
+            </legend>
+            <div id="judge-core-inputs" class="score-inputs"></div>
+          </fieldset>
+          <fieldset class="score-group">
+            <legend>
+              Bonus bucket <span class="score-group-cap">up to / 30</span>
+            </legend>
+            <div id="judge-bonus-inputs" class="score-inputs"></div>
+          </fieldset>
+          <label class="field">
+            <span class="field-label">Notes for the record</span>
+            <textarea
+              name="thoughts"
+              rows="3"
+              placeholder="What did this submission nail? Where did it cut corners?"
+            ></textarea>
+          </label>
+          <footer class="modal-foot">
+            <div class="score-running">
+              <span class="score-running-label">Running total</span
+              ><span id="judge-running-total" class="score-running-num">0</span>
+              / 130
+            </div>
+            <div class="modal-actions">
+              <button type="button" class="btn btn-ghost" data-close-modal>
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary">Save score</button>
+            </div>
+          </footer>
+        </form>
+      </div>
     </div>
-  </div>
 
-  <script src="script.js?v=10"></script>
-</body>
+    <!-- Manager modal -->
+    <div
+      class="modal hidden"
+      id="manager-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="manager-modal-title"
+    >
+      <div class="modal-backdrop" data-close-modal></div>
+      <div class="modal-card manager-card" role="document">
+        <header class="modal-head">
+          <div>
+            <span class="eyebrow">Hackathon manager</span>
+            <h2 id="manager-modal-title" class="modal-title">
+              Organizer cockpit
+            </h2>
+          </div>
+          <button
+            type="button"
+            class="close-btn"
+            data-close-modal
+            aria-label="Close manager modal"
+          >
+            &times;
+          </button>
+        </header>
+        <div class="modal-body">
+          <div class="manager-stats" id="manager-stats"></div>
+
+          <section class="manager-section">
+            <h3>Leaderboard · by track</h3>
+            <div class="leaderboards">
+              <div class="leaderboard">
+                <h4>Money Movement</h4>
+                <ol id="leaderboard-money-movement"></ol>
+              </div>
+              <div class="leaderboard">
+                <h4>Financial Intelligence</h4>
+                <ol id="leaderboard-financial-intelligence"></ol>
+              </div>
+            </div>
+          </section>
+
+          <section class="manager-section">
+            <h3>Integrity watchlist</h3>
+            <p class="manager-hint">
+              Projects with one or more integrity flags raised.
+            </p>
+            <ul id="flagged-list" class="flagged-list"></ul>
+          </section>
+
+          <section class="manager-section">
+            <h3>Locally-submitted projects</h3>
+            <p class="manager-hint">
+              Submissions entered through the Submit modal this session.
+            </p>
+            <ul id="local-submissions" class="flagged-list"></ul>
+          </section>
+
+          <footer class="modal-foot">
+            <p class="form-help">
+              Exports are stubs for the demo; in production the manager panel
+              writes back to <code>data/</code> and rebuilds on next deploy.
+            </p>
+            <div class="modal-actions">
+              <button
+                type="button"
+                class="btn btn-ghost"
+                id="export-submissions-btn"
+              >
+                Export submissions JSON
+              </button>
+              <button type="button" class="btn btn-primary" data-close-modal>
+                Close
+              </button>
+            </div>
+          </footer>
+        </div>
+      </div>
+    </div>
+
+    <!-- Password gate (judges + organizers) -->
+    <div
+      class="modal hidden"
+      id="password-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="password-modal-title"
+    >
+      <div class="modal-backdrop" data-close-modal></div>
+      <div class="modal-card password-card" role="document">
+        <header class="modal-head">
+          <div>
+            <span class="eyebrow">Restricted</span>
+            <h2 id="password-modal-title" class="modal-title">
+              Enter access code
+            </h2>
+          </div>
+          <button
+            type="button"
+            class="close-btn"
+            data-close-modal
+            aria-label="Close password prompt"
+          >
+            &times;
+          </button>
+        </header>
+        <form id="password-form" class="modal-body" novalidate>
+          <p class="form-help" style="margin-top: 0">
+            Judge &amp; Hack Manager panels are password-protected. Ask the
+            organizers for the code.
+          </p>
+          <label class="field">
+            <span class="field-label">Access code <em>*</em></span>
+            <input
+              name="password"
+              type="password"
+              autocomplete="off"
+              required
+              placeholder="••••••••"
+            />
+          </label>
+          <p
+            id="password-error"
+            class="form-help"
+            role="alert"
+            style="color: var(--danger); min-height: 1.2em; margin-top: -4px"
+          ></p>
+          <footer class="modal-foot">
+            <div class="modal-actions">
+              <button type="button" class="btn btn-ghost" data-close-modal>
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary">Unlock</button>
+            </div>
+          </footer>
+        </form>
+      </div>
+    </div>
+
+    <script src="script.js?v=12"></script>
+  </body>
 </html>

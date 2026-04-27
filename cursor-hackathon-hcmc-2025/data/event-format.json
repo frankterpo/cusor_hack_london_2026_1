@@ -1,39 +1,39 @@
 {
   "event_name": "Cursor x Briefcase London hackathon",
-  "event_tagline": "AI-native agents for the modern finance stack",
-  "event_dates": "2026-05-17 → 2026-05-18",
+  "event_tagline": "Human out of the loop in high-risk financial workflows",
+  "event_dates": "2026-04-30",
   "event_location": "London",
   "hack_id": "cursor-briefcase-london-2026",
   "timeline": {
-    "t0": "2026-05-17T10:00:00+01:00",
-    "t1": "2026-05-18T16:00:00+01:00",
-    "submissions_close": "2026-05-18T16:00:00+01:00",
-    "judging_closes": "2026-05-18T19:30:00+01:00",
-    "winners_announced": "2026-05-18T20:00:00+01:00"
+    "t0": "2026-04-30T10:00:00+01:00",
+    "t1": "2026-04-30T18:00:00+01:00",
+    "submissions_close": "2026-04-30T18:00:00+01:00",
+    "judging_closes": "2026-04-30T19:30:00+01:00",
+    "winners_announced": "2026-04-30T20:00:00+01:00"
   },
   "main_tracks": [
     {
-      "id": "Reactive-Finance-Agents",
-      "name": "Reactive Finance Agents",
-      "short": "Reactive",
-      "summary": "Triggered by user intent or inbound events.",
-      "description": "Agents triggered by user intent or inbound events — answer ledger questions, triage invoices, reconcile on demand, co-pilot bookkeeping workflows.",
+      "id": "Money-Movement",
+      "name": "Money Movement",
+      "short": "Money Movement",
+      "summary": "Agents that actually move money. A wrong action means real money is gone.",
+      "description": "Workflows where your agent moves money — paying invoices, running payroll, sending refunds, transferring between accounts. The risk is direct: get it wrong and the money is gone. The human-in-the-loop question: how big is too big to act alone, what counts as suspicious, and who can the agent trust?",
       "examples": [
-        "Slack bot that answers \"what's our cash runway?\"",
-        "Email parser that triages AP invoices into Xero",
-        "Reconciliation copilot for bank feeds"
+        "Agent that auto-pays small invoices and escalates the rest",
+        "Payroll runner that pauses when something looks off",
+        "Refund bot that handles routine cases and asks before the rest"
       ]
     },
     {
-      "id": "Proactive-Finance-Agents",
-      "name": "Proactive Finance Agents",
-      "short": "Proactive",
-      "summary": "Always-on. Monitors, anticipates, acts.",
-      "description": "Always-on agents that monitor, anticipate, and act — continuous VAT & audit checks, anomaly detection, receipt capture, cash-flow foresight, closes on schedule.",
+      "id": "Financial-Intelligence",
+      "name": "Financial Intelligence",
+      "short": "Financial Intelligence",
+      "summary": "Agents that read, interpret, and explain. A wrong answer means a wrong decision downstream.",
+      "description": "Agents that read and interpret money — categorising transactions, spotting fraud, explaining bank lines, answering \"what is this charge for?\". The risk is indirect: a wrong answer becomes a wrong decision downstream. The human-in-the-loop question: how confident is the agent really, and which edge cases deserve a human eye?",
       "examples": [
-        "Continuous VAT validator that flags filings before HMRC does",
-        "Anomaly detector scanning the ledger every 10 minutes",
-        "Auto-close agent that books recurring journals on schedule"
+        "Agent that categorises transactions and flags the ones it isn't sure about",
+        "Fraud detector that asks a human when the signal is mixed",
+        "Bot that explains every line on a bank statement"
       ]
     }
   ],
@@ -52,13 +52,13 @@
         "id": "track_fit",
         "name": "Track Fit",
         "points": 25,
-        "description": "How purely does the submission embody its chosen track (reactive vs proactive)?"
+        "description": "How purely does the submission embody its chosen track (money movement vs financial intelligence)?"
       },
       {
-        "id": "reliability_and_verification",
-        "name": "Reliability & Verification",
+        "id": "human_in_the_loop_decision",
+        "name": "Human-in-the-Loop Decision",
         "points": 20,
-        "description": "Evals, guardrails, audit trails, human-in-the-loop checkpoints."
+        "description": "Does the system know when a human should be in the loop vs not? Thresholds, confidence gates, escalation paths."
       },
       {
         "id": "technical_execution",
@@ -77,45 +77,26 @@
   "judge_bonus_bucket": {
     "name": "Judge Bonus Bucket",
     "max_points": 30,
-    "description": "Judges may allocate up to 30 total bonus points across one or more side quests."
+    "description": "Three side quests, 10 points each. Judges score every quest independently."
   },
   "side_quests": [
     {
-      "id": "best_cursor_native_workflow",
-      "name": "Best Cursor-Native Workflow",
-      "blurb": "The cleanest end-to-end Cursor → code → agent pipeline."
+      "id": "repeatability",
+      "name": "Repeatability",
+      "points": 10,
+      "blurb": "The agent completes the workflow reliably across multiple runs — same input, same outcome."
     },
     {
-      "id": "best_developer_tool",
-      "name": "Best Developer Tool",
-      "blurb": "Something accountants or devs on finance teams would actually install."
+      "id": "learning_from_steering",
+      "name": "Learning from Human Steering",
+      "points": 10,
+      "blurb": "When a human makes a correction, the agent learns from it and improves the next run."
     },
     {
-      "id": "best_reliability_system",
-      "name": "Best Reliability System",
-      "blurb": "Evals, traces, fallbacks, repro tests — reliability as first-class design."
-    },
-    {
-      "id": "most_technically_ambitious",
-      "name": "Most Technically Ambitious",
-      "blurb": "Hardest thing attempted — bonus for nailing it."
-    },
-    {
-      "id": "best_demo",
-      "name": "Best Demo",
-      "blurb": "The demo that makes a judge lean forward."
-    },
-    {
-      "id": "best_use_of_ai_safety",
-      "name": "Best Use of AI Safety",
-      "sponsor": "White Circle",
-      "blurb": "Safety-first finance agents — evals for hallucination, PII leakage, prompt injection, and audit-grade reasoning traces."
-    },
-    {
-      "id": "best_use_of_openai",
-      "name": "Best Use of OpenAI",
-      "sponsor": "OpenAI",
-      "blurb": "Sharpest use of the OpenAI model family — reasoning, tool use, Codex, Realtime, Responses API."
+      "id": "creativity",
+      "name": "Creativity",
+      "points": 10,
+      "blurb": "An angle on the problem that no one else thought to try."
     }
   ],
   "prizes": [
@@ -186,11 +167,11 @@
     }
   ],
   "sponsors": [
-    { "name": "Cursor",       "tier": "host" },
-    { "name": "Briefcase",    "tier": "design-partner" },
+    { "name": "Cursor", "tier": "host" },
+    { "name": "Briefcase", "tier": "design-partner" },
     { "name": "White Circle", "tier": "ai-safety" },
-    { "name": "OpenAI",       "tier": "models" },
-    { "name": "Vercel",       "tier": "infra" },
-    { "name": "Anthropic",    "tier": "models" }
+    { "name": "OpenAI", "tier": "models" },
+    { "name": "Vercel", "tier": "infra" },
+    { "name": "Anthropic", "tier": "models" }
   ]
 }

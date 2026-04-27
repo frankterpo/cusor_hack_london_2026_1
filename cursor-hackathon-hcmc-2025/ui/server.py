@@ -17,6 +17,8 @@ from urllib.parse import unquote
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 JUDGE_RESPONSES_PATH = PROJECT_ROOT / "data" / "judge-responses-normalized.json"
 SUBMISSIONS_PATH = PROJECT_ROOT / "data" / "submissions-normalized.json"
+EVENT_FORMAT_PATH = PROJECT_ROOT / "data" / "event-format.json"
+HACKS_PATH = PROJECT_ROOT / "data" / "hacks.json"
 
 
 class UiHandler(SimpleHTTPRequestHandler):
@@ -49,6 +51,10 @@ class UiHandler(SimpleHTTPRequestHandler):
             return self.handle_judges()
         if path == "/api/submissions":
             return self.handle_submissions()
+        if path == "/api/event-format":
+            return self.handle_event_format()
+        if path == "/api/hacks":
+            return self.handle_hacks()
         if path.startswith("/api/repo/"):
             return self.handle_repo(path)
         return super().do_GET()
@@ -80,6 +86,24 @@ class UiHandler(SimpleHTTPRequestHandler):
             data = json.loads(SUBMISSIONS_PATH.read_text(encoding="utf-8"))
         except Exception as exc:
             return self._send_json({"error": f"failed to load submissions data: {exc}"}, status=500)
+        return self._send_json(data)
+
+    def handle_event_format(self):
+        if not EVENT_FORMAT_PATH.exists():
+            return self._send_json({"error": "event format not found"}, status=404)
+        try:
+            data = json.loads(EVENT_FORMAT_PATH.read_text(encoding="utf-8"))
+        except Exception as exc:
+            return self._send_json({"error": f"failed to load event format: {exc}"}, status=500)
+        return self._send_json(data)
+
+    def handle_hacks(self):
+        if not HACKS_PATH.exists():
+            return self._send_json({"hacks": [], "active_hack_id": None})
+        try:
+            data = json.loads(HACKS_PATH.read_text(encoding="utf-8"))
+        except Exception as exc:
+            return self._send_json({"error": f"failed to load hacks: {exc}"}, status=500)
         return self._send_json(data)
 
     def handle_repo(self, path: str):
