@@ -10,7 +10,7 @@
       name="description"
       content="Cursor x Briefcase London hackathon — two tracks, 130 points, five judges. AI-native agents for the modern finance stack."
     />
-    <link rel="stylesheet" href="style.css?v=19" />
+    <link rel="stylesheet" href="style.css?v=26" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -24,17 +24,20 @@
 
     <header>
       <div class="brand">
-        <span class="brand-mark brand-mark--video" aria-hidden="true">
+        <span
+          class="brand-mark brand-mark--video"
+          tabindex="0"
+          role="button"
+          aria-label="Play Cursor logo animation"
+        >
           <div class="brand-cursor-video-tint">
             <video
               class="brand-cursor-video video-smooth"
               playsinline
               muted
-              loop
-              autoplay
               preload="auto"
               poster="cursor-cube-briefcase.png"
-              aria-label="Cursor logo animation"
+              aria-hidden="true"
             >
               <source type="video/webm" src="https://cursor.com/marketing-static/logo/logo-dark-theme.webm" />
               <source type="video/mp4" src="https://cursor.com/marketing-static/logo/logo-dark-theme.mp4" />
@@ -108,7 +111,7 @@
         </button>
         <button
           type="button"
-          class="btn btn-chip manager-btn"
+          class="btn btn-primary manager-btn"
           data-open-modal="manager-modal"
           aria-label="Hackathon manager"
         >
@@ -146,17 +149,8 @@
           </div>
         </div>
       </div>
-      <div
-        class="tracks-grid"
-        role="group"
-        aria-label="Filter submissions by track"
-      >
-        <button
-          type="button"
-          class="track-card"
-          data-track="money-movement"
-          aria-pressed="false"
-        >
+      <div class="tracks-grid" role="group" aria-label="Hackathon tracks">
+        <article class="track-card">
           <div class="track-card-head">
             <span class="track-card-eyebrow">Track 01</span>
             <span class="track-card-badge badge-accent">Money Movement</span>
@@ -174,14 +168,8 @@
             <li>Runs payroll, pauses when something looks off</li>
             <li>Sweeps idle cash within set rails</li>
           </ul>
-          <span class="track-card-cta">Filter submissions →</span>
-        </button>
-        <button
-          type="button"
-          class="track-card"
-          data-track="financial-intelligence"
-          aria-pressed="false"
-        >
+        </article>
+        <article class="track-card">
           <div class="track-card-head">
             <span class="track-card-eyebrow">Track 02</span>
             <span class="track-card-badge badge-accent"
@@ -204,8 +192,7 @@
             <li>Detects fraud, asks when the signal is mixed</li>
             <li>Explains bank lines, escalates the weird ones</li>
           </ul>
-          <span class="track-card-cta">Filter submissions →</span>
-        </button>
+        </article>
       </div>
     </section>
 
@@ -452,8 +439,26 @@
 
     <footer class="site-footer">
       <div class="footer-left">
-        <span class="brand-mark small" aria-hidden="true">
-          <img src="cursor-cube-briefcase.png" alt="" width="16" height="16" />
+        <span
+          class="brand-mark brand-mark--video brand-mark--footer"
+          tabindex="0"
+          role="button"
+          aria-label="Play Cursor logo animation"
+        >
+          <div class="brand-cursor-video-tint">
+            <video
+              class="brand-cursor-video video-smooth"
+              playsinline
+              muted
+              preload="auto"
+              poster="cursor-cube-briefcase.png"
+              aria-hidden="true"
+            >
+              <source type="video/webm" src="https://cursor.com/marketing-static/logo/logo-dark-theme.webm" />
+              <source type="video/mp4" src="https://cursor.com/marketing-static/logo/logo-dark-theme.mp4" />
+              <source type="video/quicktime" src="https://cursor.com/marketing-static/logo/logo-dark-theme.mov" />
+            </video>
+          </div>
         </span>
         <span>
           Cursor × Briefcase ·
@@ -825,6 +830,6 @@
       </div>
     </div>
 
-    <script src="script.js?v=14"></script>
+    <script src="script.js?v=17"></script>
   </body>
 </html>

@@ -1612,26 +1612,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const exportBtn = document.getElementById("export-submissions-btn");
   if (exportBtn) exportBtn.addEventListener("click", exportSubmissionsJSON);
 
-  // Track cards act as filters — click Money Movement / Financial Intelligence to filter the table
-  const trackCards = Array.from(document.querySelectorAll(".track-card"));
-  const submissionsPanel = document.querySelector(".panel.full-width");
-  trackCards.forEach((card) => {
-    card.addEventListener("click", () => {
-      const category = card.dataset.track || null;
-      const isActive = window.__trackFilter === category;
-      window.__trackFilter = isActive ? null : category;
-      trackCards.forEach((c) => {
-        const active = c.dataset.track === window.__trackFilter;
-        c.classList.toggle("is-active", active);
-        c.setAttribute("aria-pressed", active ? "true" : "false");
-      });
-      renderSummaryTable(window.__summaryRows || []);
-      if (!isActive && submissionsPanel) {
-        submissionsPanel.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    });
-  });
-
   // Drawer close handlers
   document
     .getElementById("close-drawer")
@@ -1648,13 +1628,37 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  const brandVideo = document.querySelector(".brand-cursor-video");
-  if (brandVideo) {
-    const reveal = () => brandVideo.classList.add("is-visible");
-    brandVideo.addEventListener("canplay", reveal, { once: true });
-    brandVideo.addEventListener("loadeddata", reveal, { once: true });
-    window.setTimeout(reveal, 4500);
-  }
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  document.querySelectorAll(".brand-mark.brand-mark--video").forEach((brandShell) => {
+    const brandVideo = brandShell.querySelector(".brand-cursor-video");
+    if (!brandVideo) return;
+    brandVideo.pause();
+    brandVideo.currentTime = 0;
+
+    function isActivelyPlaying() {
+      return !brandVideo.paused && !brandVideo.ended;
+    }
+
+    function tryPlayBrandVideo() {
+      if (reduceMotion) return;
+      if (isActivelyPlaying()) return;
+      if (brandVideo.ended) brandVideo.currentTime = 0;
+      const p = brandVideo.play();
+      if (p !== undefined) p.catch(() => {});
+    }
+
+    brandShell.addEventListener("mouseenter", tryPlayBrandVideo);
+    brandShell.addEventListener("click", (e) => {
+      e.preventDefault();
+      tryPlayBrandVideo();
+    });
+    brandShell.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        tryPlayBrandVideo();
+      }
+    });
+  });
 
   // Load event format + hacks + data
   loadHacks();

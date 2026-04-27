@@ -151,24 +151,25 @@ header {
   color: var(--primary-700);
   box-shadow: var(--shadow-xs), 0 0 18px var(--accent-glow);
 }
-@keyframes brand-mark-cube-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Header video mark: no chrome — poster reads as the logo until hover/click plays clip */
+.brand-mark.brand-mark--video {
+  width: auto;
+  height: auto;
+  min-width: 0;
+  min-height: 0;
+  max-width: none;
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  overflow: visible;
+  cursor: pointer;
 }
-header .brand-mark:hover .brand-cursor-video-tint,
-header .brand-mark:hover > img {
-  animation: brand-mark-cube-spin 0.7s ease-in-out;
-  transform-origin: center center;
-}
-@media (prefers-reduced-motion: reduce) {
-  header .brand-mark:hover .brand-cursor-video-tint,
-  header .brand-mark:hover > img {
-    animation: none;
-  }
+.brand-mark.brand-mark--video:focus-visible {
+  outline: 2px solid var(--primary-500);
+  outline-offset: 3px;
+  border-radius: 6px;
 }
 /* Static cube fallback (poster / img) — same luminous teal as accents */
 .brand-mark > img {
@@ -178,47 +179,28 @@ header .brand-mark:hover > img {
   filter: drop-shadow(0 0 4px rgba(160, 220, 231, 0.5)) brightness(1.08) saturate(1.2);
 }
 
-/* Cursor.com logo loop — Briefcase teal via overlay + slight filter */
-.brand-mark--video {
-  width: auto;
-  min-width: 44px;
-  max-width: 112px;
-  padding: 2px 6px;
-  overflow: hidden;
-}
 .brand-cursor-video-tint {
-  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   height: 36px;
-  max-width: 100%;
-  isolation: isolate;
-}
-.brand-cursor-video-tint::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  border-radius: 8px;
-  background: rgba(160, 220, 231, 0.34);
-  mix-blend-mode: color;
-  z-index: 1;
+  line-height: 0;
 }
 .brand-cursor-video {
-  position: relative;
-  z-index: 0;
   display: block;
-  height: 100%;
+  height: 36px;
   width: auto;
-  max-width: 100%;
+  max-width: min(112px, 32vw);
   object-fit: contain;
-  opacity: 0;
-  transition: opacity 0.5s ease;
-  filter: saturate(1.2) brightness(1.08);
-}
-.brand-cursor-video.is-visible {
   opacity: 1;
+  filter: saturate(1.08) brightness(1.04);
+}
+.brand-mark.brand-mark--video.brand-mark--footer .brand-cursor-video-tint {
+  height: 14px;
+}
+.brand-mark.brand-mark--video.brand-mark--footer .brand-cursor-video {
+  height: 14px;
+  max-width: 48px;
 }
 .video-smooth {
   -webkit-backface-visibility: hidden;
@@ -241,9 +223,9 @@ header .brand-mark:hover > img {
 
 .brand-subtitle {
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;
   gap: 8px;
-  margin-top: 3px;
+  margin-top: 6px;
 }
 
 .brand-location {
@@ -274,8 +256,8 @@ header .brand-mark:hover > img {
   display: inline-flex;
   align-items: center;
   image-rendering: pixelated;
-  /* Optical align with .brand-location cap height (baseline flex sits SVG high) */
-  transform: translateY(2px);
+  /* Nudge below cap line so logo center matches location text + clears title above */
+  transform: translateY(7px);
 }
 .brand-halkin-svg {
   display: block;
@@ -418,28 +400,17 @@ header .brand-mark:hover > img {
   border-radius: var(--r-2xl);
   padding: 26px 26px 24px;
   box-shadow: var(--shadow-sm);
-  cursor: pointer;
   transition: box-shadow 0.18s ease, transform 0.18s ease,
     border-color 0.18s ease;
   text-align: left;
   width: 100%;
-  font: inherit;
   color: inherit;
-  -webkit-appearance: none;
-  appearance: none;
 }
 
-.track-card:hover,
-.track-card:focus-visible {
+.track-card:hover {
   box-shadow: var(--shadow-md);
   border-color: var(--primary-200);
   transform: translateY(-1px);
-  outline: none;
-}
-
-.track-card.is-active {
-  border-color: var(--primary-500);
-  box-shadow: 0 0 0 3px var(--accent-ring), var(--shadow-md);
 }
 
 .track-card-head {
@@ -510,31 +481,6 @@ header .brand-mark:hover > img {
   border: 1px solid var(--border-subtle);
   padding: 3px 8px;
   border-radius: 5px;
-}
-
-.track-card-cta {
-  display: inline-block;
-  margin-top: 18px;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  color: var(--primary-700);
-  opacity: 0;
-  transform: translateX(-4px);
-  transition: opacity 0.18s ease, transform 0.18s ease;
-}
-
-.track-card:hover .track-card-cta,
-.track-card:focus-visible .track-card-cta,
-.track-card.is-active .track-card-cta {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-.track-card.is-active .track-card-cta::before {
-  content: "Filtering · ";
-  color: var(--primary-800);
 }
 
 /* ---------------- Main layout ---------------- */
@@ -2398,19 +2344,6 @@ html {
 .footer-halkin:hover {
   color: var(--primary-400);
   text-decoration: underline;
-}
-.brand-mark.small {
-  width: 22px;
-  height: 22px;
-  font-size: 0.9rem;
-  border-radius: 6px;
-  background: var(--primary-50);
-  border: 1px solid var(--primary-200);
-  box-shadow: 0 0 14px var(--accent-glow);
-}
-.brand-mark.small img {
-  display: block;
-  filter: drop-shadow(0 0 4px rgba(160, 220, 231, 0.5)) brightness(1.08) saturate(1.2);
 }
 .footer-right {
   display: flex;
