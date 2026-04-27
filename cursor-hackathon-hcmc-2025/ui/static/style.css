@@ -181,12 +181,31 @@ header {
   text-transform: uppercase;
 }
 
-.brand-annotation {
-  font-family: var(--font-script);
-  font-size: 1.05rem;
-  color: var(--primary-700);
-  transform: rotate(-4deg) translateY(1px);
-  display: inline-block;
+.brand-halkin {
+  display: inline-flex;
+  align-items: center;
+  line-height: 0;
+  text-decoration: none;
+  border-radius: 6px;
+  outline-offset: 2px;
+  transition: opacity 0.15s ease;
+}
+.brand-halkin:hover {
+  opacity: 0.9;
+}
+.brand-halkin:focus-visible {
+  outline: 2px solid var(--primary-500);
+}
+.brand-halkin-inner {
+  display: inline-flex;
+  align-items: center;
+  image-rendering: pixelated;
+}
+.brand-halkin img {
+  display: block;
+  height: 22px;
+  width: auto;
+  max-width: min(134px, 38vw);
 }
 
 .header-right {
