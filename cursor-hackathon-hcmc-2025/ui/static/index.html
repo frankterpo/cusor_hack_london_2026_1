@@ -10,7 +10,7 @@
       name="description"
       content="Cursor x Briefcase London hackathon — two tracks, 130 points, five judges. AI-native agents for the modern finance stack."
     />
-    <link rel="stylesheet" href="style.css?v=28" />
+    <link rel="stylesheet" href="style.css?v=38" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -20,7 +20,7 @@
     <link rel="icon" type="image/png" href="cursor-cube-briefcase-32.png" sizes="32x32" />
   </head>
   <body>
-    <a class="skip-link" href="#tracks">Skip to content</a>
+    <a class="skip-link" href="#site-content">Skip to content</a>
 
     <header>
       <div class="brand">
@@ -36,7 +36,6 @@
               playsinline
               muted
               preload="auto"
-              poster="cursor-cube-briefcase.png"
               aria-hidden="true"
             >
               <source type="video/webm" src="https://cursor.com/marketing-static/logo/logo-dark-theme.webm" />
@@ -97,13 +96,6 @@
       <div class="header-right">
         <button
           type="button"
-          class="btn btn-ghost"
-          data-open-modal="judge-modal"
-        >
-          Judge panel
-        </button>
-        <button
-          type="button"
           class="btn btn-primary"
           data-open-modal="submit-modal"
         >
@@ -111,7 +103,14 @@
         </button>
         <button
           type="button"
-          class="btn btn-primary manager-btn"
+          class="btn btn-ghost"
+          data-open-modal="judge-modal"
+        >
+          Judge panel
+        </button>
+        <button
+          type="button"
+          class="btn btn-ghost manager-btn"
           data-open-modal="manager-modal"
           aria-label="Hackathon manager"
         >
@@ -120,6 +119,7 @@
       </div>
     </header>
 
+    <main id="site-content" tabindex="-1">
     <section id="tracks" class="tracks">
       <div class="tracks-header">
         <span class="eyebrow">London · April 30 · 2026</span>
@@ -194,6 +194,90 @@
           </ul>
         </article>
       </div>
+      <div class="subtracks" aria-labelledby="subtracks-heading">
+        <p class="subtracks-eyebrow" id="subtracks-heading">Spotlight awards</p>
+        <ul class="subtracks-grid">
+          <li class="subtrack-card">
+            <div class="subtrack-logo-wrap" aria-hidden="true">
+              <img
+                class="subtrack-logo subtrack-logo--cursor"
+                src="cursor-cube-briefcase-32.png"
+                width="40"
+                height="40"
+                alt=""
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <h3 class="subtrack-title">Best use of Cursor</h3>
+          </li>
+          <li class="subtrack-card">
+            <div class="subtrack-logo-wrap" aria-hidden="true">
+              <img
+                class="subtrack-logo subtrack-logo--safe-ai"
+                src="white-circle-safe-ai.svg"
+                width="44"
+                height="44"
+                alt=""
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <h3 class="subtrack-title">Best use of Safe AI</h3>
+          </li>
+          <li class="subtrack-card">
+            <div class="subtrack-logo-wrap" aria-hidden="true">
+              <svg
+                class="subtrack-icon"
+                viewBox="0 0 48 48"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect
+                  x="8"
+                  y="12"
+                  width="32"
+                  height="26"
+                  rx="4"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  fill="rgba(109,201,219,0.08)"
+                />
+                <path
+                  d="M14 22h8M14 28h20M14 34h12"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  opacity="0.85"
+                />
+              </svg>
+            </div>
+            <h3 class="subtrack-title">Best use of Financial Practices</h3>
+          </li>
+          <li class="subtrack-card">
+            <div class="subtrack-logo-wrap" aria-hidden="true">
+              <svg
+                class="subtrack-icon"
+                viewBox="0 0 48 48"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <circle cx="14" cy="16" r="4" fill="currentColor" opacity="0.9" />
+                <circle cx="34" cy="12" r="4" fill="currentColor" opacity="0.9" />
+                <circle cx="24" cy="32" r="4" fill="currentColor" opacity="0.9" />
+                <path
+                  d="M17 18l4 10M30 14l-4 12M18 32l10-4"
+                  stroke="currentColor"
+                  stroke-width="1.25"
+                  stroke-linecap="round"
+                  opacity="0.65"
+                />
+              </svg>
+            </div>
+            <h3 class="subtrack-title">Best use of LLM models</h3>
+          </li>
+        </ul>
+      </div>
     </section>
 
     <section id="rubric" class="rubric-section">
@@ -252,191 +336,6 @@
       <ul id="judge-grid" class="judge-grid"></ul>
     </section>
 
-    <main id="submissions" class="requires-auth" hidden>
-      <section class="panel full-width">
-        <div class="panel-header">
-          <div class="panel-header-text">
-            <h2>Submissions</h2>
-            <p class="panel-sub">
-              <span id="submissions-count">—</span> projects · live dashboard
-            </p>
-          </div>
-          <div class="filters">
-            <label><input type="checkbox" id="filter-preT0" /> Pre-T0</label>
-            <label><input type="checkbox" id="filter-bulk" /> Bulk</label>
-            <label><input type="checkbox" id="filter-merge" /> Merge</label>
-            <div class="sorter">
-              <span>Sort by</span>
-              <select id="sort-select" aria-label="Sort submissions">
-                <option value="default">Default</option>
-                <option value="judge">Judge total</option>
-                <option value="commits">Commits</option>
-              </select>
-            </div>
-          </div>
-        </div>
-        <div class="table-wrapper">
-          <table id="summary-table">
-            <caption class="sr-only">
-              Hackathon submissions, integrity flags, and judge scores
-            </caption>
-            <thead>
-              <tr>
-                <th scope="col" class="th-repo">Submission</th>
-                <th scope="col" class="th-track">Track</th>
-                <th scope="col" class="th-status">Status</th>
-                <th
-                  scope="col"
-                  class="th-judge"
-                  data-tooltip="Average total score using the 100 core + 30 judge bonus bucket model"
-                >
-                  Judge Total
-                </th>
-                <th
-                  scope="col"
-                  class="th-num"
-                  data-tooltip="Total number of commits in the repository"
-                >
-                  Commits
-                </th>
-                <th
-                  scope="col"
-                  class="th-num"
-                  data-tooltip="Lines of code added across all commits"
-                >
-                  LOC+
-                </th>
-                <th
-                  scope="col"
-                  class="th-num"
-                  data-tooltip="Lines of code deleted across all commits"
-                >
-                  LOC−
-                </th>
-                <th
-                  scope="col"
-                  class="th-flag"
-                  data-tooltip="Commits made before the hackathon start time (T0)"
-                >
-                  Pre-T0
-                </th>
-                <th
-                  scope="col"
-                  class="th-flag"
-                  data-tooltip="Contains bulk commits with unusually large changes"
-                >
-                  Bulk
-                </th>
-                <th
-                  scope="col"
-                  class="th-flag"
-                  data-tooltip="Large initial commit after T0 (potential pre-work)"
-                >
-                  Init
-                </th>
-                <th
-                  scope="col"
-                  class="th-flag"
-                  data-tooltip="Contains merge commits (may indicate external collaboration)"
-                >
-                  Merge
-                </th>
-                <th
-                  scope="col"
-                  class="th-verdict"
-                  data-tooltip="AI assessment of project authenticity"
-                >
-                  Assessment
-                </th>
-                <th scope="col" class="th-ai">AI Summary</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- Slide-out details panel -->
-      <aside
-        id="details-drawer"
-        class="drawer hidden"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="detail-title"
-        tabindex="-1"
-      >
-        <div class="drawer-header">
-          <h2 id="detail-title">Repository Details</h2>
-          <div class="drawer-actions">
-            <button
-              type="button"
-              class="btn btn-ghost btn-small"
-              id="drawer-judge-btn"
-            >
-              Score this
-            </button>
-            <button
-              id="close-drawer"
-              class="close-btn"
-              aria-label="Close details"
-            >
-              &times;
-            </button>
-          </div>
-        </div>
-        <div class="drawer-content">
-          <div class="ai-section">
-            <h3>AI Analysis</h3>
-            <div id="ai-output" class="ai-output"></div>
-          </div>
-          <div class="judge-section">
-            <h3>Submission</h3>
-            <div id="submission-output" class="judge-output"></div>
-          </div>
-          <div class="judge-section">
-            <h3>Judge Responses</h3>
-            <div id="judge-output" class="judge-output"></div>
-          </div>
-          <div class="metrics-grid">
-            <div class="metric-card">
-              <h4>Summary</h4>
-              <pre id="metrics-summary"></pre>
-            </div>
-            <div class="metric-card">
-              <h4>Flags</h4>
-              <pre id="metrics-flags"></pre>
-            </div>
-            <div class="metric-card">
-              <h4>Time Distribution</h4>
-              <pre id="metrics-time"></pre>
-            </div>
-          </div>
-          <div class="commits-section">
-            <h3>Commits <span class="commit-count"></span></h3>
-            <div class="table-wrapper commits-table-wrapper">
-              <table id="commits-table">
-                <thead>
-                  <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Time</th>
-                    <th scope="col">+</th>
-                    <th scope="col">−</th>
-                    <th scope="col">Files</th>
-                    <th scope="col">Bulk</th>
-                    <th scope="col">&lt;T0</th>
-                    <th scope="col">&gt;T1</th>
-                    <th scope="col">Message</th>
-                  </tr>
-                </thead>
-                <tbody></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </aside>
-      <div id="drawer-overlay" class="drawer-overlay hidden"></div>
-    </main>
-
     <footer class="site-footer">
       <div class="footer-left">
         <span
@@ -451,7 +350,6 @@
               playsinline
               muted
               preload="auto"
-              poster="cursor-cube-briefcase.png"
               aria-hidden="true"
             >
               <source type="video/webm" src="https://cursor.com/marketing-static/logo/logo-dark-theme.webm" />
@@ -472,6 +370,7 @@
         </span>
       </div>
     </footer>
+    </main>
 
     <!-- Submit modal -->
     <div
@@ -611,7 +510,7 @@
       aria-labelledby="judge-modal-title"
     >
       <div class="modal-backdrop" data-close-modal></div>
-      <div class="modal-card judge-card" role="document">
+      <div class="modal-card modal-card--judge" role="document">
         <header class="modal-head">
           <div>
             <span class="eyebrow">Judge panel</span>
@@ -629,7 +528,7 @@
           </button>
         </header>
         <form id="judge-form" class="modal-body" novalidate>
-          <div class="form-row two">
+          <div class="form-row two judge-form-row-top">
             <label class="field">
               <span class="field-label">Judge name <em>*</em></span>
               <input
@@ -639,14 +538,20 @@
                 placeholder="e.g. Ján Stehlík"
               />
             </label>
-            <label class="field">
+            <div class="field field--block">
               <span class="field-label">Submission <em>*</em></span>
               <select
                 name="submission_id"
                 id="judge-submission-select"
                 required
+                class="judge-submission-select"
               ></select>
-            </label>
+              <div
+                id="judge-submission-toolbar"
+                class="judge-submission-toolbar"
+                aria-live="polite"
+              ></div>
+            </div>
           </div>
           <div
             id="judge-submission-summary"
@@ -717,42 +622,217 @@
           </button>
         </header>
         <div class="modal-body">
-          <div class="manager-stats" id="manager-stats"></div>
-
-          <section class="manager-section">
-            <h3>Leaderboard · by track</h3>
-            <div class="leaderboards">
-              <div class="leaderboard">
-                <h4>Money Movement</h4>
-                <ol id="leaderboard-money-movement"></ol>
-              </div>
-              <div class="leaderboard">
-                <h4>Financial Intelligence</h4>
-                <ol id="leaderboard-financial-intelligence"></ol>
-              </div>
+          <div data-manager-dashboard tabindex="-1" id="manager-recap-start">
+            <div
+              class="manager-tablist"
+              role="tablist"
+              aria-label="Organizer views"
+            >
+              <button
+                type="button"
+                class="manager-tab"
+                role="tab"
+                id="tab-mgr-submissions"
+                data-manager-tab="submissions"
+                aria-selected="true"
+                aria-controls="panel-mgr-submissions"
+              >
+                Submissions
+              </button>
+              <button
+                type="button"
+                class="manager-tab"
+                role="tab"
+                id="tab-mgr-leaderboards"
+                data-manager-tab="leaderboards"
+                aria-selected="false"
+                aria-controls="panel-mgr-leaderboards"
+                tabindex="-1"
+              >
+                Leaderboards
+              </button>
+              <button
+                type="button"
+                class="manager-tab"
+                role="tab"
+                id="tab-mgr-recap"
+                data-manager-tab="recap"
+                aria-selected="false"
+                aria-controls="panel-mgr-recap"
+                tabindex="-1"
+              >
+                Recap
+              </button>
+              <button
+                type="button"
+                class="manager-tab"
+                role="tab"
+                id="tab-mgr-integrity"
+                data-manager-tab="integrity"
+                aria-selected="false"
+                aria-controls="panel-mgr-integrity"
+                tabindex="-1"
+              >
+                Integrity &amp; local
+              </button>
             </div>
-          </section>
 
-          <section class="manager-section">
-            <h3>Integrity watchlist</h3>
-            <p class="manager-hint">
-              Projects with one or more integrity flags raised.
-            </p>
-            <ul id="flagged-list" class="flagged-list"></ul>
-          </section>
+            <div
+              id="panel-mgr-submissions"
+              role="tabpanel"
+              class="manager-tab-panel"
+              data-manager-panel="submissions"
+              aria-labelledby="tab-mgr-submissions"
+            >
+              <div class="manager-toolbar">
+                <span class="manager-toolbar-label">Actions</span>
+                <button
+                  type="button"
+                  class="btn btn-ghost"
+                  id="manager-jump-dashboard"
+                  title="Open Submissions tab and scroll to the live table"
+                >
+                  Jump to table
+                </button>
+                <a
+                  class="btn btn-ghost"
+                  id="manager-open-organizer"
+                  href="organizer.html"
+                  title="Full-page organizer recap (same data)"
+                >
+                  Full organizer page
+                </a>
+              </div>
 
-          <section class="manager-section">
-            <h3>Locally-submitted projects</h3>
-            <p class="manager-hint">
-              Submissions entered through the Submit modal this session.
-            </p>
-            <ul id="local-submissions" class="flagged-list"></ul>
-          </section>
+              <div class="manager-stats" id="manager-stats"></div>
+              <div
+                class="manager-secondary-stats"
+                id="manager-secondary-stats"
+                aria-label="Recap totals"
+              ></div>
+
+              <div
+                id="manager-submissions-host"
+                class="manager-submissions-host"
+                aria-label="Live submissions table"
+              ></div>
+
+              <section class="manager-section manager-section--first">
+                <h3>All submissions · snapshot</h3>
+                <p class="manager-hint">
+                  Quick scan with commits, churn, and links. Row actions open the
+                  same detail drawer as the main table. API-backed lists are
+                  scoped to the active hackathon on the server.
+                </p>
+                <div class="manager-table-scroll">
+                  <table class="manager-snapshot-table" id="manager-snapshot-table">
+                    <thead>
+                      <tr>
+                        <th scope="col">Project</th>
+                        <th scope="col">Track</th>
+                        <th scope="col">Commits</th>
+                        <th scope="col">+LOC</th>
+                        <th scope="col">−LOC</th>
+                        <th scope="col">Integrity</th>
+                        <th scope="col">Judge Ø</th>
+                        <th scope="col">Links</th>
+                      </tr>
+                    </thead>
+                    <tbody id="manager-snapshot-tbody"></tbody>
+                  </table>
+                </div>
+              </section>
+            </div>
+
+            <div
+              id="panel-mgr-leaderboards"
+              role="tabpanel"
+              class="manager-tab-panel"
+              data-manager-panel="leaderboards"
+              aria-labelledby="tab-mgr-leaderboards"
+              hidden
+            >
+              <section class="manager-section manager-section--first">
+                <h3>Leaderboard · overall (judge average)</h3>
+                <p class="manager-hint">
+                  Highest combined rubric scores — across both tracks.
+                </p>
+                <div class="leaderboard leaderboard--full">
+                  <ol id="leaderboard-overall"></ol>
+                </div>
+              </section>
+
+              <section class="manager-section">
+                <h3>Leaderboard · by track</h3>
+                <p class="manager-hint">
+                  When a submission has no track label, it appears only in the
+                  overall board — tag submissions in the form or data to split
+                  leaderboards.
+                </p>
+                <div class="leaderboards">
+                  <div class="leaderboard">
+                    <h4>Money Movement</h4>
+                    <ol id="leaderboard-money-movement"></ol>
+                  </div>
+                  <div class="leaderboard">
+                    <h4>Financial Intelligence</h4>
+                    <ol id="leaderboard-financial-intelligence"></ol>
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            <div
+              id="panel-mgr-recap"
+              role="tabpanel"
+              class="manager-tab-panel"
+              data-manager-panel="recap"
+              aria-labelledby="tab-mgr-recap"
+              hidden
+            >
+              <section class="manager-section manager-section--first manager-section--compact">
+                <h3>Recap · engineering signals</h3>
+                <p class="manager-hint">
+                  Aggregated from the Git analysis feed (commits + churn). Use
+                  alongside integrity flags when reviewing submissions.
+                </p>
+                <div class="manager-aggregates" id="manager-aggregates"></div>
+              </section>
+            </div>
+
+            <div
+              id="panel-mgr-integrity"
+              role="tabpanel"
+              class="manager-tab-panel"
+              data-manager-panel="integrity"
+              aria-labelledby="tab-mgr-integrity"
+              hidden
+            >
+              <section class="manager-section manager-section--first">
+                <h3>Integrity watchlist</h3>
+                <p class="manager-hint">
+                  Projects with one or more integrity flags raised.
+                </p>
+                <ul id="flagged-list" class="flagged-list"></ul>
+              </section>
+
+              <section class="manager-section">
+                <h3>Locally-submitted projects</h3>
+                <p class="manager-hint">
+                  Submissions entered through the Submit modal this session
+                  (browser only).
+                </p>
+                <ul id="local-submissions" class="flagged-list"></ul>
+              </section>
+            </div>
+          </div>
 
           <footer class="modal-foot">
             <p class="form-help">
-              Exports are stubs for the demo; in production the manager panel
-              writes back to <code>data/</code> and rebuilds on next deploy.
+              Export downloads JSON including merged Git summary rows
+              (<code>github_summary_rows</code>), local scores, and
+              browser-only submissions. Production can POST the same payload to
+              your API.
             </p>
             <div class="modal-actions">
               <button
@@ -830,6 +910,191 @@
       </div>
     </div>
 
-    <script src="script.js?v=17"></script>
+    <!-- Slide-out details panel (body-level so it is not clipped inside modals) -->
+    <aside
+      id="details-drawer"
+      class="drawer hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="detail-title"
+      tabindex="-1"
+    >
+      <div class="drawer-header">
+        <h2 id="detail-title">Repository Details</h2>
+        <div class="drawer-actions">
+          <button
+            type="button"
+            class="btn btn-ghost btn-small"
+            id="drawer-judge-btn"
+          >
+            Score this
+          </button>
+          <button
+            id="close-drawer"
+            class="close-btn"
+            aria-label="Close details"
+          >
+            &times;
+          </button>
+        </div>
+      </div>
+      <div class="drawer-content">
+        <div class="ai-section">
+          <h3>AI Analysis</h3>
+          <div id="ai-output" class="ai-output"></div>
+        </div>
+        <div class="judge-section">
+          <h3>Submission</h3>
+          <div id="submission-output" class="judge-output"></div>
+        </div>
+        <div class="judge-section">
+          <h3>Judge Responses</h3>
+          <div id="judge-output" class="judge-output"></div>
+        </div>
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <h4>Summary</h4>
+            <pre id="metrics-summary"></pre>
+          </div>
+          <div class="metric-card">
+            <h4>Flags</h4>
+            <pre id="metrics-flags"></pre>
+          </div>
+          <div class="metric-card">
+            <h4>Time Distribution</h4>
+            <pre id="metrics-time"></pre>
+          </div>
+        </div>
+        <div class="commits-section">
+          <h3>Commits <span class="commit-count"></span></h3>
+          <div class="table-wrapper commits-table-wrapper">
+            <table id="commits-table">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Time</th>
+                  <th scope="col">+</th>
+                  <th scope="col">−</th>
+                  <th scope="col">Files</th>
+                  <th scope="col">Bulk</th>
+                  <th scope="col">&lt;T0</th>
+                  <th scope="col">&gt;T1</th>
+                  <th scope="col">Message</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </aside>
+    <div id="drawer-overlay" class="drawer-overlay hidden"></div>
+
+    <template id="manager-submissions-template">
+            <section class="panel full-width manager-submissions-panel">
+              <div class="panel-header">
+                <div class="panel-header-text">
+                  <h2>Submissions</h2>
+                  <p class="panel-sub">
+                    <span id="submissions-count">—</span> projects · live dashboard
+                  </p>
+                </div>
+                <div class="filters">
+                  <label><input type="checkbox" id="filter-preT0" /> Pre-T0</label>
+                  <label><input type="checkbox" id="filter-bulk" /> Bulk</label>
+                  <label><input type="checkbox" id="filter-merge" /> Merge</label>
+                  <div class="sorter">
+                    <span>Sort by</span>
+                    <select id="sort-select" aria-label="Sort submissions">
+                      <option value="default">Default</option>
+                      <option value="judge">Judge total</option>
+                      <option value="commits">Commits</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="table-wrapper manager-summary-table-wrap">
+                <table id="summary-table">
+                  <caption class="sr-only">
+                    Hackathon submissions, integrity flags, and judge scores
+                  </caption>
+                  <thead>
+                    <tr>
+                      <th scope="col" class="th-repo">Submission</th>
+                      <th scope="col" class="th-track">Track</th>
+                      <th scope="col" class="th-status">Status</th>
+                      <th
+                        scope="col"
+                        class="th-judge"
+                        data-tooltip="Average total score using the 100 core + 30 judge bonus bucket model"
+                      >
+                        Judge Total
+                      </th>
+                      <th
+                        scope="col"
+                        class="th-num"
+                        data-tooltip="Total number of commits in the repository"
+                      >
+                        Commits
+                      </th>
+                      <th
+                        scope="col"
+                        class="th-num"
+                        data-tooltip="Lines of code added across all commits"
+                      >
+                        LOC+
+                      </th>
+                      <th
+                        scope="col"
+                        class="th-num"
+                        data-tooltip="Lines of code deleted across all commits"
+                      >
+                        LOC−
+                      </th>
+                      <th
+                        scope="col"
+                        class="th-flag"
+                        data-tooltip="Commits made before the hackathon start time (T0)"
+                      >
+                        Pre-T0
+                      </th>
+                      <th
+                        scope="col"
+                        class="th-flag"
+                        data-tooltip="Contains bulk commits with unusually large changes"
+                      >
+                        Bulk
+                      </th>
+                      <th
+                        scope="col"
+                        class="th-flag"
+                        data-tooltip="Large initial commit after T0 (potential pre-work)"
+                      >
+                        Init
+                      </th>
+                      <th
+                        scope="col"
+                        class="th-flag"
+                        data-tooltip="Contains merge commits (may indicate external collaboration)"
+                      >
+                        Merge
+                      </th>
+                      <th
+                        scope="col"
+                        class="th-verdict"
+                        data-tooltip="AI assessment of project authenticity"
+                      >
+                        Assessment
+                      </th>
+                      <th scope="col" class="th-ai">AI Summary</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </section>
+    </template>
+
+    <script src="script.js?v=26"></script>
   </body>
 </html>

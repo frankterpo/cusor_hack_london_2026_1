@@ -4,6 +4,11 @@ function getEnv(name) {
   return value;
 }
 
+/** Default hackathon row from migration `20260427150000_hackathons_multitenant.sql` */
+const DEFAULT_HACKATHON_ID =
+  process.env.DEFAULT_HACKATHON_ID ||
+  "a0000001-0000-4000-8000-000000000001";
+
 async function supabaseRest(path, options = {}) {
   const url = getEnv("SUPABASE_PROJECT_URL");
   const key = getEnv("SUPABASE_SERVICE_ROLE_SECRET");
@@ -27,7 +32,10 @@ async function supabaseRest(path, options = {}) {
 // --- Submissions ---
 
 async function getSubmissions() {
-  const rows = await supabaseRest("/submissions?order=submitted_at.desc.nullsfirst");
+  const hid = encodeURIComponent(DEFAULT_HACKATHON_ID);
+  const rows = await supabaseRest(
+    `/submissions?hackathon_id=eq.${hid}&order=submitted_at.desc.nullsfirst`
+  );
   return (rows || []).map(r => ({ ...r, timestamp: r.submitted_at }));
 }
 
@@ -63,6 +71,7 @@ async function upsertSubmission(row) {
     has_merge_commits: row.has_merge_commits || 0,
     default_branch: row.default_branch || "",
     uses_white_circle: row.uses_white_circle === true,
+    hackathon_id: row.hackathon_id || DEFAULT_HACKATHON_ID,
   };
   const result = await supabaseRest("/submissions?on_conflict=repo_key", {
     method: "POST",
@@ -75,8 +84,9 @@ async function upsertSubmission(row) {
 // --- Judge Responses ---
 
 async function getJudgeResponses(repoKey) {
+  const hid = `&hackathon_id=eq.${encodeURIComponent(DEFAULT_HACKATHON_ID)}`;
   const filter = repoKey ? `&repo_key=eq.${encodeURIComponent(repoKey)}` : "";
-  const rows = await supabaseRest(`/judge_responses?order=submitted_at.desc${filter}`);
+  const rows = await supabaseRest(`/judge_responses?order=submitted_at.desc${hid}${filter}`);
   return (rows || []).map(r => ({ ...r, timestamp: r.submitted_at }));
 }
 
@@ -96,19 +106,26 @@ async function upsertJudgeResponse(row) {
     bonus_total_raw: row.bonus_total_raw || 0,
     bonus_total_capped: row.bonus_total_capped || 0,
     total_score: row.total_score || 0,
+    hackathon_id: row.hackathon_id || DEFAULT_HACKATHON_ID,
   };
-  const result = await supabaseRest("/judge_responses?on_conflict=judge_name,repo_key", {
+  const result = await supabaseRest(
+    "/judge_responses?on_conflict=judge_name,repo_key,hackathon_id",
+    {
     method: "POST",
     headers: { Prefer: "return=representation,resolution=merge-duplicates" },
     body: JSON.stringify(payload),
-  });
+    }
+  );
   return result && result[0] ? { ...result[0], timestamp: result[0].submitted_at } : payload;
 }
 
 // --- Analyses ---
 
 async function getAnalysis(repoKey) {
-  const rows = await supabaseRest(`/analyses?repo_key=eq.${encodeURIComponent(repoKey)}`);
+  const hid = encodeURIComponent(DEFAULT_HACKATHON_ID);
+  const rows = await supabaseRest(
+    `/analyses?repo_key=eq.${encodeURIComponent(repoKey)}&hackathon_id=eq.${hid}&limit=1`
+  );
   return rows && rows[0] ? rows[0].analysis_data : null;
 }
 
@@ -118,6 +135,7 @@ async function upsertAnalysis(repoKey, analysisData) {
     headers: { Prefer: "return=minimal,resolution=merge-duplicates" },
     body: JSON.stringify({
       repo_key: repoKey,
+      hackathon_id: DEFAULT_HACKATHON_ID,
       analysis_data: analysisData,
       analyzed_at: new Date().toISOString(),
     }),
@@ -127,7 +145,10 @@ async function upsertAnalysis(repoKey, analysisData) {
 // --- Settings ---
 
 async function getAnalysisSettings() {
-  const rows = await supabaseRest("/analysis_settings?id=eq.1");
+  const hid = DEFAULT_HACKATHON_ID;
+  const rows = await supabaseRest(
+    `/analysis_settings?hackathon_id=eq.${encodeURIComponent(hid)}&limit=1`
+  );
   if (!rows || !rows[0]) return null;
   const s = rows[0];
   return {
@@ -140,11 +161,12 @@ async function getAnalysisSettings() {
 }
 
 async function upsertAnalysisSettings(settings) {
-  const result = await supabaseRest("/analysis_settings?on_conflict=id", {
+  const hid = settings.hackathon_id || DEFAULT_HACKATHON_ID;
+  const result = await supabaseRest("/analysis_settings?on_conflict=hackathon_id", {
     method: "POST",
     headers: { Prefer: "return=representation,resolution=merge-duplicates" },
     body: JSON.stringify({
-      id: 1,
+      hackathon_id: hid,
       event_t0: settings.event_t0,
       event_t1: settings.event_t1,
       bulk_insertion_threshold: settings.bulk_insertion_threshold,

@@ -235,13 +235,44 @@ function trackChip(track) {
   return `<span class="track-chip">${escapeHtml(track)}</span>`;
 }
 
+function normalizeTrackForMatch(track) {
+  return String(track || "")
+    .toLowerCase()
+    .replace(/_/g, "-")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * Match submission track labels to Money Movement vs Financial Intelligence.
+ * Handles slugs (Money-Movement), prose labels, and sparse data.
+ */
 function trackMatchesCategory(track, category) {
   if (!category) return true;
   if (!track) return false;
-  const t = String(track).toLowerCase();
-  if (category === "money-movement") return t.includes("money");
-  if (category === "financial-intelligence") return t.includes("intelligence");
+  const t = normalizeTrackForMatch(track);
+  const slug = t.replace(/\s+/g, "-");
+  if (category === "money-movement") {
+    if (slug.includes("money-movement") || slug.includes("moneymovement"))
+      return true;
+    if (slug.includes("financial-intelligence")) return false;
+    return /\bmoney\b/.test(t) || t.startsWith("money ");
+  }
+  if (category === "financial-intelligence") {
+    if (
+      slug.includes("financial-intelligence") ||
+      slug.includes("financialintelligence")
+    )
+      return true;
+    if (slug.includes("money-movement")) return false;
+    return /\bintelligence\b/.test(t) || /\bfinancial\b/.test(t);
+  }
   return true;
+}
+
+function getRowTrackLabel(row) {
+  const sub = getSubmissionInfoForRow(row);
+  return (sub?.chosen_track || row.chosen_track || "").trim();
 }
 
 function demoLink(submission) {
@@ -369,11 +400,13 @@ function renderJudgeDetails(info) {
 
 async function renderSummaryTable(rows) {
   const tbody = document.querySelector("#summary-table tbody");
+  if (!tbody) return;
   tbody.innerHTML = "";
-  const filterPre = document.querySelector("#filter-preT0").checked;
-  const filterBulk = document.querySelector("#filter-bulk").checked;
-  const filterMerge = document.querySelector("#filter-merge").checked;
-  const sortMode = document.querySelector("#sort-select").value;
+  const filterPre = document.querySelector("#filter-preT0")?.checked ?? false;
+  const filterBulk = document.querySelector("#filter-bulk")?.checked ?? false;
+  const filterMerge = document.querySelector("#filter-merge")?.checked ?? false;
+  const sortMode =
+    document.querySelector("#sort-select")?.value || "default";
 
   const trackFilter = window.__trackFilter || null;
   const filteredRows = rows.filter((r) => {
@@ -526,7 +559,23 @@ async function loadSummary() {
     })
   );
   window.__summaryRows = merged;
-  await renderSummaryTable(window.__summaryRows);
+  maybeRenderSummaryTable();
+}
+
+/** Live submissions grid + scores: only populate on the event site after password unlock. */
+function canRenderSensitiveSummaryTable() {
+  if (document.body.classList.contains("organizer-page")) return true;
+  return isAuthed();
+}
+
+function maybeRenderSummaryTable() {
+  const rows = window.__summaryRows || [];
+  if (!canRenderSensitiveSummaryTable()) {
+    const tbody = document.querySelector("#summary-table tbody");
+    if (tbody) tbody.innerHTML = "";
+    return;
+  }
+  renderSummaryTable(rows);
 }
 
 function mergeRows(summaryRows, submissions) {
@@ -970,8 +1019,61 @@ function isAuthed() {
 function applyAuthState() {
   const authed = isAuthed();
   document.body.classList.toggle("is-authed", authed);
-  const main = document.getElementById("submissions");
-  if (main) main.hidden = !authed;
+  document.querySelectorAll(".organizer-wrap").forEach((el) => {
+    el.hidden = !authed;
+  });
+  document.querySelectorAll(".organizer-gate").forEach((el) => {
+    el.hidden = authed;
+  });
+  if (authed) maybeRenderSummaryTable();
+}
+
+/** Clone submissions panel from template — not in DOM until Manager opens (no landing leak). */
+function ensureManagerSubmissionsPanel() {
+  const host = document.getElementById("manager-submissions-host");
+  const tpl = document.getElementById("manager-submissions-template");
+  if (!host || !tpl || host.childElementCount > 0) return;
+  host.appendChild(tpl.content.cloneNode(true));
+}
+
+function setManagerTab(name) {
+  const modal = document.getElementById("manager-modal");
+  if (!modal) return;
+  modal.querySelectorAll("[data-manager-tab]").forEach((tab) => {
+    const on = tab.getAttribute("data-manager-tab") === name;
+    tab.setAttribute("aria-selected", on ? "true" : "false");
+    tab.tabIndex = on ? 0 : -1;
+  });
+  modal.querySelectorAll("[data-manager-panel]").forEach((panel) => {
+    const on = panel.getAttribute("data-manager-panel") === name;
+    panel.hidden = !on;
+  });
+}
+
+function initManagerTabs() {
+  const modal = document.getElementById("manager-modal");
+  if (!modal) return;
+  modal.querySelectorAll("[data-manager-tab]").forEach((tab) => {
+    tab.addEventListener("click", () => {
+      setManagerTab(tab.getAttribute("data-manager-tab"));
+    });
+    tab.addEventListener("keydown", (e) => {
+      const tabs = [...modal.querySelectorAll("[data-manager-tab]")];
+      const i = tabs.indexOf(document.activeElement);
+      if (i < 0) return;
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        e.preventDefault();
+        const next = tabs[(i + 1) % tabs.length];
+        next.focus();
+        setManagerTab(next.getAttribute("data-manager-tab"));
+      } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        e.preventDefault();
+        const prev = tabs[(i - 1 + tabs.length) % tabs.length];
+        prev.focus();
+        setManagerTab(prev.getAttribute("data-manager-tab"));
+      }
+    });
+  });
 }
 
 function openModal(id) {
@@ -986,7 +1088,12 @@ function openModal(id) {
   modal.classList.remove("hidden");
   const firstInput = modal.querySelector("input, select, textarea, button");
   if (firstInput) setTimeout(() => firstInput.focus(), 60);
-  if (id === "manager-modal") renderManagerPanel();
+  if (id === "manager-modal") {
+    ensureManagerSubmissionsPanel();
+    setManagerTab("submissions");
+    renderManagerPanel();
+    maybeRenderSummaryTable();
+  }
   if (id === "judge-modal") refreshJudgeSubmissionSelect();
 }
 function closeModal(id) {
@@ -1066,30 +1173,51 @@ function buildJudgeFormSkeleton() {
 }
 
 function scoreRow({ key, name, hint, max, group }) {
+  const fname = `${group}_${key}`;
   return `
     <label class="score-row" data-score-group="${escapeAttr(group)}">
       <span class="score-row-name">${escapeHtml(name)}<small>${escapeHtml(
     hint
   )}</small></span>
       <input type="range" min="0" max="${max}" step="1" value="0" name="${escapeAttr(
-    group
-  )}_${escapeAttr(key)}" data-max="${max}">
-      <span class="score-row-value">0</span>
+    fname
+  )}" data-max="${max}">
+      <input type="number" class="score-row-num" min="0" max="${max}" step="1" value="0" inputmode="numeric" aria-label="${escapeHtml(
+        name
+      )} — points">
     </label>
   `;
 }
 
 function attachScoreInputListeners() {
-  document
-    .querySelectorAll("#judge-modal .score-row input[type=range]")
-    .forEach((input) => {
-      input.addEventListener("input", () => {
-        const row = input.closest(".score-row");
-        const out = row.querySelector(".score-row-value");
-        if (out) out.textContent = input.value;
-        updateJudgeRunningTotal();
-      });
+  const modal = document.getElementById("judge-modal");
+  if (!modal) return;
+
+  function clampNumInput(numInp) {
+    const row = numInp.closest(".score-row");
+    const range = row && row.querySelector('input[type="range"]');
+    if (!range) return;
+    const max = Number(range.dataset.max || range.getAttribute("max") || 0);
+    let v = parseInt(numInp.value, 10);
+    if (Number.isNaN(v)) v = 0;
+    v = Math.max(0, Math.min(max, v));
+    numInp.value = String(v);
+    range.value = String(v);
+    updateJudgeRunningTotal();
+  }
+
+  modal.querySelectorAll(".score-row input[type=range]").forEach((range) => {
+    range.addEventListener("input", () => {
+      const row = range.closest(".score-row");
+      const num = row && row.querySelector(".score-row-num");
+      if (num) num.value = range.value;
+      updateJudgeRunningTotal();
     });
+  });
+  modal.querySelectorAll(".score-row-num").forEach((numInp) => {
+    numInp.addEventListener("input", () => clampNumInput(numInp));
+    numInp.addEventListener("blur", () => clampNumInput(numInp));
+  });
 }
 
 function updateJudgeRunningTotal() {
@@ -1116,6 +1244,12 @@ function sumScoreInputs(group) {
 
 const LOCAL_JUDGE_NAME_KEY = "bfa-london-2026-judge-name";
 
+function formatTrackForLabel(raw) {
+  const t = (raw || "").trim();
+  if (!t || t.toLowerCase() === "unassigned") return "unscored";
+  return t;
+}
+
 function scoredIdsForJudge(judgeName) {
   const trimmed = (judgeName || "").trim().toLowerCase();
   if (!trimmed) return new Set();
@@ -1136,33 +1270,52 @@ function refreshJudgeSubmissionSelect() {
   const nameInput = document.getElementById("judge-name-input");
   const cachedName = (nameInput && nameInput.value) || "";
   const scored = scoredIdsForJudge(cachedName);
-  const options = ['<option value="">— pick a submission —</option>'];
+  const entries = [];
 
   rows.forEach((r) => {
     const sub = getSubmissionInfoForRow(r);
     const name = sub?.project_name || r.repo_id || extractRepoName(r.repo);
     const id = r.repo_id || name;
-    const suffix = scored.has(id) ? " [SCORED]" : "";
-    const track = sub?.chosen_track || r.chosen_track || "unassigned";
+    const rawTrack = sub?.chosen_track || r.chosen_track || "";
+    entries.push({
+      id,
+      name,
+      trackLabel: formatTrackForLabel(rawTrack),
+      scored: scored.has(id),
+      isLocal: false,
+    });
+  });
+  local.forEach((s) => {
+    entries.push({
+      id: s.submission_id,
+      name: s.project_name || s.submission_id,
+      trackLabel: formatTrackForLabel(s.chosen_track || ""),
+      scored: scored.has(s.submission_id),
+      isLocal: true,
+    });
+  });
+
+  entries.sort((a, b) => {
+    if (a.scored !== b.scored) return a.scored ? 1 : -1;
+    return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
+  });
+
+  const options = ['<option value="">— pick a submission —</option>'];
+  let placedLocalSep = false;
+  entries.forEach((e) => {
+    if (e.isLocal && !placedLocalSep) {
+      options.push("<option disabled>── Local (this browser) ──</option>");
+      placedLocalSep = true;
+    }
+    const statusBit = e.scored ? "scored" : "unscored";
+    const optTitle = `${e.name} — ${e.trackLabel} (${statusBit})`;
     options.push(
-      `<option value="${escapeAttr(id)}">${escapeHtml(name)} · ${escapeHtml(
-        track
-      )}${escapeHtml(suffix)}</option>`
+      `<option value="${escapeAttr(e.id)}" title="${escapeAttr(optTitle)}">${escapeHtml(
+        e.name
+      )} · ${escapeHtml(statusBit)}</option>`
     );
   });
-  if (local.length) {
-    options.push("<option disabled>── Local (this browser) ──</option>");
-    local.forEach((s) => {
-      const suffix = scored.has(s.submission_id) ? " [SCORED]" : "";
-      options.push(
-        `<option value="${escapeAttr(s.submission_id)}">${escapeHtml(
-          s.project_name
-        )} · ${escapeHtml(s.chosen_track || "unassigned")}${escapeHtml(
-          suffix
-        )}</option>`
-      );
-    });
-  }
+
   select.innerHTML = options.join("");
   if (
     previous &&
@@ -1188,11 +1341,119 @@ function findSubmissionById(id) {
   return null;
 }
 
+function judgeNamesMatch(a, b) {
+  return (a || "").trim().toLowerCase() === (b || "").trim().toLowerCase();
+}
+
+function formatJudgeTime(isoOrStr) {
+  if (!isoOrStr) return "—";
+  const d = new Date(isoOrStr);
+  if (Number.isNaN(d.getTime())) return String(isoOrStr);
+  return d.toLocaleString(undefined, { dateStyle: "short", timeStyle: "short" });
+}
+
+function judgePriorDomId(subId) {
+  return `judge-prior-${String(subId).replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 96)}`;
+}
+
+function buildMergedScoreEntries(submissionId, judgeInfo) {
+  const out = [];
+  if (judgeInfo?.responses?.length) {
+    judgeInfo.responses.forEach((r, idx) => {
+      const jLabel =
+        r.judge !== null &&
+        r.judge !== undefined &&
+        String(r.judge).trim()
+          ? String(r.judge).trim()
+          : `Panel import #${idx + 1}`;
+      const detail = judgeInfo.legacy_mode
+        ? `${r.total_score}`
+        : `${r.total_score}/130 (core ${r.core_total ?? "—"}, bonus ${
+            r.bonus_total_capped ?? "—"
+          })`;
+      out.push({
+        source: "imported",
+        judge: jLabel,
+        at: r.timestamp || null,
+        total: r.total_score,
+        detail,
+      });
+    });
+  }
+  const locals = getLocalList(LOCAL_SCORES_KEY).filter(
+    (s) => s.submission_id === submissionId
+  );
+  locals.forEach((s) => {
+    out.push({
+      source: "local",
+      judge: s.judge_name ? String(s.judge_name).trim() : "—",
+      at: s.scored_at || null,
+      total: s.total_score,
+      detail: `${s.total_score}/130`,
+    });
+  });
+  out.sort((a, b) => {
+    const ta = a.at ? new Date(a.at).getTime() : 0;
+    const tb = b.at ? new Date(b.at).getTime() : 0;
+    return ta - tb;
+  });
+  return out;
+}
+
+function mergedScoreAverage(entries) {
+  if (!entries.length) return null;
+  const sum = entries.reduce((s, e) => s + Number(e.total ?? 0), 0);
+  return (sum / entries.length).toFixed(1);
+}
+
+function isYouScoreEntry(entry, judgeName) {
+  return entry.source === "local" && judgeNamesMatch(entry.judge, judgeName);
+}
+
+function attachJudgePriorPanelHandlers(container) {
+  const btn = container.querySelector(".judge-prior-toggle");
+  const drawer = container.querySelector(".judge-prior-drawer");
+  const icon = container.querySelector(".judge-prior-toggle-icon");
+  if (!btn || !drawer) return;
+  btn.addEventListener("click", () => {
+    const open = btn.getAttribute("aria-expanded") === "true";
+    const next = !open;
+    btn.setAttribute("aria-expanded", String(next));
+    drawer.hidden = !next;
+    if (icon) icon.textContent = next ? "▴" : "▾";
+  });
+}
+
+function renderJudgeSubmissionToolbar() {
+  const toolbar = document.getElementById("judge-submission-toolbar");
+  if (!toolbar) return;
+  const select = document.getElementById("judge-submission-select");
+  const nameInput = document.getElementById("judge-name-input");
+  const id = select?.value || "";
+  const judgeName = (nameInput && nameInput.value) || "";
+
+  if (!id) {
+    toolbar.innerHTML = `<p class="judge-toolbar-empty">Pick a submission from the list. Unscored entries sort first.</p>`;
+    return;
+  }
+
+  const scored = judgeName.trim()
+    ? scoredIdsForJudge(judgeName).has(id)
+    : false;
+  const hint = scored
+    ? `<p class="judge-toolbar-hint">You already saved a score for this project in this browser. Submitting again adds another local entry (amend / duplicate).</p>`
+    : "";
+  toolbar.innerHTML = hint;
+}
+
 function renderJudgeSubmissionSummary() {
+  renderJudgeSubmissionToolbar();
   const target = document.getElementById("judge-submission-summary");
   if (!target) return;
   const select = document.getElementById("judge-submission-select");
+  const nameInput = document.getElementById("judge-name-input");
   const id = select?.value || "";
+  const judgeName = (nameInput && nameInput.value) || "";
   if (!id) {
     target.innerHTML = "";
     target.classList.remove("is-visible");
@@ -1205,50 +1466,117 @@ function renderJudgeSubmissionSummary() {
     return;
   }
   const { row, sub } = found;
-  const project =
-    sub?.project_name || row?.repo_id || extractRepoName(row?.repo || "");
-  const team = sub?.team_name || "—";
-  const track = sub?.chosen_track || row?.chosen_track || "unassigned";
-  const repoUrl = sub?.repo_url || row?.repo || "";
-  const demoUrl = sub?.demo_url || "";
+  const subInfo =
+    sub || (row ? getSubmissionInfoForRow(row) : null);
+  const team = subInfo?.team_name || "—";
+  const trackDisplay = formatTrackForLabel(
+    subInfo?.chosen_track || row?.chosen_track || ""
+  );
+  const repoUrl = subInfo?.repo_url || row?.repo || "";
+  const demoUrl = subInfo?.demo_url || "";
   const judgeInfo = row ? getJudgeInfoForRow(row) : null;
-  const responses = judgeInfo?.responses?.length || 0;
-  const avg = judgeInfo
-    ? Number(
-        judgeInfo.averages?.grand_total ?? judgeInfo.average_score ?? 0
-      ).toFixed(1)
-    : null;
-  const priorLine =
-    responses > 0
-      ? `<span class="judge-sub-prior">${responses} prior score${
-          responses === 1 ? "" : "s"
-        } · avg ${avg}</span>`
-      : "";
-  target.innerHTML = `
-    <div class="judge-sub-head">
-      <span class="judge-sub-project">${escapeHtml(project)}</span>
-      <span class="judge-sub-track track-chip">${escapeHtml(track)}</span>
-    </div>
-    <div class="judge-sub-meta">Team ${escapeHtml(team)}</div>
-    <div class="judge-sub-links">
-      ${
+  const merged = buildMergedScoreEntries(id, judgeInfo);
+  const mergedAvg = mergedScoreAverage(merged);
+  const youScored = judgeName.trim()
+    ? scoredIdsForJudge(judgeName).has(id)
+    : false;
+  const youPill = !judgeName.trim()
+    ? `<span class="judge-sub-pill judge-sub-pill-you judge-sub-pill-muted" title="Enter your name above">You · —</span>`
+    : `<span class="judge-sub-pill judge-sub-pill-you ${
+        youScored ? "is-on" : ""
+      }" title="Your saves in this browser">You · ${
+        youScored ? "scored" : "not scored"
+      }</span>`;
+
+  const othersEntries = merged.filter((e) => !isYouScoreEntry(e, judgeName));
+  const othersPill =
+    othersEntries.length > 0
+      ? `<span class="judge-sub-pill judge-sub-pill-others is-on" title="Imports + other judges’ local saves">Others · ${othersEntries.length}</span>`
+      : `<span class="judge-sub-pill judge-sub-pill-others judge-sub-pill-muted">Others · none</span>`;
+
+  const drawerId = judgePriorDomId(id);
+  const hasPrior = merged.length > 0;
+  const priorControl = hasPrior
+    ? `<div class="judge-sub-prior-wrap">
+        <button type="button" class="judge-prior-toggle" aria-expanded="false" aria-controls="${escapeAttr(
+          drawerId
+        )}" id="${escapeAttr(drawerId)}-btn">
+          <span class="judge-prior-toggle-label">Prior · avg ${mergedAvg} · ${
+            merged.length
+          } score${merged.length === 1 ? "" : "s"}</span>
+          <span class="judge-prior-toggle-icon" aria-hidden="true">▾</span>
+        </button>
+      </div>`
+    : `<span class="judge-sub-pill judge-sub-pill-muted">Prior · none</span>`;
+
+  const repoCell = repoUrl
+    ? `<a href="${escapeAttr(
         repoUrl
-          ? `<a href="${escapeAttr(
-              repoUrl
-            )}" target="_blank" rel="noreferrer noopener" class="repo-link">Repo ↗</a>`
-          : ""
-      }
-      ${
+      )}" target="_blank" rel="noreferrer noopener" class="repo-link judge-sub-link-compact">Repo</a>`
+    : `<span class="judge-sub-muted">Repo · —</span>`;
+  const demoCell = demoUrl
+    ? `<a href="${escapeAttr(
         demoUrl
-          ? `<a href="${escapeAttr(
-              demoUrl
-            )}" target="_blank" rel="noreferrer noopener" class="repo-link">Demo ↗</a>`
-          : ""
-      }
-      ${priorLine}
+      )}" target="_blank" rel="noopener noreferrer" class="repo-link judge-sub-link-compact">Demo</a>`
+    : `<span class="judge-sub-muted">Demo · —</span>`;
+
+  const tableRows = merged
+    .map(
+      (e) => `
+    <tr>
+      <td class="judge-prior-td judge-prior-judge">${escapeHtml(e.judge)}${
+        e.source === "local"
+          ? ' <span class="judge-prior-src">local</span>'
+          : ' <span class="judge-prior-src">import</span>'
+      }</td>
+      <td class="judge-prior-td judge-prior-when">${escapeHtml(
+        formatJudgeTime(e.at)
+      )}</td>
+      <td class="judge-prior-td judge-prior-num">${escapeHtml(
+        String(e.total ?? "—")
+      )}</td>
+      <td class="judge-prior-td judge-prior-detail">${escapeHtml(e.detail)}</td>
+    </tr>`
+    )
+    .join("");
+
+  target.innerHTML = `
+    <div class="judge-sub-summary-card">
+      <div class="judge-sub-meta-row">
+        <span class="judge-sub-pill judge-sub-pill-team" title="Team">Team · ${escapeHtml(
+          team
+        )}</span>
+        <span class="judge-sub-pill judge-sub-pill-track track-chip" title="Track">Track · ${escapeHtml(
+          trackDisplay
+        )}</span>
+        <span class="judge-sub-links-inline">${repoCell}<span class="judge-sub-dot" aria-hidden="true">·</span>${demoCell}</span>
+        ${youPill}
+        ${othersPill}
+        ${priorControl}
+      </div>
+      <div id="${escapeAttr(
+        drawerId
+      )}" class="judge-prior-drawer" role="region" aria-labelledby="${escapeAttr(
+    drawerId
+  )}-btn" hidden>
+        <div class="judge-prior-scroll">
+          <table class="judge-prior-table">
+            <thead>
+              <tr>
+                <th scope="col">Judge</th>
+                <th scope="col">When</th>
+                <th scope="col">Total</th>
+                <th scope="col">Breakdown</th>
+              </tr>
+            </thead>
+            <tbody>${tableRows}</tbody>
+          </table>
+        </div>
+      </div>
     </div>
   `;
   target.classList.add("is-visible");
+  attachJudgePriorPanelHandlers(target);
 }
 
 function handleJudgeForm(e) {
@@ -1304,10 +1632,11 @@ function handleJudgeForm(e) {
 
   // Reset scores only — keep judge name cached for next submission
   const scoredId = entry.submission_id;
-  form.querySelectorAll("input[type=range]").forEach((i) => {
-    i.value = "0";
-    const row = i.closest(".score-row");
-    if (row) row.querySelector(".score-row-value").textContent = "0";
+  form.querySelectorAll("#judge-modal .score-row").forEach((row) => {
+    const r = row.querySelector('input[type="range"]');
+    const n = row.querySelector(".score-row-num");
+    if (r) r.value = "0";
+    if (n) n.value = "0";
   });
   const notes = form.querySelector("textarea[name=thoughts]");
   if (notes) notes.value = "";
@@ -1330,31 +1659,86 @@ function handleJudgeForm(e) {
     }
     renderJudgeSubmissionSummary();
   }
-  toast(`Scored ${scoredId}: ${grandTotal}/130 — pick next submission`);
+  toast(`Score saved — ${grandTotal}/130. Your score is stored in this browser.`);
 }
 
 // ---------- Manager ----------
+function rowJudgeScore(row) {
+  const info = getJudgeInfoForRow(row);
+  return Number(info?.averages?.grand_total ?? info?.average_score ?? 0);
+}
+
+function integrityShortTags(r) {
+  const tags = [];
+  if (Number(r.has_commits_before_t0) > 0) tags.push("pre");
+  if (Number(r.has_bulk_commits) > 0) tags.push("bulk");
+  if (Number(r.has_large_initial_commit_after_t0) > 0) tags.push("init");
+  if (Number(r.has_merge_commits) > 0) tags.push("merge");
+  return tags;
+}
+
+function ensureLeaderboardNote(listEl, show, text) {
+  const wrap = listEl.closest(".leaderboard") || listEl.parentElement;
+  if (!wrap) return;
+  let note = wrap.querySelector("[data-lb-fallback-note]");
+  if (show) {
+    if (!note) {
+      note = document.createElement("p");
+      note.setAttribute("data-lb-fallback-note", "1");
+      note.className = "manager-hint manager-lb-fallback";
+      wrap.insertBefore(note, listEl);
+    }
+    note.hidden = false;
+    note.textContent = text;
+  } else if (note) {
+    note.hidden = true;
+  }
+}
+
 function renderManagerPanel() {
   const stats = document.getElementById("manager-stats");
+  const secondary = document.getElementById("manager-secondary-stats");
+  const aggregates = document.getElementById("manager-aggregates");
   const rows = window.__summaryRows || [];
   const local = getLocalList(LOCAL_SUBMISSIONS_KEY);
   const scores = getLocalList(LOCAL_SCORES_KEY);
   const tracked = rows.length + local.length;
+
   const moneyMovement = rows.filter((r) =>
-    trackMatchesCategory(
-      getSubmissionInfoForRow(r)?.chosen_track || r.chosen_track,
-      "money-movement"
-    )
+    trackMatchesCategory(getRowTrackLabel(r), "money-movement")
   ).length;
   const financialIntelligence = rows.filter((r) =>
-    trackMatchesCategory(
-      getSubmissionInfoForRow(r)?.chosen_track || r.chosen_track,
-      "financial-intelligence"
-    )
+    trackMatchesCategory(getRowTrackLabel(r), "financial-intelligence")
   ).length;
+  const noTrackLabel = rows.filter((r) => !getRowTrackLabel(r)).length;
+  const vagueTrack = rows.filter((r) => {
+    const t = getRowTrackLabel(r);
+    if (!t) return false;
+    return (
+      !trackMatchesCategory(t, "money-movement") &&
+      !trackMatchesCategory(t, "financial-intelligence")
+    );
+  }).length;
   const flagged = rows.filter((r) => hasAnyFlag(r)).length;
 
-  stats.innerHTML = `
+  const sumCommits = rows.reduce(
+    (s, r) => s + (Number(r.total_commits) || 0),
+    0
+  );
+  const sumAdd = rows.reduce(
+    (s, r) => s + (Number(r.total_loc_added) || 0),
+    0
+  );
+  const sumDel = rows.reduce(
+    (s, r) => s + (Number(r.total_loc_deleted) || 0),
+    0
+  );
+  const analyzed = rows.filter((r) => r.analysis_status === "analyzed").length;
+  const nRepos = rows.length || 1;
+  const avgCommits = sumCommits / nRepos;
+
+  if (stats) {
+    stats.innerHTML = `
     <div class="manager-stat"><span class="manager-stat-num">${tracked}</span><span class="manager-stat-lbl">Total submissions</span></div>
     <div class="manager-stat"><span class="manager-stat-num">${moneyMovement}</span><span class="manager-stat-lbl">Money Movement</span></div>
     <div class="manager-stat"><span class="manager-stat-num">${financialIntelligence}</span><span class="manager-stat-lbl">Financial Intelligence</span></div>
@@ -1362,43 +1746,69 @@ function renderManagerPanel() {
     <div class="manager-stat"><span class="manager-stat-num">${scores.length}</span><span class="manager-stat-lbl">Local scores</span></div>
     <div class="manager-stat"><span class="manager-stat-num">${local.length}</span><span class="manager-stat-lbl">Local submissions</span></div>
   `;
+  }
 
+  if (secondary) {
+    secondary.innerHTML = `
+    <div class="manager-stat"><span class="manager-stat-num">${noTrackLabel}</span><span class="manager-stat-lbl">No track label</span></div>
+    <div class="manager-stat"><span class="manager-stat-num">${vagueTrack}</span><span class="manager-stat-lbl">Other / unmatched track</span></div>
+    <div class="manager-stat"><span class="manager-stat-num">${formatNumber(sumCommits)}</span><span class="manager-stat-lbl">Σ commits (all repos)</span></div>
+    <div class="manager-stat"><span class="manager-stat-num">${avgCommits.toFixed(1)}</span><span class="manager-stat-lbl">Avg commits / repo</span></div>
+    <div class="manager-stat"><span class="manager-stat-num">${formatNumber(analyzed)}</span><span class="manager-stat-lbl">Analyzed repos</span></div>
+    <div class="manager-stat"><span class="manager-stat-num">${formatNumber(sumAdd)}</span><span class="manager-stat-lbl">Σ lines added</span></div>
+  `;
+  }
+
+  if (aggregates) {
+    aggregates.innerHTML = `
+    <div class="manager-aggregate-strip">
+      <div class="manager-agg"><span class="manager-agg-k">Σ commits</span><span class="manager-agg-v">${formatNumber(
+        sumCommits
+      )}</span></div>
+      <div class="manager-agg"><span class="manager-agg-k">Σ +LOC</span><span class="manager-agg-v">${formatNumber(
+        sumAdd
+      )}</span></div>
+      <div class="manager-agg"><span class="manager-agg-k">Σ −LOC</span><span class="manager-agg-v">${formatNumber(
+        sumDel
+      )}</span></div>
+      <div class="manager-agg"><span class="manager-agg-k">Churn (add+del)</span><span class="manager-agg-v">${formatNumber(
+        sumAdd + sumDel
+      )}</span></div>
+      <div class="manager-agg"><span class="manager-agg-k">Avg commits/repo</span><span class="manager-agg-v">${avgCommits.toFixed(
+        1
+      )}</span></div>
+    </div>
+  `;
+  }
+
+  renderOverallLeaderboard();
   renderLeaderboard("money-movement", "leaderboard-money-movement");
   renderLeaderboard(
     "financial-intelligence",
     "leaderboard-financial-intelligence"
   );
+  renderManagerSnapshot();
   renderFlaggedList();
   renderLocalSubmissions();
 }
 
-function renderLeaderboard(category, listId) {
-  const list = document.getElementById(listId);
+function renderOverallLeaderboard() {
+  const list = document.getElementById("leaderboard-overall");
   if (!list) return;
   const rows = window.__summaryRows || [];
-  const ranked = rows
-    .filter((r) =>
-      trackMatchesCategory(
-        getSubmissionInfoForRow(r)?.chosen_track || r.chosen_track,
-        category
-      )
-    )
-    .map((r) => {
-      const info = getJudgeInfoForRow(r);
-      const score = Number(
-        info?.averages?.grand_total ?? info?.average_score ?? 0
-      );
-      const sub = getSubmissionInfoForRow(r);
-      return {
-        name: sub?.project_name || r.repo_id || extractRepoName(r.repo),
-        score,
-      };
-    })
+  const ranked = [...rows]
+    .map((r) => ({
+      name:
+        getSubmissionInfoForRow(r)?.project_name ||
+        r.repo_id ||
+        extractRepoName(r.repo),
+      score: rowJudgeScore(r),
+    }))
     .sort((a, b) => b.score - a.score)
-    .slice(0, 5);
+    .slice(0, 8);
   if (ranked.length === 0) {
     list.innerHTML =
-      '<li style="justify-content:center;color:var(--muted);font-style:italic">No submissions yet in this track</li>';
+      '<li style="justify-content:center;color:var(--muted);font-style:italic;grid-column:1/-1;border:none;background:transparent">No submissions loaded yet</li>';
     return;
   }
   list.innerHTML = ranked
@@ -1411,6 +1821,132 @@ function renderLeaderboard(category, listId) {
   `
     )
     .join("");
+}
+
+function renderLeaderboard(category, listId) {
+  const list = document.getElementById(listId);
+  if (!list) return;
+  const rows = window.__summaryRows || [];
+  let inTrack = rows.filter((r) =>
+    trackMatchesCategory(getRowTrackLabel(r), category)
+  );
+  let ranked = inTrack
+    .map((r) => ({
+      name:
+        getSubmissionInfoForRow(r)?.project_name ||
+        r.repo_id ||
+        extractRepoName(r.repo),
+      score: rowJudgeScore(r),
+    }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 5);
+
+  let usedFallback = false;
+  if (ranked.length === 0 && rows.length > 0) {
+    usedFallback = true;
+    ranked = rows
+      .map((r) => ({
+        name:
+          getSubmissionInfoForRow(r)?.project_name ||
+          r.repo_id ||
+          extractRepoName(r.repo),
+        score: rowJudgeScore(r),
+      }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5);
+  }
+
+  if (ranked.length === 0) {
+    ensureLeaderboardNote(list, false, "");
+    list.innerHTML =
+      '<li style="justify-content:center;color:var(--muted);font-style:italic;grid-column:1/-1;border:none;background:transparent">No submissions yet in this track</li>';
+    return;
+  }
+
+  ensureLeaderboardNote(
+    list,
+    usedFallback,
+    usedFallback
+      ? "No projects matched this track label (missing or non-standard track text). Showing top judge scores overall instead."
+      : ""
+  );
+
+  list.innerHTML = ranked
+    .map(
+      (r) => `
+    <li>
+      <span class="lb-name">${escapeHtml(r.name)}</span>
+      <span class="lb-score">${r.score > 0 ? r.score.toFixed(1) : "—"}</span>
+    </li>
+  `
+    )
+    .join("");
+}
+
+function renderManagerSnapshot() {
+  const tbody = document.getElementById("manager-snapshot-tbody");
+  if (!tbody) return;
+  const rows = [...(window.__summaryRows || [])].sort(
+    (a, b) =>
+      (Number(b.total_commits) || 0) - (Number(a.total_commits) || 0)
+  );
+
+  if (rows.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" class="manager-snapshot-empty">No submission rows — check API or data bundle.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = rows
+    .map((r) => {
+      const sub = getSubmissionInfoForRow(r);
+      const repoId =
+        r.repo_id || r.submission_id || extractRepoName(r.repo || sub?.repo_url);
+      const name =
+        sub?.project_name || r.repo_id || extractRepoName(r.repo);
+      const track = getRowTrackLabel(r) || "—";
+      const tc = Number(r.total_commits) || 0;
+      const la = Number(r.total_loc_added) || 0;
+      const ld = Number(r.total_loc_deleted) || 0;
+      const tagStr = integrityShortTags(r).join(" · ") || "—";
+      const j = rowJudgeScore(r);
+      const url = r.repo || sub?.repo_url || "";
+      const demo = sub?.demo_url || "";
+      const links = `${repoLink(url)}${
+        demo ? ` ${demoLink(sub)}` : ""
+      } <button type="button" class="btn btn-ghost manager-open-detail" data-repo="${escapeAttr(
+        repoId
+      )}">Details</button>`;
+      return `<tr data-repo-id="${escapeAttr(repoId)}" class="manager-snap-row" tabindex="0">
+        <td><span class="snap-name">${escapeHtml(name)}</span>${tc ? `<span class="snap-meta">${tc} commits</span>` : ""}</td>
+        <td>${trackChip(track === "—" ? "" : track)}</td>
+        <td class="num-cell">${tc}</td>
+        <td class="num-cell loc-add">+${formatNumber(la)}</td>
+        <td class="num-cell loc-del">−${formatNumber(ld)}</td>
+        <td class="snap-flags">${escapeHtml(tagStr)}</td>
+        <td class="num-cell">${j > 0 ? j.toFixed(1) : "—"}</td>
+        <td class="snap-actions">${links}</td>
+      </tr>`;
+    })
+    .join("");
+
+  tbody.querySelectorAll(".manager-open-detail").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const id = btn.getAttribute("data-repo");
+      if (id) openDrawer(id);
+    });
+  });
+  tbody.querySelectorAll(".manager-snap-row").forEach((tr) => {
+    const id = tr.getAttribute("data-repo-id");
+    const open = () => id && openDrawer(id);
+    tr.addEventListener("dblclick", open);
+    tr.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        open();
+      }
+    });
+  });
 }
 
 function renderFlaggedList() {
@@ -1433,14 +1969,36 @@ function renderFlaggedList() {
       if (Number(r.has_merge_commits) > 0) tags.push("merge");
       const sub = getSubmissionInfoForRow(r);
       const name = sub?.project_name || r.repo_id;
+      const tc = Number(r.total_commits) || 0;
+      const url = r.repo || sub?.repo_url || "";
+      const repoId =
+        r.repo_id || r.submission_id || extractRepoName(r.repo || url);
+      const detailBtn = `<button type="button" class="btn btn-ghost manager-open-detail" data-repo="${escapeAttr(
+        repoId
+      )}">Details</button>`;
+      const linkPart = url
+        ? `<a class="repo-link" href="${escapeAttr(
+            url
+          )}" target="_blank" rel="noreferrer">Repo</a>`
+        : "";
       return `
       <li>
-        <span class="flagged-name">${escapeHtml(name)}</span>
-        <span class="flagged-tags">${escapeHtml(tags.join(" · "))}</span>
+        <span class="flagged-name">${escapeHtml(name)}<span class="flagged-meta">${tc} commits</span></span>
+        <span class="flagged-actions"><span class="flagged-tags">${escapeHtml(
+          tags.join(" · ")
+        )}</span>${linkPart ? ` ${linkPart}` : ""} ${detailBtn}</span>
       </li>
     `;
     })
     .join("");
+
+  ul.querySelectorAll(".manager-open-detail").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const id = btn.getAttribute("data-repo");
+      if (id) openDrawer(id);
+    });
+  });
 }
 
 function renderLocalSubmissions() {
@@ -1471,11 +2029,13 @@ function renderLocalSubmissions() {
 function exportSubmissionsJSON() {
   const local = getLocalList(LOCAL_SUBMISSIONS_KEY);
   const scores = getLocalList(LOCAL_SCORES_KEY);
+  const rows = window.__summaryRows || [];
   const payload = {
     exported_at: new Date().toISOString(),
     event: eventFormat?.event_name || "Build Finance Agents · London 2026",
     local_submissions: local,
     local_scores: scores,
+    github_summary_rows: rows,
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], {
     type: "application/json",
@@ -1488,7 +2048,9 @@ function exportSubmissionsJSON() {
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
-  toast(`Exported ${local.length} submissions, ${scores.length} scores`);
+  toast(
+    `Exported ${rows.length} Git rows, ${local.length} local submissions, ${scores.length} scores`
+  );
 }
 
 // ---------- Toasts ----------
@@ -1512,18 +2074,50 @@ function toast(message) {
 // ---------- Update submissions count after load ----------
 function updateSubmissionsCount(rows) {
   const el = document.getElementById("submissions-count");
-  if (el) el.textContent = rows.length;
+  if (!el) return;
+  if (!canRenderSensitiveSummaryTable()) {
+    el.textContent = "—";
+    return;
+  }
+  el.textContent = rows.length;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Filter handlers
-  ["filter-preT0", "filter-bulk", "filter-merge"].forEach((id) => {
-    document.getElementById(id).addEventListener("change", () => {
-      renderSummaryTable(window.__summaryRows || []);
+  const jumpDash = document.getElementById("manager-jump-dashboard");
+  if (jumpDash) {
+    jumpDash.addEventListener("click", () => {
+      setManagerTab("submissions");
+      const modalBody = document.querySelector("#manager-modal .modal-body");
+      const panel = document.querySelector(".manager-submissions-panel");
+      const table = document.getElementById("summary-table");
+      const wrap = table?.closest(".manager-summary-table-wrap");
+      const target = panel || wrap || table;
+      if (modalBody && target) {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        const region = modalBody.querySelector("[data-manager-dashboard]");
+        try {
+          region?.focus({ preventScroll: true });
+        } catch {
+          /* no-op */
+        }
+      }
     });
-  });
-  document.getElementById("sort-select").addEventListener("change", () => {
-    renderSummaryTable(window.__summaryRows || []);
+  }
+
+  initManagerTabs();
+
+  // Filters live inside a <template> until Manager opens — delegate changes.
+  document.getElementById("manager-modal")?.addEventListener("change", (e) => {
+    const t = e.target;
+    if (
+      t &&
+      (t.id === "filter-preT0" ||
+        t.id === "filter-bulk" ||
+        t.id === "filter-merge" ||
+        t.id === "sort-select")
+    ) {
+      maybeRenderSummaryTable();
+    }
   });
 
   // Modal open triggers
@@ -1666,10 +2260,15 @@ document.addEventListener("DOMContentLoaded", () => {
   loadSummary()
     .then(() => {
       updateSubmissionsCount(window.__summaryRows || []);
+      if (document.body.classList.contains("organizer-page")) {
+        renderManagerPanel();
+      }
     })
     .catch((err) => {
+      if (!canRenderSensitiveSummaryTable()) return;
       const tbody = document.querySelector("#summary-table tbody");
-      tbody.innerHTML = `
+      if (tbody) {
+        tbody.innerHTML = `
       <tr>
         <td colspan="13">
           <div class="empty-state">
@@ -1679,5 +2278,6 @@ document.addEventListener("DOMContentLoaded", () => {
         </td>
       </tr>
     `;
+      }
     });
 });
