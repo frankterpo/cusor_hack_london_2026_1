@@ -203,9 +203,9 @@ header {
 }
 .brand-halkin img {
   display: block;
-  height: 22px;
+  height: 13px;
   width: auto;
-  max-width: min(134px, 38vw);
+  max-width: min(78px, 32vw);
 }
 
 .header-right {
