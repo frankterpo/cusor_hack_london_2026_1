@@ -1,15 +1,15 @@
 {
-  "event_name": "Cursor x Briefcase London hackathon",
+  "event_name": "Cursor Live · London · Q3 2026",
   "event_tagline": "Human out of the loop in high-risk financial workflows",
-  "event_dates": "2026-04-30",
+  "event_dates": "September 2026 (TBA)",
   "event_location": "London",
-  "hack_id": "cursor-briefcase-london-2026",
+  "hack_id": "cursor-live-london-q3-2026",
   "timeline": {
-    "t0": "2026-04-30T10:00:00+01:00",
-    "t1": "2026-04-30T18:00:00+01:00",
-    "submissions_close": "2026-04-30T18:00:00+01:00",
-    "judging_closes": "2026-04-30T19:30:00+01:00",
-    "winners_announced": "2026-04-30T20:00:00+01:00"
+    "t0": "2026-09-15T10:00:00+01:00",
+    "t1": "2026-09-15T18:00:00+01:00",
+    "submissions_close": "2026-09-15T18:00:00+01:00",
+    "judging_closes": "2026-09-15T19:30:00+01:00",
+    "winners_announced": "2026-09-15T20:00:00+01:00"
   },
   "main_tracks": [
     {
@@ -77,26 +77,32 @@
   "judge_bonus_bucket": {
     "name": "Judge Bonus Bucket",
     "max_points": 30,
-    "description": "Three side quests, 10 points each. Judges score every quest independently."
+    "description": "Four sponsor-aligned buckets (8 + 8 + 7 + 7 points). Judges score each bucket independently — 30 bonus total."
   },
   "side_quests": [
     {
-      "id": "repeatability",
-      "name": "Repeatability",
-      "points": 10,
-      "blurb": "The agent completes the workflow reliably across multiple runs — same input, same outcome."
+      "id": "best_use_cursor",
+      "name": "Best use of Cursor",
+      "points": 8,
+      "blurb": "How effectively the build used Cursor — editor, agents, and workflow — end to end."
     },
     {
-      "id": "learning_from_steering",
-      "name": "Learning from Human Steering",
-      "points": 10,
-      "blurb": "When a human makes a correction, the agent learns from it and improves the next run."
+      "id": "best_use_white_circle",
+      "name": "Best use of White Circle",
+      "points": 8,
+      "blurb": "Standout use of White Circle for safety, policy, or guardrails in the product."
     },
     {
-      "id": "creativity",
-      "name": "Creativity",
-      "points": 10,
-      "blurb": "An angle on the problem that no one else thought to try."
+      "id": "best_use_financial_practices",
+      "name": "Best use of Financial Practices",
+      "points": 7,
+      "blurb": "Depth on real finance rails, compliance, or domain fit — not a slide deck."
+    },
+    {
+      "id": "best_use_llm_models",
+      "name": "Best use of LLM models",
+      "points": 7,
+      "blurb": "Smart or effective use of models — APIs, routing, evals, or multi-model design."
     }
   ],
   "prizes": [

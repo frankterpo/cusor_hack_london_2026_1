@@ -6,12 +6,12 @@ Usage: python3 ui/server.py --work-dir work --port 8000
 """
 
 import argparse
+from urllib.parse import unquote
 import csv
 import json
 import os
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
-from urllib.parse import unquote
 
 # Resolve relative to project root (parent of ui/)
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -110,7 +110,7 @@ class UiHandler(SimpleHTTPRequestHandler):
         parts = path.split("/")
         if len(parts) < 4:
             return self._send_json({"error": "invalid repo path"}, status=400)
-        repo_id = parts[3]
+        repo_id = unquote(parts[3])
         suffix = "/".join(parts[4:]) if len(parts) > 4 else ""
         metrics_path = self.work_dir / "metrics" / f"{repo_id}.json"
         commits_path = self.work_dir / "metrics" / f"{repo_id}_commits.csv"

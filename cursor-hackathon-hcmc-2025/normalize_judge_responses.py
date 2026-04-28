@@ -13,6 +13,7 @@ RAW_RESPONSES_PATH = Path("data/judge-responses-raw.csv")
 PROJECT_MAP_PATH = Path("data/project-repo-map.csv")
 EVENT_FORMAT_PATH = Path("data/event-format.json")
 OUTPUT_PATH = Path("data/judge-responses-normalized.json")
+LEGACY_JUDGE_OVERRIDE_PATH = Path("data/legacy-response-judge-overrides.json")
 
 LEGACY_SCORE_FIELD = "Score"
 LEGACY_NOTES_FIELD = "Thoughts"
@@ -186,6 +187,37 @@ def normalize_detailed_row(row: Dict[str, str], event_format: dict) -> dict:
     }
 
 
+def load_legacy_response_judge_overrides() -> dict:
+    if not LEGACY_JUDGE_OVERRIDE_PATH.exists():
+        return {}
+    try:
+        raw = json.loads(LEGACY_JUDGE_OVERRIDE_PATH.read_text(encoding="utf-8"))
+        if not isinstance(raw, dict):
+            return {}
+        return raw
+    except Exception:
+        return {}
+
+
+def apply_legacy_response_judge_overrides(
+    repo_url: str, responses: List[dict], overrides: dict
+) -> None:
+    """Fill missing judge labels for legacy CSV rows when source had no Judge column."""
+    raw_by_ts = overrides.get(repo_url)
+    by_ts = raw_by_ts if isinstance(raw_by_ts, dict) else {}
+    if not by_ts:
+        return
+    for r in responses:
+        if r.get("judge"):
+            continue
+        ts = (r.get("timestamp") or "").strip()
+        if not ts:
+            continue
+        name = by_ts.get(ts)
+        if isinstance(name, str) and name.strip():
+            r["judge"] = name.strip()
+
+
 def aggregate_repo(project: str, raw_names: set[str], responses: List[dict], event_format: dict) -> dict:
     core_fields = get_core_fields(event_format)
     bonus_fields = get_bonus_fields(event_format)
@@ -252,7 +284,9 @@ def normalize_responses() -> Dict[str, dict]:
         else:
             unmapped.append({"project": project_raw, **entry})
 
+    judge_overrides = load_legacy_response_judge_overrides()
     for repo_url, data in aggregator.items():
+        apply_legacy_response_judge_overrides(repo_url, data["responses"], judge_overrides)
         normalized[repo_url] = aggregate_repo(
             project=data["project"],
             raw_names=data["raw_project_names"],

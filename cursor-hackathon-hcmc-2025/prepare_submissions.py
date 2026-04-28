@@ -81,11 +81,12 @@ def slugify(value: str) -> str:
     return compact or "submission"
 
 
-def normalize_rows(input_path: Path) -> List[Dict[str, str]]:
+def normalize_rows(input_path: Path, hack_id: str) -> List[Dict[str, str]]:
     with input_path.open(newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         rows = list(reader)
 
+    cohort = (hack_id or "").strip()
     normalized = []
     for idx, row in enumerate(rows, start=1):
         repo_url = first_non_empty(row, REPO_URL_KEYS)
@@ -103,6 +104,7 @@ def normalize_rows(input_path: Path) -> List[Dict[str, str]]:
         normalized.append(
             {
                 "submission_id": submission_id,
+                "hack_id": cohort,
                 "team_name": team_name or project_name,
                 "project_name": project_name,
                 "repo_slug": slug,
@@ -166,9 +168,14 @@ def main() -> int:
         type=Path,
         help="Output normalized submissions JSON path",
     )
+    parser.add_argument(
+        "--hack-id",
+        default="cursor-live-london-q3-2026",
+        help="Cohort id on each submission (must match hacks.json active_hack_id)",
+    )
     args = parser.parse_args()
 
-    rows = normalize_rows(args.input)
+    rows = normalize_rows(args.input, args.hack_id)
     write_repos_csv(args.repos_out, rows)
     write_project_map(args.project_map_out, rows)
     write_json(args.json_out, rows)

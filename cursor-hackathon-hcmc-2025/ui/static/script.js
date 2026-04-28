@@ -89,12 +89,72 @@ function normalizeRepoKey(repoUrl = "") {
     .toLowerCase();
 }
 
+/** Load before submission/judge merges so cohort scoping matches config. */
+let eventFormat = null;
+let hacksIndex = { hacks: [], active_hack_id: null };
+
+function getActiveHackId() {
+  return (
+    hacksIndex.active_hack_id ||
+    (eventFormat && eventFormat.hack_id) ||
+    "cursor-live-london-q3-2026"
+  );
+}
+
+function submissionMatchesActiveHack(sub) {
+  if (!sub || typeof sub !== "object") return false;
+  const active = String(getActiveHackId() || "").trim();
+  const h = String(sub.hack_id || "").trim();
+  if (!h) return false;
+  return h === active;
+}
+
+function hackStorageSlug() {
+  const id = String(getActiveHackId() || "hack").trim();
+  const s = slugify(id.replace(/[^\w\s-]/g, " "));
+  return s || "hack";
+}
+
+function localSubmissionsKey() {
+  return `hack-${hackStorageSlug()}-submissions`;
+}
+
+function localScoresKey() {
+  return `hack-${hackStorageSlug()}-scores`;
+}
+
+function localJudgeNameKey() {
+  return `hack-${hackStorageSlug()}-judge-name`;
+}
+
 function slugify(value = "") {
   return String(value)
     .trim()
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+/** Match summary rows whether repo_id is slug-style or github org/repo style. */
+function canonicalRepoRowSlug(row) {
+  if (!row) return "";
+  const rid = (row.repo_id && String(row.repo_id).trim()) || "";
+  if (rid) return slugify(rid);
+  const ex = extractRepoName(row.repo || "");
+  return ex ? slugify(ex) : "";
+}
+
+function findSummaryRowForRepoId(repoId) {
+  const needle = slugify(String(repoId || "").trim());
+  if (!needle) return undefined;
+  return (window.__summaryRows || []).find(
+    (r) => canonicalRepoRowSlug(r) === needle
+  );
+}
+
+/** Encode repo id for /api/repo/:id/... paths (repo_id may contain reserved URL chars). */
+function encodeRepoApiSegment(repoId) {
+  return encodeURIComponent(String(repoId || "").trim());
 }
 
 async function loadJudgeData() {
@@ -121,6 +181,7 @@ async function loadSubmissionData() {
     const data = await fetchJSON("/api/submissions");
     const map = new Map();
     for (const submission of data.submissions || []) {
+      if (!submissionMatchesActiveHack(submission)) continue;
       if (submission.repo_url) {
         map.set(normalizeRepoKey(submission.repo_url), submission);
       }
@@ -140,7 +201,8 @@ const aiCache = new Map();
 
 async function fetchAISummary(repoId) {
   if (aiCache.has(repoId)) return aiCache.get(repoId);
-  const text = await fetchText(`/api/repo/${repoId}/ai`);
+  const seg = encodeRepoApiSegment(repoId);
+  const text = await fetchText(`/api/repo/${seg}/ai`);
   aiCache.set(repoId, text);
   return text;
 }
@@ -220,6 +282,14 @@ function getSubmissionInfoForRow(row) {
   if (repoKey && submissionMap.has(repoKey)) return submissionMap.get(repoKey);
   if (row.repo_id && submissionMap.has(`submission:${row.repo_id}`))
     return submissionMap.get(`submission:${row.repo_id}`);
+  if (
+    row.project_name != null ||
+    row.team_name != null ||
+    row.chosen_track != null ||
+    row.demo_url != null
+  ) {
+    return row;
+  }
   return null;
 }
 
@@ -289,6 +359,23 @@ function repoLink(url) {
   )}" target="_blank" rel="noreferrer">Repo</a>`;
 }
 
+function repoUrlForRow(row) {
+  if (!row) return "";
+  const sub = getSubmissionInfoForRow(row);
+  return String(row.repo || sub?.repo_url || "").trim();
+}
+
+function lbNameCell(row, displayName) {
+  const url = repoUrlForRow(row);
+  const safe = escapeHtml(displayName);
+  if (url) {
+    return `<a class="lb-name lb-name--link" href="${escapeAttr(
+      url
+    )}" target="_blank" rel="noreferrer">${safe}</a>`;
+  }
+  return `<span class="lb-name">${safe}</span>`;
+}
+
 function buildJudgeTooltip(info) {
   if (!info || !info.responses || info.responses.length === 0)
     return "No judge responses";
@@ -320,12 +407,26 @@ function renderJudgeCell(info) {
   return `<span class="judge-chip" title="${tooltip}">${avg}${cap}<span class="judge-count"> · ${info.responses.length}</span></span>`;
 }
 
-function renderJudgeDetails(info) {
-  const container = document.getElementById("judge-output");
+function judgeImportResponsesListHtml(info) {
+  if (!info?.responses?.length) return "";
+  return info.responses
+    .map((r, idx) => {
+      const thought = r.thoughts
+        ? `<div class="judge-thought">${escapeHtml(r.thoughts)}</div>`
+        : "";
+      const scoreLine = info.legacy_mode
+        ? `#${idx + 1} • ${r.total_score}`
+        : `#${idx + 1} • ${r.total_score}/130 (core ${r.core_total}, bonus ${
+            r.bonus_total_capped
+          })`;
+      return `<div class="judge-row"><div class="judge-score-pill">${scoreLine}</div>${thought}</div>`;
+    })
+    .join("");
+}
+
+function judgeAggregateBlockHtml(info) {
   if (!info || !info.responses || info.responses.length === 0) {
-    container.innerHTML =
-      '<div class="empty-state"><div class="empty-state-icon">🧑‍⚖️</div><div>No judge responses</div></div>';
-    return;
+    return "";
   }
   const grandAvg = Number(
     (info.averages && info.averages.grand_total) ?? info.average_score ?? 0
@@ -360,22 +461,9 @@ function renderJudgeDetails(info) {
             )} avg</div></div>`
         )
         .join("");
-  const list = info.responses
-    .map((r, idx) => {
-      const thought = r.thoughts
-        ? `<div class="judge-thought">${escapeHtml(r.thoughts)}</div>`
-        : "";
-      const scoreLine = info.legacy_mode
-        ? `#${idx + 1} • ${r.total_score}`
-        : `#${idx + 1} • ${r.total_score}/130 (core ${r.core_total}, bonus ${
-            r.bonus_total_capped
-          })`;
-      return `<div class="judge-row"><div class="judge-score-pill">${scoreLine}</div>${thought}</div>`;
-    })
-    .join("");
-  container.innerHTML = `
+  return `
     <div class="judge-summary">
-      <div class="judge-score-pill highlight">${grandAvg}${
+      <div class="judge-score-pill highlight" title="Average of imported judge scores (${info.responses.length} response${info.responses.length !== 1 ? "s" : ""})."><span class="judge-score-avg-label">Avg</span> ${grandAvg}${
     info.legacy_mode ? "" : "/130"
   }</div>
       <div class="judge-meta">${info.responses.length} response${
@@ -393,9 +481,19 @@ function renderJudgeDetails(info) {
       <div class="judge-list">${criterionList}</div>
       <div class="judge-list">${bonusList}</div>
     `
-    }
-    <div class="judge-list">${list}</div>
-  `;
+    }`;
+}
+
+function renderJudgeDetails(info, containerEl) {
+  const container =
+    containerEl || document.getElementById("judge-output");
+  if (!info || !info.responses || info.responses.length === 0) {
+    container.innerHTML =
+      '<div class="empty-state"><div class="empty-state-icon">🧑‍⚖️</div><div>No judge responses</div></div>';
+    return;
+  }
+  const list = judgeImportResponsesListHtml(info);
+  container.innerHTML = `${judgeAggregateBlockHtml(info)}<div class="judge-list">${list}</div>`;
 }
 
 async function renderSummaryTable(rows) {
@@ -542,22 +640,24 @@ async function renderSummaryTable(rows) {
 }
 
 async function loadSummary() {
+  await Promise.all([loadHacks(), loadEventFormat()]);
   const [summaryData] = await Promise.all([
     fetchJSON("/api/summary").catch(() => ({ rows: [] })),
     loadJudgeData(),
     loadSubmissionData(),
   ]);
   const summaryRows = summaryData.rows || [];
-  const merged = mergeRows(
-    summaryRows,
-    Array.from(submissionMap.values()).filter((value, index, array) => {
-      return (
-        array.findIndex(
-          (candidate) => candidate.submission_id === value.submission_id
-        ) === index
-      );
-    })
+  const dedupApi = Array.from(submissionMap.values()).filter((value, index, array) => {
+    return (
+      array.findIndex(
+        (candidate) => candidate.submission_id === value.submission_id
+      ) === index
+    );
+  });
+  const localSubs = getLocalList(localSubmissionsKey()).filter((s) =>
+    submissionMatchesActiveHack(s)
   );
+  const merged = mergeRows(summaryRows, [...dedupApi, ...localSubs]);
   window.__summaryRows = merged;
   maybeRenderSummaryTable();
 }
@@ -578,11 +678,33 @@ function maybeRenderSummaryTable() {
   renderSummaryTable(rows);
 }
 
+function dedupeSubmissionsBySubmissionId(submissions) {
+  const seen = new Set();
+  const out = [];
+  for (const s of submissions || []) {
+    if (!s) continue;
+    const id =
+      (s.submission_id && String(s.submission_id).trim()) ||
+      normalizeRepoKey(s.repo_url || "");
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    out.push(s);
+  }
+  return out;
+}
+
 function mergeRows(summaryRows, submissions) {
   const byRepo = new Map();
+  const submissionsDedup = dedupeSubmissionsBySubmissionId(submissions);
+  const allowedRepoKeys = new Set(
+    submissionsDedup
+      .map((s) => normalizeRepoKey(s.repo_url || ""))
+      .filter(Boolean)
+  );
 
   summaryRows.forEach((row) => {
     const repoKey = normalizeRepoKey(row.repo || "");
+    if (!repoKey || !allowedRepoKeys.has(repoKey)) return;
     byRepo.set(repoKey, {
       ...row,
       repo_id: row.repo_id || extractRepoName(row.repo),
@@ -591,8 +713,9 @@ function mergeRows(summaryRows, submissions) {
     });
   });
 
-  submissions.forEach((submission) => {
+  submissionsDedup.forEach((submission) => {
     const repoKey = normalizeRepoKey(submission.repo_url || "");
+    if (!repoKey) return;
     if (byRepo.has(repoKey)) {
       byRepo.set(repoKey, {
         ...byRepo.get(repoKey),
@@ -664,68 +787,198 @@ function closeDrawer() {
     .forEach((r) => r.classList.remove("selected"));
 }
 
-async function loadDetails(repoId) {
-  document.getElementById("detail-title").textContent = repoId;
+function detailElsForDrawer() {
+  return {
+    detailTitle: document.getElementById("detail-title"),
+    submissionOutput: document.getElementById("submission-output"),
+    metricsSummary: document.getElementById("metrics-summary"),
+    metricsFlags: document.getElementById("metrics-flags"),
+    metricsTime: document.getElementById("metrics-time"),
+    aiOutput: document.getElementById("ai-output"),
+    judgeOutput: document.getElementById("judge-output"),
+    commitsTbody: document.querySelector("#commits-table tbody"),
+    commitCountEl: document.querySelector("#details-drawer .commit-count"),
+  };
+}
 
-  const submissionEl = document.getElementById("submission-output");
-  const summaryEl = document.getElementById("metrics-summary");
-  const flagsEl = document.getElementById("metrics-flags");
-  const timeEl = document.getElementById("metrics-time");
-  const aiEl = document.getElementById("ai-output");
-  const judgeEl = document.getElementById("judge-output");
+function detailElsForJudgeSidePanel() {
+  return {
+    detailTitle: document.getElementById("judge-side-detail-title"),
+    submissionOutput: document.getElementById("judge-side-submission-output"),
+    metricsSummary: document.getElementById("judge-side-metrics-summary"),
+    metricsFlags: document.getElementById("judge-side-metrics-flags"),
+    metricsTime: document.getElementById("judge-side-metrics-time"),
+    aiOutput: document.getElementById("judge-side-ai-output"),
+    judgeOutput: document.getElementById("judge-side-judge-output"),
+    commitsTbody: document.querySelector("#judge-side-commits-table tbody"),
+    commitCountEl: document.getElementById("judge-side-commit-count"),
+  };
+}
 
-  submissionEl.textContent = "Loading...";
-  summaryEl.textContent = "Loading...";
-  flagsEl.textContent = "Loading...";
-  timeEl.textContent = "Loading...";
-  aiEl.textContent = "Loading...";
-  judgeEl.textContent = "Loading...";
+function mergeDetailEls(overrides) {
+  if (!overrides) return detailElsForDrawer();
+
+  const submissionOut = overrides.submissionOutput;
+  const judgeOut = overrides.judgeOutput;
+  const targetsJudgeSidePanel =
+    (submissionOut && submissionOut.id === "judge-side-submission-output") ||
+    (judgeOut && judgeOut.id === "judge-side-judge-output");
+
+  if (targetsJudgeSidePanel) {
+    const side = detailElsForJudgeSidePanel();
+    const o = { ...side };
+    Object.keys(overrides).forEach((k) => {
+      if (overrides[k] != null) o[k] = overrides[k];
+    });
+    return o;
+  }
+
+  const base = detailElsForDrawer();
+  const o = { ...base };
+  Object.keys(overrides).forEach((k) => {
+    if (overrides[k] != null) o[k] = overrides[k];
+  });
+  return o;
+}
+
+function mergedTableRowsHtml(merged) {
+  return merged
+    .map(
+      (e) => `
+    <tr>
+      <td class="judge-prior-td judge-prior-judge">${escapeHtml(e.judge)}${
+        e.source === "local"
+          ? ' <span class="judge-prior-src">local</span>'
+          : ' <span class="judge-prior-src">import</span>'
+      }</td>
+      <td class="judge-prior-td judge-prior-when">${escapeHtml(
+        formatJudgeTime(e.at)
+      )}</td>
+      <td class="judge-prior-td judge-prior-num">${escapeHtml(
+        String(e.total ?? "—")
+      )}</td>
+      <td class="judge-prior-td judge-prior-detail">${escapeHtml(e.detail)}</td>
+    </tr>`
+    )
+    .join("");
+}
+
+function countUniqueJudges(merged) {
+  const s = new Set();
+  for (const e of merged) {
+    const j = (e.judge && String(e.judge).trim()) || "";
+    if (j) s.add(j.toLowerCase());
+  }
+  return s.size;
+}
+
+function renderJudgeSideScoresTab(submissionId, judgeInfo) {
+  const agg = document.getElementById("judge-side-scores-aggregate");
+  const tbody = document.querySelector("#judge-side-merged-scores tbody");
+  if (!agg || !tbody) return;
+  const merged = buildMergedScoreEntries(submissionId, judgeInfo);
+  tbody.innerHTML = mergedTableRowsHtml(merged);
+  if (judgeInfo && judgeInfo.responses && judgeInfo.responses.length) {
+    agg.innerHTML = judgeAggregateBlockHtml(judgeInfo);
+  } else {
+    agg.innerHTML = merged.length
+      ? `<p class="judge-scores-tab-hint">No imported panel average — see merged scores below (local + any imports).</p>`
+      : `<div class="empty-state"><div class="empty-state-icon">🧑‍⚖️</div><div>No scores yet for this pick.</div></div>`;
+  }
+}
+
+async function loadDetails(repoId, elsOrOverrides) {
+  const {
+    detailTitle,
+    submissionOutput,
+    metricsSummary,
+    metricsFlags,
+    metricsTime,
+    aiOutput,
+    judgeOutput,
+    commitsTbody,
+    commitCountEl,
+  } = mergeDetailEls(elsOrOverrides);
+
+  if (detailTitle) {
+    detailTitle.textContent = repoId;
+    if (detailTitle.id === "judge-side-detail-title") {
+      if (repoId) detailTitle.removeAttribute("hidden");
+      else detailTitle.setAttribute("hidden", "");
+    }
+  }
+
+  if (submissionOutput) submissionOutput.textContent = "Loading...";
+  if (metricsSummary) metricsSummary.textContent = "Loading...";
+  if (metricsFlags) metricsFlags.textContent = "Loading...";
+  if (metricsTime) metricsTime.textContent = "Loading...";
+  if (aiOutput) aiOutput.textContent = "Loading...";
+  if (judgeOutput) judgeOutput.textContent = "Loading...";
 
   try {
-    const summaryRow = (window.__summaryRows || []).find(
-      (r) => (r.repo_id || extractRepoName(r.repo)) === repoId
-    );
-    renderSubmissionDetails(summaryRow);
+    const apiSeg = encodeRepoApiSegment(repoId);
+    const summaryRow = findSummaryRowForRepoId(repoId);
+    renderSubmissionDetails(summaryRow, submissionOutput);
     const [metrics, aiText, commitsData] = await Promise.all([
-      fetchJSON(`/api/repo/${repoId}/metrics`),
-      fetchText(`/api/repo/${repoId}/ai`),
-      fetchJSON(`/api/repo/${repoId}/commits`).catch(() => ({ rows: [] })),
+      fetchJSON(`/api/repo/${apiSeg}/metrics`),
+      fetchText(`/api/repo/${apiSeg}/ai`),
+      fetchJSON(`/api/repo/${apiSeg}/commits`).catch(() => ({ rows: [] })),
     ]);
 
-    summaryEl.textContent = formatJSON(metrics.summary || {});
-    flagsEl.textContent = formatJSON(metrics.flags || {});
-    timeEl.textContent = formatJSON(metrics.time_distribution || {});
+    if (metricsSummary) {
+      metricsSummary.textContent = formatJSON(metrics.summary || {});
+    }
+    if (metricsFlags) {
+      metricsFlags.textContent = formatJSON(metrics.flags || {});
+    }
+    if (metricsTime) {
+      metricsTime.textContent = formatJSON(metrics.time_distribution || {});
+    }
 
-    // Format AI output with verdict highlighting
-    if (aiText) {
-      const formattedAI = formatAIOutput(aiText);
-      aiEl.innerHTML = formattedAI;
-    } else {
-      aiEl.textContent = "No AI analysis available for this submission.";
+    if (aiOutput) {
+      if (aiText) {
+        aiOutput.innerHTML = formatAIOutput(aiText);
+      } else {
+        aiOutput.textContent = "No AI analysis available for this submission.";
+      }
     }
 
     const judgeInfo = getJudgeInfoForRow(summaryRow);
-    renderJudgeDetails(judgeInfo);
+    renderJudgeDetails(judgeInfo, judgeOutput);
 
-    renderCommits(commitsData.rows || []);
+    const commitTargets = { tbody: commitsTbody, countEl: commitCountEl };
+    renderCommits(commitsData.rows || [], commitTargets);
+    if (judgeOutput && judgeOutput.id === "judge-side-judge-output") {
+      const sid = document.getElementById("judge-submission-select")?.value;
+      if (sid) renderJudgeSideScoresTab(sid, judgeInfo);
+    }
   } catch (err) {
-    const summaryRow = (window.__summaryRows || []).find(
-      (r) => (r.repo_id || extractRepoName(r.repo)) === repoId
-    );
-    renderSubmissionDetails(summaryRow);
-    summaryEl.textContent = rowHasAnalysis(summaryRow)
-      ? `Error: ${err.message}`
-      : "Analysis not generated yet.";
-    flagsEl.textContent = rowHasAnalysis(summaryRow)
-      ? ""
-      : "Run scan.py to populate commit metrics and authenticity flags.";
-    timeEl.textContent = "";
-    aiEl.textContent = rowHasAnalysis(summaryRow)
-      ? ""
-      : "AI analysis appears after repo analysis has been run.";
+    const summaryRow = findSummaryRowForRepoId(repoId);
+    renderSubmissionDetails(summaryRow, submissionOutput);
+    if (metricsSummary) {
+      metricsSummary.textContent = rowHasAnalysis(summaryRow)
+        ? `Error: ${err.message}`
+        : "Analysis not generated yet.";
+    }
+    if (metricsFlags) {
+      metricsFlags.textContent = rowHasAnalysis(summaryRow)
+        ? ""
+        : "Run scan.py to populate commit metrics and authenticity flags.";
+    }
+    if (metricsTime) metricsTime.textContent = "";
+    if (aiOutput) {
+      aiOutput.textContent = rowHasAnalysis(summaryRow)
+        ? ""
+        : "AI analysis appears after repo analysis has been run.";
+    }
     const judgeInfo = getJudgeInfoForRow(summaryRow);
-    renderJudgeDetails(judgeInfo);
-    renderCommits([]);
+    renderJudgeDetails(judgeInfo, judgeOutput);
+    const commitTargets = { tbody: commitsTbody, countEl: commitCountEl };
+    renderCommits([], commitTargets);
+    if (judgeOutput && judgeOutput.id === "judge-side-judge-output") {
+      const sid = document.getElementById("judge-submission-select")?.value;
+      if (sid) renderJudgeSideScoresTab(sid, judgeInfo);
+    }
   }
 }
 
@@ -733,8 +986,10 @@ function rowHasAnalysis(row) {
   return row && row.analysis_status === "analyzed";
 }
 
-function renderSubmissionDetails(row) {
-  const container = document.getElementById("submission-output");
+function renderSubmissionDetails(row, outputEl) {
+  const container =
+    outputEl || document.getElementById("submission-output");
+  if (!container) return;
   const submission = getSubmissionInfoForRow(row) || row;
   if (!submission) {
     container.innerHTML =
@@ -792,12 +1047,17 @@ function formatAIOutput(text) {
   return html;
 }
 
-function renderCommits(rows) {
-  const tbody = document.querySelector("#commits-table tbody");
-  const countEl = document.querySelector(".commit-count");
+function renderCommits(rows, targets) {
+  const tbody =
+    (targets && targets.tbody) ||
+    document.querySelector("#commits-table tbody");
+  const countEl =
+    (targets && targets.countEl) ||
+    document.querySelector("#details-drawer .commit-count");
+  if (!tbody) return;
   tbody.innerHTML = "";
 
-  countEl.textContent = `(${rows.length})`;
+  if (countEl) countEl.textContent = `(${rows.length})`;
 
   if (rows.length === 0) {
     tbody.innerHTML = `
@@ -834,19 +1094,6 @@ function renderCommits(rows) {
 // ================================================================
 // Event format (rubric / side quests / judges / prizes) + modals
 // ================================================================
-
-let eventFormat = null;
-let hacksIndex = { hacks: [], active_hack_id: null };
-const LOCAL_SUBMISSIONS_KEY = "bfa-london-2026-submissions";
-const LOCAL_SCORES_KEY = "bfa-london-2026-scores";
-
-function getActiveHackId() {
-  return (
-    hacksIndex.active_hack_id ||
-    (eventFormat && eventFormat.hack_id) ||
-    "cursor-briefcase-london-2026"
-  );
-}
 
 function getActiveHack() {
   const id = getActiveHackId();
@@ -1096,9 +1343,97 @@ function openModal(id) {
   }
   if (id === "judge-modal") refreshJudgeSubmissionSelect();
 }
+function getJudgeApiRepoId() {
+  const id = document.getElementById("judge-submission-select")?.value;
+  if (!id) return "";
+  const found = findSubmissionById(id);
+  if (found && found.row) {
+    return (
+      found.row.repo_id ||
+      extractRepoName(found.row.repo) ||
+      id
+    );
+  }
+  return id;
+}
+
+function isJudgeSidePanelOpen() {
+  const p = document.getElementById("judge-side-panel");
+  return !!(p && !p.hidden);
+}
+
+function closeJudgeSidePanel() {
+  const panel = document.getElementById("judge-side-panel");
+  const modal = document.getElementById("judge-modal");
+  if (panel) {
+    panel.hidden = true;
+    panel.setAttribute("aria-hidden", "true");
+  }
+  if (modal) modal.classList.remove("judge-side-open");
+}
+
+function openJudgeSidePanel() {
+  const panel = document.getElementById("judge-side-panel");
+  const modal = document.getElementById("judge-modal");
+  if (!panel || !modal) return;
+  setActiveJudgeSideTab("submission");
+  panel.hidden = false;
+  panel.setAttribute("aria-hidden", "false");
+  modal.classList.add("judge-side-open");
+  const repoId = getJudgeApiRepoId();
+  if (repoId) {
+    loadDetails(repoId, detailElsForJudgeSidePanel());
+  }
+}
+
+function setActiveJudgeSideTab(which) {
+  const subP = document.getElementById("judge-panel-submission");
+  const scP = document.getElementById("judge-panel-scores");
+  const tSub = document.getElementById("judge-tab-submission");
+  const tSc = document.getElementById("judge-tab-scores");
+  if (!subP || !scP || !tSub || !tSc) return;
+  if (which === "scores") {
+    subP.classList.remove("is-active");
+    scP.classList.add("is-active");
+    tSub.classList.remove("is-active");
+    tSub.setAttribute("aria-selected", "false");
+    tSub.tabIndex = -1;
+    tSc.classList.add("is-active");
+    tSc.setAttribute("aria-selected", "true");
+    tSc.tabIndex = 0;
+  } else {
+    scP.classList.remove("is-active");
+    subP.classList.add("is-active");
+    tSc.classList.remove("is-active");
+    tSc.setAttribute("aria-selected", "false");
+    tSc.tabIndex = -1;
+    tSub.classList.add("is-active");
+    tSub.setAttribute("aria-selected", "true");
+    tSub.tabIndex = 0;
+  }
+}
+
+/** Selected submission ⇒ show enrichment side panel; cleared selection ⇒ hide. */
+function syncJudgeFullViewFromSelection() {
+  const sel = document.getElementById("judge-submission-select");
+  if (!sel) return;
+  const id = (sel.value || "").trim();
+  if (!id) {
+    closeJudgeSidePanel();
+    return;
+  }
+  openJudgeSidePanel();
+}
+
+function onJudgeSubmissionSelectChanged() {
+  renderJudgeSubmissionSummary();
+  syncJudgeFullViewFromSelection();
+}
+
 function closeModal(id) {
   const modal = document.getElementById(id);
   if (!modal) return;
+  if (id === "judge-modal") closeJudgeSidePanel();
   modal.classList.add("hidden");
   if (
     lastFocusedBeforeModal &&
@@ -1127,9 +1462,9 @@ function handleSubmitForm(e) {
     notes: data.notes || "",
     source: "local-modal",
   };
-  const list = getLocalList(LOCAL_SUBMISSIONS_KEY);
+  const list = getLocalList(localSubmissionsKey());
   list.push(entry);
-  setLocalList(LOCAL_SUBMISSIONS_KEY, list);
+  setLocalList(localSubmissionsKey(), list);
   form.reset();
   closeModal("submit-modal");
   toast(
@@ -1242,7 +1577,6 @@ function sumScoreInputs(group) {
   return sum;
 }
 
-const LOCAL_JUDGE_NAME_KEY = "bfa-london-2026-judge-name";
 
 function formatTrackForLabel(raw) {
   const t = (raw || "").trim();
@@ -1253,7 +1587,7 @@ function formatTrackForLabel(raw) {
 function scoredIdsForJudge(judgeName) {
   const trimmed = (judgeName || "").trim().toLowerCase();
   if (!trimmed) return new Set();
-  const scores = getLocalList(LOCAL_SCORES_KEY);
+  const scores = getLocalList(localScoresKey());
   return new Set(
     scores
       .filter((s) => (s.judge_name || "").trim().toLowerCase() === trimmed)
@@ -1266,7 +1600,9 @@ function refreshJudgeSubmissionSelect() {
   if (!select) return;
   const previous = select.value;
   const rows = window.__summaryRows || [];
-  const local = getLocalList(LOCAL_SUBMISSIONS_KEY);
+  const local = getLocalList(localSubmissionsKey()).filter(
+    submissionMatchesActiveHack
+  );
   const nameInput = document.getElementById("judge-name-input");
   const cachedName = (nameInput && nameInput.value) || "";
   const scored = scoredIdsForJudge(cachedName);
@@ -1324,6 +1660,7 @@ function refreshJudgeSubmissionSelect() {
     select.value = previous;
   }
   renderJudgeSubmissionSummary();
+  syncJudgeFullViewFromSelection();
 }
 
 function findSubmissionById(id) {
@@ -1334,9 +1671,9 @@ function findSubmissionById(id) {
     const rid = r.repo_id || sub?.project_name || extractRepoName(r.repo);
     if (rid === id) return { row: r, sub: sub || null };
   }
-  const local = getLocalList(LOCAL_SUBMISSIONS_KEY).find(
-    (s) => s.submission_id === id
-  );
+  const local = getLocalList(localSubmissionsKey())
+    .filter(submissionMatchesActiveHack)
+    .find((s) => s.submission_id === id);
   if (local) return { row: null, sub: local };
   return null;
 }
@@ -1350,10 +1687,6 @@ function formatJudgeTime(isoOrStr) {
   const d = new Date(isoOrStr);
   if (Number.isNaN(d.getTime())) return String(isoOrStr);
   return d.toLocaleString(undefined, { dateStyle: "short", timeStyle: "short" });
-}
-
-function judgePriorDomId(subId) {
-  return `judge-prior-${String(subId).replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 96)}`;
 }
 
 function buildMergedScoreEntries(submissionId, judgeInfo) {
@@ -1380,7 +1713,7 @@ function buildMergedScoreEntries(submissionId, judgeInfo) {
       });
     });
   }
-  const locals = getLocalList(LOCAL_SCORES_KEY).filter(
+  const locals = getLocalList(localScoresKey()).filter(
     (s) => s.submission_id === submissionId
   );
   locals.forEach((s) => {
@@ -1410,20 +1743,6 @@ function isYouScoreEntry(entry, judgeName) {
   return entry.source === "local" && judgeNamesMatch(entry.judge, judgeName);
 }
 
-function attachJudgePriorPanelHandlers(container) {
-  const btn = container.querySelector(".judge-prior-toggle");
-  const drawer = container.querySelector(".judge-prior-drawer");
-  const icon = container.querySelector(".judge-prior-toggle-icon");
-  if (!btn || !drawer) return;
-  btn.addEventListener("click", () => {
-    const open = btn.getAttribute("aria-expanded") === "true";
-    const next = !open;
-    btn.setAttribute("aria-expanded", String(next));
-    drawer.hidden = !next;
-    if (icon) icon.textContent = next ? "▴" : "▾";
-  });
-}
-
 function renderJudgeSubmissionToolbar() {
   const toolbar = document.getElementById("judge-submission-toolbar");
   if (!toolbar) return;
@@ -1449,6 +1768,7 @@ function renderJudgeSubmissionToolbar() {
 function renderJudgeSubmissionSummary() {
   renderJudgeSubmissionToolbar();
   const target = document.getElementById("judge-submission-summary");
+  const recap = document.getElementById("judge-quick-recap");
   if (!target) return;
   const select = document.getElementById("judge-submission-select");
   const nameInput = document.getElementById("judge-name-input");
@@ -1457,12 +1777,20 @@ function renderJudgeSubmissionSummary() {
   if (!id) {
     target.innerHTML = "";
     target.classList.remove("is-visible");
+    if (recap) {
+      recap.textContent = "";
+      recap.hidden = true;
+    }
     return;
   }
   const found = findSubmissionById(id);
   if (!found) {
     target.innerHTML = "";
     target.classList.remove("is-visible");
+    if (recap) {
+      recap.textContent = "";
+      recap.hidden = true;
+    }
     return;
   }
   const { row, sub } = found;
@@ -1476,7 +1804,6 @@ function renderJudgeSubmissionSummary() {
   const demoUrl = subInfo?.demo_url || "";
   const judgeInfo = row ? getJudgeInfoForRow(row) : null;
   const merged = buildMergedScoreEntries(id, judgeInfo);
-  const mergedAvg = mergedScoreAverage(merged);
   const youScored = judgeName.trim()
     ? scoredIdsForJudge(judgeName).has(id)
     : false;
@@ -1494,21 +1821,6 @@ function renderJudgeSubmissionSummary() {
       ? `<span class="judge-sub-pill judge-sub-pill-others is-on" title="Imports + other judges’ local saves">Others · ${othersEntries.length}</span>`
       : `<span class="judge-sub-pill judge-sub-pill-others judge-sub-pill-muted">Others · none</span>`;
 
-  const drawerId = judgePriorDomId(id);
-  const hasPrior = merged.length > 0;
-  const priorControl = hasPrior
-    ? `<div class="judge-sub-prior-wrap">
-        <button type="button" class="judge-prior-toggle" aria-expanded="false" aria-controls="${escapeAttr(
-          drawerId
-        )}" id="${escapeAttr(drawerId)}-btn">
-          <span class="judge-prior-toggle-label">Prior · avg ${mergedAvg} · ${
-            merged.length
-          } score${merged.length === 1 ? "" : "s"}</span>
-          <span class="judge-prior-toggle-icon" aria-hidden="true">▾</span>
-        </button>
-      </div>`
-    : `<span class="judge-sub-pill judge-sub-pill-muted">Prior · none</span>`;
-
   const repoCell = repoUrl
     ? `<a href="${escapeAttr(
         repoUrl
@@ -1520,25 +1832,19 @@ function renderJudgeSubmissionSummary() {
       )}" target="_blank" rel="noopener noreferrer" class="repo-link judge-sub-link-compact">Demo</a>`
     : `<span class="judge-sub-muted">Demo · —</span>`;
 
-  const tableRows = merged
-    .map(
-      (e) => `
-    <tr>
-      <td class="judge-prior-td judge-prior-judge">${escapeHtml(e.judge)}${
-        e.source === "local"
-          ? ' <span class="judge-prior-src">local</span>'
-          : ' <span class="judge-prior-src">import</span>'
-      }</td>
-      <td class="judge-prior-td judge-prior-when">${escapeHtml(
-        formatJudgeTime(e.at)
-      )}</td>
-      <td class="judge-prior-td judge-prior-num">${escapeHtml(
-        String(e.total ?? "—")
-      )}</td>
-      <td class="judge-prior-td judge-prior-detail">${escapeHtml(e.detail)}</td>
-    </tr>`
-    )
-    .join("");
+  if (recap) {
+    if (merged.length) {
+      const ma = mergedScoreAverage(merged);
+      const nJ = countUniqueJudges(merged);
+      recap.textContent = `Quick recap: avg ${ma} · ${merged.length} score${
+        merged.length === 1 ? "" : "s"
+      } · ${nJ} judge${nJ === 1 ? "" : "s"}`;
+      recap.hidden = false;
+    } else {
+      recap.textContent = "";
+      recap.hidden = true;
+    }
+  }
 
   target.innerHTML = `
     <div class="judge-sub-summary-card">
@@ -1552,31 +1858,10 @@ function renderJudgeSubmissionSummary() {
         <span class="judge-sub-links-inline">${repoCell}<span class="judge-sub-dot" aria-hidden="true">·</span>${demoCell}</span>
         ${youPill}
         ${othersPill}
-        ${priorControl}
-      </div>
-      <div id="${escapeAttr(
-        drawerId
-      )}" class="judge-prior-drawer" role="region" aria-labelledby="${escapeAttr(
-    drawerId
-  )}-btn" hidden>
-        <div class="judge-prior-scroll">
-          <table class="judge-prior-table">
-            <thead>
-              <tr>
-                <th scope="col">Judge</th>
-                <th scope="col">When</th>
-                <th scope="col">Total</th>
-                <th scope="col">Breakdown</th>
-              </tr>
-            </thead>
-            <tbody>${tableRows}</tbody>
-          </table>
-        </div>
       </div>
     </div>
   `;
   target.classList.add("is-visible");
-  attachJudgePriorPanelHandlers(target);
 }
 
 function handleJudgeForm(e) {
@@ -1592,7 +1877,7 @@ function handleJudgeForm(e) {
     return;
   }
   try {
-    localStorage.setItem(LOCAL_JUDGE_NAME_KEY, data.judge_name);
+    localStorage.setItem(localJudgeNameKey(), data.judge_name);
   } catch {}
 
   const coreScores = {};
@@ -1626,9 +1911,9 @@ function handleJudgeForm(e) {
     total_score: grandTotal,
     thoughts: data.thoughts || "",
   };
-  const list = getLocalList(LOCAL_SCORES_KEY);
+  const list = getLocalList(localScoresKey());
   list.push(entry);
-  setLocalList(LOCAL_SCORES_KEY, list);
+  setLocalList(localScoresKey(), list);
 
   // Reset scores only — keep judge name cached for next submission
   const scoredId = entry.submission_id;
@@ -1658,6 +1943,10 @@ function handleJudgeForm(e) {
       }
     }
     renderJudgeSubmissionSummary();
+    if (isJudgeSidePanelOpen()) {
+      const r = getJudgeApiRepoId();
+      if (r) loadDetails(r, detailElsForJudgeSidePanel());
+    }
   }
   toast(`Score saved — ${grandTotal}/130. Your score is stored in this browser.`);
 }
@@ -1697,11 +1986,10 @@ function ensureLeaderboardNote(listEl, show, text) {
 
 function renderManagerPanel() {
   const stats = document.getElementById("manager-stats");
-  const secondary = document.getElementById("manager-secondary-stats");
   const aggregates = document.getElementById("manager-aggregates");
   const rows = window.__summaryRows || [];
-  const local = getLocalList(LOCAL_SUBMISSIONS_KEY);
-  const scores = getLocalList(LOCAL_SCORES_KEY);
+  const local = getLocalList(localSubmissionsKey());
+  const scores = getLocalList(localScoresKey());
   const tracked = rows.length + local.length;
 
   const moneyMovement = rows.filter((r) =>
@@ -1739,23 +2027,18 @@ function renderManagerPanel() {
 
   if (stats) {
     stats.innerHTML = `
-    <div class="manager-stat"><span class="manager-stat-num">${tracked}</span><span class="manager-stat-lbl">Total submissions</span></div>
-    <div class="manager-stat"><span class="manager-stat-num">${moneyMovement}</span><span class="manager-stat-lbl">Money Movement</span></div>
-    <div class="manager-stat"><span class="manager-stat-num">${financialIntelligence}</span><span class="manager-stat-lbl">Financial Intelligence</span></div>
+    <div class="manager-stat"><span class="manager-stat-num">${tracked}</span><span class="manager-stat-lbl">Total</span></div>
+    <div class="manager-stat"><span class="manager-stat-num">${moneyMovement}</span><span class="manager-stat-lbl">Money mov.</span></div>
+    <div class="manager-stat"><span class="manager-stat-num">${financialIntelligence}</span><span class="manager-stat-lbl">Fin. intel.</span></div>
     <div class="manager-stat"><span class="manager-stat-num">${flagged}</span><span class="manager-stat-lbl">Flagged</span></div>
     <div class="manager-stat"><span class="manager-stat-num">${scores.length}</span><span class="manager-stat-lbl">Local scores</span></div>
-    <div class="manager-stat"><span class="manager-stat-num">${local.length}</span><span class="manager-stat-lbl">Local submissions</span></div>
-  `;
-  }
-
-  if (secondary) {
-    secondary.innerHTML = `
-    <div class="manager-stat"><span class="manager-stat-num">${noTrackLabel}</span><span class="manager-stat-lbl">No track label</span></div>
-    <div class="manager-stat"><span class="manager-stat-num">${vagueTrack}</span><span class="manager-stat-lbl">Other / unmatched track</span></div>
-    <div class="manager-stat"><span class="manager-stat-num">${formatNumber(sumCommits)}</span><span class="manager-stat-lbl">Σ commits (all repos)</span></div>
-    <div class="manager-stat"><span class="manager-stat-num">${avgCommits.toFixed(1)}</span><span class="manager-stat-lbl">Avg commits / repo</span></div>
-    <div class="manager-stat"><span class="manager-stat-num">${formatNumber(analyzed)}</span><span class="manager-stat-lbl">Analyzed repos</span></div>
-    <div class="manager-stat"><span class="manager-stat-num">${formatNumber(sumAdd)}</span><span class="manager-stat-lbl">Σ lines added</span></div>
+    <div class="manager-stat"><span class="manager-stat-num">${local.length}</span><span class="manager-stat-lbl">Local subs</span></div>
+    <div class="manager-stat"><span class="manager-stat-num">${noTrackLabel}</span><span class="manager-stat-lbl">No track</span></div>
+    <div class="manager-stat"><span class="manager-stat-num">${vagueTrack}</span><span class="manager-stat-lbl">Other track</span></div>
+    <div class="manager-stat"><span class="manager-stat-num">${formatNumber(sumCommits)}</span><span class="manager-stat-lbl">Σ commits</span></div>
+    <div class="manager-stat"><span class="manager-stat-num">${avgCommits.toFixed(1)}</span><span class="manager-stat-lbl">Avg cmt/repo</span></div>
+    <div class="manager-stat"><span class="manager-stat-num">${formatNumber(analyzed)}</span><span class="manager-stat-lbl">Analyzed</span></div>
+    <div class="manager-stat"><span class="manager-stat-num">${formatNumber(sumAdd)}</span><span class="manager-stat-lbl">Σ +LOC</span></div>
   `;
   }
 
@@ -1798,6 +2081,7 @@ function renderOverallLeaderboard() {
   const rows = window.__summaryRows || [];
   const ranked = [...rows]
     .map((r) => ({
+      row: r,
       name:
         getSubmissionInfoForRow(r)?.project_name ||
         r.repo_id ||
@@ -1815,7 +2099,7 @@ function renderOverallLeaderboard() {
     .map(
       (r) => `
     <li>
-      <span class="lb-name">${escapeHtml(r.name)}</span>
+      ${lbNameCell(r.row, r.name)}
       <span class="lb-score">${r.score > 0 ? r.score.toFixed(1) : "—"}</span>
     </li>
   `
@@ -1832,6 +2116,7 @@ function renderLeaderboard(category, listId) {
   );
   let ranked = inTrack
     .map((r) => ({
+      row: r,
       name:
         getSubmissionInfoForRow(r)?.project_name ||
         r.repo_id ||
@@ -1846,6 +2131,7 @@ function renderLeaderboard(category, listId) {
     usedFallback = true;
     ranked = rows
       .map((r) => ({
+        row: r,
         name:
           getSubmissionInfoForRow(r)?.project_name ||
           r.repo_id ||
@@ -1875,7 +2161,7 @@ function renderLeaderboard(category, listId) {
     .map(
       (r) => `
     <li>
-      <span class="lb-name">${escapeHtml(r.name)}</span>
+      ${lbNameCell(r.row, r.name)}
       <span class="lb-score">${r.score > 0 ? r.score.toFixed(1) : "—"}</span>
     </li>
   `
@@ -2004,7 +2290,7 @@ function renderFlaggedList() {
 function renderLocalSubmissions() {
   const ul = document.getElementById("local-submissions");
   if (!ul) return;
-  const local = getLocalList(LOCAL_SUBMISSIONS_KEY);
+  const local = getLocalList(localSubmissionsKey());
   if (local.length === 0) {
     ul.innerHTML =
       '<li style="justify-content:center;color:var(--muted);font-style:italic">None yet — try the Submit modal</li>';
@@ -2027,8 +2313,8 @@ function renderLocalSubmissions() {
 }
 
 function exportSubmissionsJSON() {
-  const local = getLocalList(LOCAL_SUBMISSIONS_KEY);
-  const scores = getLocalList(LOCAL_SCORES_KEY);
+  const local = getLocalList(localSubmissionsKey());
+  const scores = getLocalList(localScoresKey());
   const rows = window.__summaryRows || [];
   const payload = {
     exported_at: new Date().toISOString(),
@@ -2043,7 +2329,7 @@ function exportSubmissionsJSON() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `bfa-london-2026-export-${Date.now()}.json`;
+  a.download = `${hackStorageSlug()}-export-${Date.now()}.json`;
   document.body.appendChild(a);
   a.click();
   a.remove();
@@ -2083,27 +2369,6 @@ function updateSubmissionsCount(rows) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  const jumpDash = document.getElementById("manager-jump-dashboard");
-  if (jumpDash) {
-    jumpDash.addEventListener("click", () => {
-      setManagerTab("submissions");
-      const modalBody = document.querySelector("#manager-modal .modal-body");
-      const panel = document.querySelector(".manager-submissions-panel");
-      const table = document.getElementById("summary-table");
-      const wrap = table?.closest(".manager-summary-table-wrap");
-      const target = panel || wrap || table;
-      if (modalBody && target) {
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
-        const region = modalBody.querySelector("[data-manager-dashboard]");
-        try {
-          region?.focus({ preventScroll: true });
-        } catch {
-          /* no-op */
-        }
-      }
-    });
-  }
-
   initManagerTabs();
 
   // Filters live inside a <template> until Manager opens — delegate changes.
@@ -2141,19 +2406,27 @@ document.addEventListener("DOMContentLoaded", () => {
   const nameInput = document.getElementById("judge-name-input");
   if (nameInput) {
     try {
-      const cached = localStorage.getItem(LOCAL_JUDGE_NAME_KEY);
+      const cached = localStorage.getItem(localJudgeNameKey());
       if (cached) nameInput.value = cached;
     } catch {}
     nameInput.addEventListener("input", () => {
       try {
-        localStorage.setItem(LOCAL_JUDGE_NAME_KEY, nameInput.value);
+        localStorage.setItem(localJudgeNameKey(), nameInput.value);
       } catch {}
       refreshJudgeSubmissionSelect();
     });
   }
   const judgeSelect = document.getElementById("judge-submission-select");
-  if (judgeSelect)
-    judgeSelect.addEventListener("change", renderJudgeSubmissionSummary);
+  if (judgeSelect) {
+    judgeSelect.addEventListener("change", onJudgeSubmissionSelectChanged);
+  }
+  document.querySelectorAll("[data-judge-side-tab]").forEach((b) => {
+    b.addEventListener("click", () => {
+      setActiveJudgeSideTab(
+        b.getAttribute("data-judge-side-tab") || "submission"
+      );
+    });
+  });
 
   // Password gate
   applyAuthState();
@@ -2198,7 +2471,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const opt = Array.from(select.options).find(
           (o) => o.value === title || o.textContent.startsWith(title)
         );
-        if (opt) select.value = opt.value;
+        if (opt) {
+          select.value = opt.value;
+          renderJudgeSubmissionSummary();
+          syncJudgeFullViewFromSelection();
+        }
       }
     });
   }
@@ -2216,6 +2493,10 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       closeDrawer();
+      if (isJudgeSidePanelOpen()) {
+        closeJudgeSidePanel();
+        return;
+      }
       document
         .querySelectorAll(".modal:not(.hidden)")
         .forEach((m) => closeModal(m.id));
@@ -2254,9 +2535,205 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Load event format + hacks + data
-  loadHacks();
-  loadEventFormat();
+  (function initContextLightbox() {
+    const N = 11;
+    const GALLERY = [
+      {
+        src: "context-signals/01.png?v=3",
+        href: "https://x.com/RogoAI/status/2044445676134654303",
+        href2: null,
+        title: "Rogo — Felix",
+        desc: "Purpose-built agent for high finance: long-running workflows, decks, models, and documents end-to-end.",
+      },
+      {
+        src: "context-signals/02.png?v=3",
+        href: "https://x.com/V7Labs/status/2046593801314021550",
+        href2: null,
+        title: "V7 — slide engine",
+        desc: "From vibe-coded drafts to slides that present and export without falling apart.",
+      },
+      {
+        src: "context-signals/11.png?v=3",
+        href: "https://x.com/Lovable/status/2043708202676568491",
+        href2: "https://x.com/Lovable/status/2043708204358443341",
+        title: "Lovable Payments",
+        desc: "Describe what you sell, test safely, one conversation to go live—vibe coding meets revenue.",
+      },
+      {
+        src: "context-signals/09.png?v=3",
+        href: "https://x.com/immad/status/2048797308448587997",
+        href2: null,
+        title: "Mercury — national bank path",
+        desc: "Conditional OCC approval: regulated rails and long-term trust in fintech.",
+      },
+      {
+        src: "context-signals/10.png?v=3",
+        href: "https://x.com/apurvas96/status/2048795121005604926",
+        href2: null,
+        title: "Avoca — $125M+ / $1B",
+        desc: "AI agents for the services economy: capital flowing to operator-grade autonomy.",
+      },
+      {
+        src: "context-signals/05.png?v=3",
+        href: "https://x.com/Teknium/status/2048727164875592005",
+        href2: null,
+        title: "Teknium — Hermes",
+        desc: "Tooling, contests, and “achievement” energy around real agent session history.",
+      },
+      {
+        src: "context-signals/04.png?v=3",
+        href: "https://x.com/vikvang1/status/2048792916823285871",
+        href2: null,
+        title: "Autonomy, meet friction",
+        desc: "When the agent runs but still asks permission for the smallest tool calls.",
+      },
+      {
+        src: "context-signals/08.png?v=3",
+        href: "https://x.com/ryanvogel/status/2048447871834325416",
+        href2: null,
+        title: "Monitor everything",
+        desc: "Markets, timelines, and noise: the control-room problem for builder and bank desks alike.",
+      },
+      {
+        src: "context-signals/07.png?v=3",
+        href: "https://x.com/seraleev/status/2048612749555425323",
+        href2: null,
+        title: "Interfaces beyond the chat box",
+        desc: "Spatial UI concepts on top of money: high-agency, high-stakes, still emerging.",
+      },
+      {
+        src: "context-signals/03.png?v=3",
+        href: "https://x.com/MaginAbheet/status/2048391811576562152",
+        href2: null,
+        title: "Hyperscalers + London",
+        desc: "AI labs and big bets in Kings Cross: why the city is the venue for the next fintech act.",
+      },
+      {
+        src: "context-signals/06.png?v=3",
+        href: "https://x.com/VibesPatrol/status/2041121703099568225",
+        href2: null,
+        title: "Londonmaxxing",
+        desc: "Stop surviving the city; build and celebrate what only London stacks this way.",
+      },
+    ];
+    if (GALLERY.length !== N) return;
+    const lightbox = document.getElementById("context-lightbox");
+    const backdrop = lightbox && lightbox.querySelector(".context-lightbox__backdrop");
+    const shell = lightbox && lightbox.querySelector(".context-lightbox__shell");
+    const img = document.getElementById("context-lb-img");
+    const desc = document.getElementById("context-lb-desc");
+    const hrefEl = document.getElementById("context-lb-href");
+    const href2El = document.getElementById("context-lb-href2");
+    const prevBtn = document.getElementById("context-lb-prev");
+    const nextBtn = document.getElementById("context-lb-next");
+    const strip = document.getElementById("context-strip");
+    if (!lightbox || !backdrop || !shell || !img || !desc || !hrefEl || !href2El || !prevBtn || !nextBtn || !strip) return;
+
+    let currentIndex = 0;
+    let openFromEl = null;
+
+    function renderAt(i) {
+      const m = GALLERY.length;
+      const idx = ((i % m) + m) % m;
+      const item = GALLERY[idx];
+      currentIndex = idx;
+      img.src = item.src;
+      img.alt = item.title;
+      desc.textContent = item.desc;
+      hrefEl.href = item.href;
+      if (item.href2) {
+        href2El.href = item.href2;
+        href2El.removeAttribute("hidden");
+        href2El.classList.remove("hidden");
+      } else {
+        href2El.setAttribute("hidden", "");
+        href2El.classList.add("hidden");
+      }
+    }
+
+    function openAt(i, fromEl) {
+      openFromEl = fromEl && typeof fromEl.focus === "function" ? fromEl : null;
+      renderAt(i);
+      lightbox.removeAttribute("hidden");
+      document.body.style.overflow = "hidden";
+      prevBtn.focus();
+    }
+
+    function close() {
+      lightbox.setAttribute("hidden", "");
+      document.body.style.overflow = "";
+      if (openFromEl) {
+        try {
+          openFromEl.focus();
+        } catch (e) {
+          /* ignore */
+        }
+        openFromEl = null;
+      }
+    }
+
+    function step(d) {
+      renderAt(currentIndex + d);
+    }
+
+    function onDocKey(e) {
+      if (lightbox.hasAttribute("hidden")) return;
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        step(-1);
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        step(1);
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        close();
+      }
+    }
+
+    strip.querySelectorAll(".context-thumb").forEach((thumb) => {
+      thumb.addEventListener("click", (e) => {
+        if (e.target.closest("a[href]")) return;
+        const raw = parseInt(thumb.getAttribute("data-idx") || "0", 10);
+        const i = Number.isNaN(raw) ? 0 : raw;
+        openAt(i, thumb);
+      });
+      thumb.addEventListener("keydown", (e) => {
+        if (e.key !== "Enter" && e.key !== " ") return;
+        if (e.target.closest("a[href]")) return;
+        e.preventDefault();
+        const raw = parseInt(thumb.getAttribute("data-idx") || "0", 10);
+        const i = Number.isNaN(raw) ? 0 : raw;
+        openAt(i, thumb);
+      });
+    });
+
+    backdrop.addEventListener("click", () => {
+      close();
+    });
+
+    shell.addEventListener("click", (e) => {
+      if (
+        e.target.closest(".context-lightbox__nav") ||
+        e.target.closest("a") ||
+        e.target.closest("img")
+      ) {
+        return;
+      }
+      close();
+    });
+
+    prevBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      step(-1);
+    });
+    nextBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      step(1);
+    });
+
+    document.addEventListener("keydown", onDocKey, true);
+  })();
+
   loadSummary()
     .then(() => {
       updateSubmissionsCount(window.__summaryRows || []);

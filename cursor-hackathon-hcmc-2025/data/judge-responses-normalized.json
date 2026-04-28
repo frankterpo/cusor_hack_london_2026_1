@@ -1,84 +1,202 @@
 {
   "event_format": {
-    "event_name": "Build Eric's Software Factory",
+    "event_name": "Cursor x Briefcase London hackathon",
+    "event_tagline": "Human out of the loop in high-risk financial workflows",
+    "event_dates": "2026-04-30",
+    "event_location": "London",
+    "hack_id": "cursor-briefcase-london-2026",
+    "timeline": {
+      "t0": "2026-04-30T10:00:00+01:00",
+      "t1": "2026-04-30T18:00:00+01:00",
+      "submissions_close": "2026-04-30T18:00:00+01:00",
+      "judging_closes": "2026-04-30T19:30:00+01:00",
+      "winners_announced": "2026-04-30T20:00:00+01:00"
+    },
     "main_tracks": [
       {
-        "id": "Always-On-Agents",
-        "name": "Always-On Agents",
-        "description": "Webhook and schedule driven agents that stay useful after the demo."
+        "id": "Money-Movement",
+        "name": "Money Movement",
+        "short": "Money Movement",
+        "summary": "Agents that actually move money. A wrong action means real money is gone.",
+        "description": "Workflows where your agent moves money — paying invoices, running payroll, sending refunds, transferring between accounts. The risk is direct: get it wrong and the money is gone. The human-in-the-loop question: how big is too big to act alone, what counts as suspicious, and who can the agent trust?",
+        "examples": [
+          "Agent that auto-pays small invoices and escalates the rest",
+          "Payroll runner that pauses when something looks off",
+          "Refund bot that handles routine cases and asks before the rest"
+        ]
       },
       {
-        "id": "Review-QA",
-        "name": "Review + QA",
-        "description": "Reliability systems, verifiers, incident responders, and evidence-driven debugging."
-      },
-      {
-        "id": "Agent-Runtime-Tools",
-        "name": "Agent Runtime Tools",
-        "description": "Skills, MCP tools, model routing, and decision systems that make agents more capable."
-      },
-      {
-        "id": "Software-Factory",
-        "name": "Software Factory",
-        "description": "Systems that continuously build, test, coordinate, and improve codebases."
+        "id": "Financial-Intelligence",
+        "name": "Financial Intelligence",
+        "short": "Financial Intelligence",
+        "summary": "Agents that read, interpret, and explain. A wrong answer means a wrong decision downstream.",
+        "description": "Agents that read and interpret money — categorising transactions, spotting fraud, explaining bank lines, answering \"what is this charge for?\". The risk is indirect: a wrong answer becomes a wrong decision downstream. The human-in-the-loop question: how confident is the agent really, and which edge cases deserve a human eye?",
+        "examples": [
+          "Agent that categorises transactions and flags the ones it isn't sure about",
+          "Fraud detector that asks a human when the signal is mixed",
+          "Bot that explains every line on a bank statement"
+        ]
       }
     ],
     "rubric": {
       "core_max_points": 100,
       "side_bonus_cap": 30,
+      "total_cap": 130,
       "criteria": [
         {
           "id": "concrete_workflow_value",
           "name": "Concrete Workflow Value",
-          "points": 30
+          "points": 30,
+          "description": "Does it replace or compress a real finance workflow a human does today?"
         },
         {
           "id": "track_fit",
           "name": "Track Fit",
-          "points": 25
+          "points": 25,
+          "description": "How purely does the submission embody its chosen track (money movement vs financial intelligence)?"
         },
         {
-          "id": "reliability_and_verification",
-          "name": "Reliability And Verification",
-          "points": 20
+          "id": "human_in_the_loop_decision",
+          "name": "Human-in-the-Loop Decision",
+          "points": 20,
+          "description": "Does the system know when a human should be in the loop vs not? Thresholds, confidence gates, escalation paths."
         },
         {
           "id": "technical_execution",
           "name": "Technical Execution",
-          "points": 15
+          "points": 15,
+          "description": "Architecture quality, tool design, latency, integrations that actually work."
         },
         {
           "id": "demo_clarity",
           "name": "Demo Clarity",
-          "points": 10
+          "points": 10,
+          "description": "Can the judge, in 90 seconds, see exactly what this agent does and why it matters?"
         }
       ]
     },
     "judge_bonus_bucket": {
       "name": "Judge Bonus Bucket",
       "max_points": 30,
-      "description": "Judges may allocate up to 30 total bonus points across one or more side quests."
+      "description": "Four sponsor-aligned buckets (8 + 8 + 7 + 7 points). Judges score each bucket independently — 30 bonus total."
     },
     "side_quests": [
       {
-        "id": "best_cursor_native_workflow",
-        "name": "Best Cursor-Native Workflow"
+        "id": "best_use_cursor",
+        "name": "Best use of Cursor",
+        "points": 8,
+        "blurb": "How effectively the build used Cursor — editor, agents, and workflow — end to end."
       },
       {
-        "id": "best_developer_tool",
-        "name": "Best Developer Tool"
+        "id": "best_use_white_circle",
+        "name": "Best use of White Circle",
+        "points": 8,
+        "blurb": "Standout use of White Circle for safety, policy, or guardrails in the product."
       },
       {
-        "id": "best_reliability_system",
-        "name": "Best Reliability System"
+        "id": "best_use_financial_practices",
+        "name": "Best use of Financial Practices",
+        "points": 7,
+        "blurb": "Depth on real finance rails, compliance, or domain fit — not a slide deck."
       },
       {
-        "id": "most_technically_ambitious",
-        "name": "Most Technically Ambitious"
+        "id": "best_use_llm_models",
+        "name": "Best use of LLM models",
+        "points": 7,
+        "blurb": "Smart or effective use of models — APIs, routing, evals, or multi-model design."
+      }
+    ],
+    "prizes": [
+      {
+        "tier": "first",
+        "name": "1st place",
+        "value": "£2,000 + 6 months Cursor Ultra",
+        "description": "Top-scoring submission across both tracks. Cash and half a year on Cursor's top tier."
       },
       {
-        "id": "best_demo",
-        "name": "Best Demo"
+        "tier": "second",
+        "name": "2nd place",
+        "value": "4 months Cursor Ultra",
+        "description": "Runner-up across both tracks."
+      },
+      {
+        "tier": "third",
+        "name": "3rd place",
+        "value": "3 months Cursor Ultra",
+        "description": "Third highest score across both tracks."
+      }
+    ],
+    "judges": [
+      {
+        "name": "Ján Stehlík",
+        "title": "Co-Founder & CTO",
+        "role": "Briefcase",
+        "focus": "AI accounting automation",
+        "linkedin": "https://www.linkedin.com/in/jan-stehlik-5855aa123/",
+        "photo_url": "/judges/jan.jpg",
+        "avatar_color": "#429aaa"
+      },
+      {
+        "name": "Alec Barber",
+        "title": "Member of Technical Staff",
+        "role": "OpenAI",
+        "focus": "LLM evals · agents",
+        "linkedin": "https://www.linkedin.com/in/alec-barber/",
+        "photo_url": "/judges/alec.jpg",
+        "avatar_color": "#32737f"
+      },
+      {
+        "name": "Umberto Belluzzo",
+        "title": "Investor",
+        "role": "Earlybird Venture Capital",
+        "focus": "AI compute · deeptech VC",
+        "linkedin": "https://www.linkedin.com/in/umberto-belluzzo/",
+        "photo_url": "/judges/umberto.png",
+        "avatar_color": "#6dc9db"
+      },
+      {
+        "name": "David Gelberg",
+        "title": "No10 Innovation Fellow",
+        "role": "10 Downing Street",
+        "focus": "Gov AI deployment",
+        "linkedin": "https://www.linkedin.com/in/davidgelberg/",
+        "photo_url": "/judges/david.jpg",
+        "avatar_color": "#214d55"
+      },
+      {
+        "name": "Jamesin Seidel",
+        "title": "General Partner",
+        "role": "Chapter One",
+        "focus": "Pre-seed AI · infra",
+        "linkedin": "https://www.linkedin.com/in/jamesin-seidel-5325b147/",
+        "photo_url": "/judges/jamesin.png",
+        "avatar_color": "#53c0d4"
+      }
+    ],
+    "sponsors": [
+      {
+        "name": "Cursor",
+        "tier": "host"
+      },
+      {
+        "name": "Briefcase",
+        "tier": "design-partner"
+      },
+      {
+        "name": "White Circle",
+        "tier": "ai-safety"
+      },
+      {
+        "name": "OpenAI",
+        "tier": "models"
+      },
+      {
+        "name": "Vercel",
+        "tier": "infra"
+      },
+      {
+        "name": "Anthropic",
+        "tier": "models"
       }
     ]
   },
@@ -129,16 +247,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 5.5,
         "bonus_total": 0.0,
@@ -208,16 +325,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 7.333,
         "bonus_total": 0.0,
@@ -286,16 +402,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 5.667,
         "bonus_total": 0.0,
@@ -364,16 +479,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 6.0,
         "bonus_total": 0.0,
@@ -426,16 +540,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 8.0,
         "bonus_total": 0.0,
@@ -504,16 +617,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 6.0,
         "bonus_total": 0.0,
@@ -582,16 +694,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 8.0,
         "bonus_total": 0.0,
@@ -660,16 +771,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 6.667,
         "bonus_total": 0.0,
@@ -722,16 +832,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 4.5,
         "bonus_total": 0.0,
@@ -768,16 +877,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 7.0,
         "bonus_total": 0.0,
@@ -848,16 +956,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 5.0,
         "bonus_total": 0.0,
@@ -910,16 +1017,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 9.0,
         "bonus_total": 0.0,
@@ -972,16 +1078,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 8.0,
         "bonus_total": 0.0,
@@ -1034,16 +1139,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 7.5,
         "bonus_total": 0.0,
@@ -1096,16 +1200,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 8.5,
         "bonus_total": 0.0,
@@ -1158,16 +1261,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 6.0,
         "bonus_total": 0.0,
@@ -1220,16 +1322,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 8.0,
         "bonus_total": 0.0,
@@ -1283,16 +1384,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 7.0,
         "bonus_total": 0.0,
@@ -1345,16 +1445,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 8.5,
         "bonus_total": 0.0,
@@ -1407,16 +1506,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 7.5,
         "bonus_total": 0.0,
@@ -1469,16 +1567,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 7.5,
         "bonus_total": 0.0,
@@ -1532,16 +1629,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 8.0,
         "bonus_total": 0.0,
@@ -1594,16 +1690,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 6.0,
         "bonus_total": 0.0,
@@ -1656,16 +1751,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 7.0,
         "bonus_total": 0.0,
@@ -1718,16 +1812,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 6.0,
         "bonus_total": 0.0,
@@ -1780,16 +1873,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 6.0,
         "bonus_total": 0.0,
@@ -1842,16 +1934,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 6.0,
         "bonus_total": 0.0,
@@ -1904,16 +1995,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 8.0,
         "bonus_total": 0.0,
@@ -1966,16 +2056,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 8.0,
         "bonus_total": 0.0,
@@ -2028,16 +2117,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 6.0,
         "bonus_total": 0.0,
@@ -2090,16 +2178,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 4.5,
         "bonus_total": 0.0,
@@ -2153,16 +2240,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 6.5,
         "bonus_total": 0.0,
@@ -2215,16 +2301,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 5.5,
         "bonus_total": 0.0,
@@ -2277,16 +2362,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 6.0,
         "bonus_total": 0.0,
@@ -2323,16 +2407,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 7.0,
         "bonus_total": 0.0,
@@ -2386,16 +2469,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 4.5,
         "bonus_total": 0.0,
@@ -2448,16 +2530,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 5.0,
         "bonus_total": 0.0,
@@ -2511,16 +2592,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 6.0,
         "bonus_total": 0.0,
@@ -2573,16 +2653,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 5.5,
         "bonus_total": 0.0,
@@ -2635,16 +2714,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 4.5,
         "bonus_total": 0.0,
@@ -2697,16 +2775,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 5.0,
         "bonus_total": 0.0,
@@ -2759,16 +2836,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 6.5,
         "bonus_total": 0.0,
@@ -2821,16 +2897,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 6.5,
         "bonus_total": 0.0,
@@ -2883,16 +2958,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 5.5,
         "bonus_total": 0.0,
@@ -2945,16 +3019,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 7.5,
         "bonus_total": 0.0,
@@ -3008,16 +3081,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 8.5,
         "bonus_total": 0.0,
@@ -3071,16 +3143,15 @@
         "core_scores": {
           "concrete_workflow_value": 0.0,
           "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
+          "human_in_the_loop_decision": 0.0,
           "technical_execution": 0.0,
           "demo_clarity": 0.0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_use_cursor": 0.0,
+          "best_use_white_circle": 0.0,
+          "best_use_financial_practices": 0.0,
+          "best_use_llm_models": 0.0
         },
         "core_total": 5.0,
         "bonus_total": 0.0,

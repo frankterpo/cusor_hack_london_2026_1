@@ -1,5 +1,5 @@
 {
-  "active_hack_id": "cursor-briefcase-london-2026",
+  "active_hack_id": "cursor-live-london-q3-2026",
   "hacks": [
     {
       "id": "cursor-hcmc-2025",
@@ -13,11 +13,20 @@
     {
       "id": "cursor-briefcase-london-2026",
       "name": "Cursor x Briefcase London hackathon",
-      "short_name": "London 2026",
+      "short_name": "Briefcase · London · Apr 2026",
       "location": "London",
       "dates": "2026-04-30",
+      "status": "ended",
+      "description": "Two-track finance-agents hackathon co-hosted by Cursor and Briefcase (completed). Submissions archived under this cohort ID."
+    },
+    {
+      "id": "cursor-live-london-q3-2026",
+      "name": "Cursor Live · London · Q3 2026",
+      "short_name": "London · Q3 2026",
+      "location": "London",
+      "dates": "2026-09 (TBA)",
       "status": "active",
-      "description": "Two-track finance-agents hackathon co-hosted by Cursor and Briefcase. All new submissions land here."
+      "description": "Current live cohort. Participant submissions use this hackathon ID; organizer pipeline and judging surface only this cohort."
     }
   ]
 }
