@@ -6,7 +6,20 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "ops:firebase:provision-london": "node scripts/provision-london-2026-firebase-project.js",
+    "ops:firebase:clear-project-children": "node scripts/clear-firebase-project-children.js",
+    "ops:luma:sync-checked-in": "node scripts/luma-firebase-checked-in-sync.js",
+    "ops:hackathon-credits-wizard": "node scripts/hackathon-credits-wizard.js",
+    "ops:smoke:test-connectivity": "node scripts/connectivity-smoke-test.js",
+    "ops:smoke:test-connectivity:read-only": "node scripts/connectivity-smoke-test.js --read-only",
+    "ops:upload-referral-codes": "node scripts/upload-referral-codes.js",
+    "ops:luma:guest-stats": "node scripts/luma-guest-stats.js",
+    "ops:luma:cookie-from-chrome": "node scripts/sniff-luma-cookie-from-chrome.js",
+    "ops:luma:cookie-from-chrome:auto": "node scripts/sniff-luma-cookie-from-chrome.js --launch-chrome",
+    "ops:luma:cookie-from-chrome:auto:login": "node scripts/sniff-luma-cookie-from-chrome.js --launch-chrome --wait-for-login",
+    "ops:luma:cookie-from-chrome:auto-login": "node scripts/sniff-luma-cookie-from-chrome.js --launch-chrome --auto-login",
+    "ops:luma:cookie-from-chrome:login-bot": "node scripts/sniff-luma-cookie-from-chrome.js --auto-login"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
@@ -16,6 +29,7 @@
     "clsx": "^2.1.1",
     "dotenv": "^17.2.1",
     "firebase": "^12.1.0",
+    "firebase-admin": "^13.8.0",
     "lucide-react": "^0.540.0",
     "next": "^16.2.2",
     "react": "19.1.0",
@@ -33,9 +47,11 @@
     "eslint": "^9",
     "eslint-config-next": "15.5.0",
     "postcss": "^8.5.6",
+    "puppeteer-core": "^24.42.0",
     "tailwindcss": "^3.4.17",
     "tailwindcss-animate": "^1.0.7",
     "tw-animate-css": "^1.3.7",
-    "typescript": "^5"
+    "typescript": "^5",
+    "ws": "^8.20.0"
   }
 }

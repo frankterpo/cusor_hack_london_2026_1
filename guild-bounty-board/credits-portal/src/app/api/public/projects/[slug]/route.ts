@@ -45,6 +45,7 @@ export async function GET(request: NextRequest, { params }: { params: { slug: st
         description: projectData.description || null,
         slug: projectData.slug,
         eventDate: projectData.eventDate?.toDate?.()?.toISOString() || null,
+        supabaseHackathonId: projectData.supabaseHackathonId || null,
       }
     });
   } catch (error) {

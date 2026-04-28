@@ -73,7 +73,9 @@ async function upsertSubmission(row) {
     uses_white_circle: row.uses_white_circle === true,
     hackathon_id: row.hackathon_id || DEFAULT_HACKATHON_ID,
   };
-  const result = await supabaseRest("/submissions?on_conflict=repo_key", {
+  const result = await supabaseRest(
+    "/submissions?on_conflict=hackathon_id,repo_key",
+    {
     method: "POST",
     headers: { Prefer: "return=representation,resolution=merge-duplicates" },
     body: JSON.stringify(payload),
@@ -130,7 +132,7 @@ async function getAnalysis(repoKey) {
 }
 
 async function upsertAnalysis(repoKey, analysisData) {
-  await supabaseRest("/analyses?on_conflict=repo_key", {
+  await supabaseRest("/analyses?on_conflict=hackathon_id,repo_key", {
     method: "POST",
     headers: { Prefer: "return=minimal,resolution=merge-duplicates" },
     body: JSON.stringify({
@@ -177,6 +179,13 @@ async function upsertAnalysisSettings(settings) {
   return result && result[0] ? result[0] : settings;
 }
 
+/** Catalog row per event (`hackathons` table). */
+async function getHackathons() {
+  return supabaseRest(
+    "/hackathons?select=id,slug,name,starts_at,ends_at,created_at,updated_at&order=starts_at.desc"
+  );
+}
+
 module.exports = {
   getSubmissions,
   upsertSubmission,
@@ -186,4 +195,5 @@ module.exports = {
   upsertAnalysis,
   getAnalysisSettings,
   upsertAnalysisSettings,
+  getHackathons,
 };

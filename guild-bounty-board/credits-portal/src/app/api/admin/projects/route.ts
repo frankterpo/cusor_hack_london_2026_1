@@ -41,6 +41,7 @@ export async function GET() {
           id: projectId,
           name: projectData.name,
           description: projectData.description || null,
+          supabaseHackathonId: projectData.supabaseHackathonId || undefined,
           slug: projectData.slug,
           status: projectData.status || 'active',
           eventDate: projectData.eventDate?.toDate?.()?.toISOString() || null,
@@ -102,7 +103,7 @@ export async function POST(request: NextRequest) {
 
     // Create project document
     const now = Timestamp.now();
-    const projectData = {
+    const projectData: Record<string, unknown> = {
       name: validatedData.name,
       description: validatedData.description || '',
       slug,
@@ -111,6 +112,9 @@ export async function POST(request: NextRequest) {
       createdAt: now,
       updatedAt: now,
     };
+    if (validatedData.supabaseHackathonId) {
+      projectData.supabaseHackathonId = validatedData.supabaseHackathonId;
+    }
 
     const docRef = await addDoc(collection(db, 'projects'), projectData);
 

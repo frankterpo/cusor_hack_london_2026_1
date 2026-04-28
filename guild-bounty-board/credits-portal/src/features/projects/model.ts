@@ -18,6 +18,8 @@ export const ProjectSchema = z.object({
     /^[a-z0-9-]+$/,
     'Slug must contain only lowercase letters, numbers, and hyphens'
   ),
+  /** Optional: UUID of `hackathons` row in Supabase (same as DEFAULT_HACKATHON_ID for that event) */
+  supabaseHackathonId: z.string().uuid().optional(),
   status: z.enum(['active', 'archived', 'draft']).default('active'),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -60,6 +62,7 @@ export const ProjectSummarySchema = z.object({
   id: z.string(),
   name: z.string(),
   description: z.string().optional(),
+  supabaseHackathonId: z.string().uuid().optional(),
   slug: z.string(),
   status: z.enum(['active', 'archived', 'draft']),
   eventDate: z.date().optional(),

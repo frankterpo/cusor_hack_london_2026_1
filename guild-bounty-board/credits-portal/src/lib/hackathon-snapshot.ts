@@ -29,6 +29,10 @@ function getEnv(name: string): string | undefined {
   return process.env[name]?.trim();
 }
 
+/** Same as guild `public/api/_lib/db.js` — scopes submissions / judges to one event */
+const DEFAULT_HACKATHON_ID =
+  getEnv("DEFAULT_HACKATHON_ID") || "a0000001-0000-4000-8000-000000000001";
+
 export function isHackathonDbConfigured(): boolean {
   return Boolean(getEnv("SUPABASE_PROJECT_URL") && getEnv("SUPABASE_SERVICE_ROLE_SECRET"));
 }
@@ -80,8 +84,9 @@ export type RepoJudgeSummary = {
 };
 
 export async function fetchPublicSubmissions(): Promise<PublicSubmission[]> {
+  const hid = encodeURIComponent(DEFAULT_HACKATHON_ID);
   const rows = await supabaseRest<SubmissionRow[]>(
-    "/submissions?select=repo_key,repo_url,project_name,chosen_track,submitted_at,analysis_status&order=submitted_at.desc.nullsfirst"
+    `/submissions?hackathon_id=eq.${hid}&select=repo_key,repo_url,project_name,chosen_track,submitted_at,analysis_status&order=submitted_at.desc.nullsfirst`
   );
   if (!rows) return [];
   return rows.map((r) => ({
@@ -95,8 +100,9 @@ export async function fetchPublicSubmissions(): Promise<PublicSubmission[]> {
 }
 
 export async function fetchJudgeSummariesByRepo(): Promise<RepoJudgeSummary[]> {
+  const hid = encodeURIComponent(DEFAULT_HACKATHON_ID);
   const rows = await supabaseRest<JudgeRow[]>(
-    "/judge_responses?select=repo_key,repo_url,project_name,chosen_track,judge_name,core_scores,bonus_bucket_scores,core_total,bonus_total_capped,total_score&order=submitted_at.desc"
+    `/judge_responses?hackathon_id=eq.${hid}&select=repo_key,repo_url,project_name,chosen_track,judge_name,core_scores,bonus_bucket_scores,core_total,bonus_total_capped,total_score&order=submitted_at.desc`
   );
   if (!rows?.length) return [];
 

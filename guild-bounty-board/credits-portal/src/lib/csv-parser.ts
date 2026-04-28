@@ -38,15 +38,32 @@ export function parseCodesCSV(csvContent: string): Array<{
   creator?: string;
   date?: string;
 }> {
-  const lines = csvContent.split('\n').filter(line => line.trim());
+  const lines = csvContent.split('\n').map(l => l.trim()).filter(Boolean);
   const codes: Array<{ code: string; cursorUrl: string; creator?: string; date?: string }> = [];
-  
+
   for (const line of lines) {
+    const comma = line.indexOf(',');
+    if (comma < 0) continue;
+    const left = line.slice(0, comma).trim();
+    const right = line.slice(comma + 1).trim();
+
+    if (/^code$/i.test(left) && /^url$/i.test(right)) continue;
+
+    if (right.includes('cursor.com/referral?code=') && left.length > 0 && !left.startsWith('http')) {
+      codes.push({
+        code: left,
+        cursorUrl: right,
+        creator: undefined,
+        date: undefined,
+      });
+      continue;
+    }
+
     const parts = line.split(',');
     const cursorUrl = parts[0]?.trim();
     const creator = parts[1]?.trim();
     const date = parts[2]?.trim();
-    
+
     if (cursorUrl && cursorUrl.includes('cursor.com/referral?code=')) {
       const code = extractCodeFromUrl(line);
       if (code) {
@@ -59,7 +76,7 @@ export function parseCodesCSV(csvContent: string): Array<{
       }
     }
   }
-  
+
   return codes;
 }
 
