@@ -1500,13 +1500,15 @@ async function handleSubmitForm(e) {
   closeModal("submit-modal");
   await loadSubmissionData();
   await loadSummary();
-  toast(
-    `Submission saved to Supabase — ${
-      entry.project_name || "project"
-    } (${
-      entry.chosen_track || "no track"
-    })`
-  );
+  toast("", {
+    variant: "success",
+    title: "You're in — submission received!",
+    detail: `${entry.project_name || "Your project"} · ${
+      entry.chosen_track || "track not set"
+    }`,
+    meta: "Your entry is saved. Judges and organizers can see it on the live board.",
+  });
+  launchConfetti();
 }
 
 // ---------- Judge form ----------
@@ -2668,21 +2670,126 @@ function exportSubmissionsJSON() {
 }
 
 // ---------- Toasts ----------
-function toast(message) {
+/**
+ * @param {string} message
+ * @param {{ variant?: 'default'|'success'; title?: string; detail?: string; meta?: string; duration?: number }} [options]
+ */
+function toast(message, options) {
+  const opts =
+    options && typeof options === "object" ? options : {};
+  const variant = opts.variant === "success" ? "success" : "default";
+  const duration =
+    typeof opts.duration === "number"
+      ? opts.duration
+      : variant === "success"
+        ? 5200
+        : 3500;
+
   let el = document.getElementById("toast-stack");
   if (!el) {
     el = document.createElement("div");
     el.id = "toast-stack";
-    el.style.cssText =
-      "position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;";
     document.body.appendChild(el);
   }
-  const pill = document.createElement("div");
-  pill.textContent = message;
-  pill.style.cssText =
-    "background:#1f2937;color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;font-weight:500;box-shadow:0 10px 25px rgba(17,24,39,.25);animation:modal-in .18s ease-out;";
-  el.appendChild(pill);
-  setTimeout(() => pill.remove(), 3500);
+
+  const wrap = document.createElement("div");
+  wrap.className = `toast toast--${variant}`;
+  wrap.setAttribute("role", "status");
+  wrap.setAttribute("aria-live", "polite");
+
+  if (variant === "success") {
+    const title = String(opts.title || "Success").trim() || "Success";
+    const detail = String(opts.detail || message || "").trim();
+    const meta = String(opts.meta || "").trim();
+    wrap.innerHTML =
+      '<span class="toast-glow" aria-hidden="true"></span>' +
+      '<div class="toast-surface">' +
+      '<span class="toast-check" aria-hidden="true">✓</span>' +
+      '<div class="toast-text">' +
+      '<div class="toast-title"></div>' +
+      (detail
+        ? '<div class="toast-detail"></div>'
+        : "") +
+      (meta
+        ? '<div class="toast-meta"></div>'
+        : "") +
+      "</div></div>";
+    wrap.querySelector(".toast-title").textContent = title;
+    const dEl = wrap.querySelector(".toast-detail");
+    if (dEl && detail) dEl.textContent = detail;
+    const mEl = wrap.querySelector(".toast-meta");
+    if (mEl && meta) mEl.textContent = meta;
+  } else {
+    wrap.textContent = String(message || "");
+  }
+
+  el.appendChild(wrap);
+  setTimeout(() => {
+    wrap.style.opacity = "0";
+    wrap.style.transform = "translateY(8px)";
+    wrap.style.transition = "opacity 0.28s ease, transform 0.28s ease";
+    setTimeout(() => wrap.remove(), 320);
+  }, duration);
+}
+
+const CONFETTI_COLORS = [
+  "#f472b6",
+  "#e879f9",
+  "#a78bfa",
+  "#818cf8",
+  "#38bdf8",
+  "#22d3ee",
+  "#34d399",
+  "#facc15",
+  "#fb923c",
+  "#f87171",
+];
+
+function launchConfetti() {
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+    return;
+  }
+  const root = document.createElement("div");
+  root.className = "confetti-layer";
+  root.setAttribute("aria-hidden", "true");
+  document.body.appendChild(root);
+
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const originX = vw / 2;
+  const originY = Math.min(vh * 0.38, vh * 0.5);
+  const count = 78;
+
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement("div");
+    p.className = "confetti-piece";
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 6 + Math.random() * 16;
+    const dx = Math.cos(angle) * speed * (14 + Math.random() * 10);
+    const dy =
+      Math.sin(angle) * speed * (10 + Math.random() * 8) - (40 + Math.random() * 60);
+    const rot = (Math.random() - 0.5) * 1440;
+    const w = 5 + Math.random() * 9;
+    const h = 3 + Math.random() * 6;
+    const color = CONFETTI_COLORS[(i + Math.floor(Math.random() * 5)) % CONFETTI_COLORS.length];
+    p.style.background = color;
+    p.style.width = `${w}px`;
+    p.style.height = `${h}px`;
+    p.style.left = `${originX}px`;
+    p.style.top = `${originY}px`;
+    p.style.setProperty("--dx", `${dx}px`);
+    p.style.setProperty("--dy", `${dy}px`);
+    p.style.setProperty("--rot", `${rot}deg`);
+    const delay = Math.random() * 0.12;
+    p.style.animationDelay = `${delay}s`;
+    root.appendChild(p);
+  }
+
+  setTimeout(() => {
+    root.style.transition = "opacity 0.45s ease";
+    root.style.opacity = "0";
+    setTimeout(() => root.remove(), 480);
+  }, 2100);
 }
 
 // ---------- Update submissions count after load ----------

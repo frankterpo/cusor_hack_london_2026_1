@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
-"""Vercel build step: bake the hackathon UI + data into a static ``dist/`` tree.
+"""Vercel build step: bake the hackathon UI + read-only data into ``dist/``.
 
-This replaces the runtime Python server by pre-generating every API response as
-a static file and copying the UI assets. Paths mirror the original ``/api/...``
-shape, so ``ui/static/script.js`` works unchanged once vercel.json rewrites
-``/api/*`` to these static files.
+Mutable endpoints such as submissions and judge scores are served by Vercel
+Functions in ``api/`` so live writes reach Supabase instead of static files.
 """
 
 from __future__ import annotations
@@ -127,8 +125,6 @@ def copy_static() -> None:
 def main() -> None:
     copy_static()
     write_json(DIST / "api" / "summary", {"rows": build_summary()})
-    write_json(DIST / "api" / "submissions", build_submissions())
-    write_json(DIST / "api" / "judges", build_judges())
     write_json(DIST / "api" / "hacks", build_hacks())
     # Also expose the event format so future clients can read tracks directly.
     event_format_path = DATA_DIR / "event-format.json"
@@ -140,7 +136,7 @@ def main() -> None:
     repo_ids = collect_repo_ids()
     for repo_id in sorted(repo_ids):
         build_per_repo(repo_id)
-    print(f"Built dist/ with {len(repo_ids)} repos, summary + judges + submissions.")
+    print(f"Built dist/ with {len(repo_ids)} repos and read-only API snapshots.")
 
 
 if __name__ == "__main__":
