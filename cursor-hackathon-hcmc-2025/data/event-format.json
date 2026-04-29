@@ -77,31 +77,25 @@
   "judge_bonus_bucket": {
     "name": "Judge Bonus Bucket",
     "max_points": 30,
-    "description": "Four sponsor-aligned buckets (8 + 8 + 7 + 7 points). Judges score each bucket independently — 30 bonus total."
+    "description": "Three sponsor-aligned buckets (10 + 10 + 10 points). Judges score each bucket independently — 30 bonus total."
   },
   "side_quests": [
     {
       "id": "best_use_cursor",
       "name": "Best use of Cursor",
-      "points": 8,
+      "points": 10,
       "blurb": "How effectively the build used Cursor — editor, agents, and workflow — end to end."
     },
     {
       "id": "best_use_specter",
       "name": "Best use of Specter",
-      "points": 8,
+      "points": 10,
       "blurb": "Standout use of Specter's API, MCP, or data for market intelligence in the product."
-    },
-    {
-      "id": "best_use_financial_practices",
-      "name": "Best use of Financial Practices",
-      "points": 7,
-      "blurb": "Depth on real finance rails, compliance, or domain fit — not a slide deck."
     },
     {
       "id": "best_use_llm_models",
       "name": "Best use of LLM models",
-      "points": 7,
+      "points": 10,
       "blurb": "Smart or effective use of models — APIs, routing, evals, or multi-model design."
     }
   ],
@@ -173,11 +167,29 @@
     }
   ],
   "sponsors": [
-    { "name": "Cursor", "tier": "host" },
-    { "name": "Briefcase", "tier": "design-partner" },
-    { "name": "Specter", "tier": "market-intelligence" },
-    { "name": "OpenAI", "tier": "models" },
-    { "name": "Vercel", "tier": "infra" },
-    { "name": "Anthropic", "tier": "models" }
+    {
+      "name": "Cursor",
+      "tier": "host"
+    },
+    {
+      "name": "Briefcase",
+      "tier": "design-partner"
+    },
+    {
+      "name": "Specter",
+      "tier": "market-intelligence"
+    },
+    {
+      "name": "OpenAI",
+      "tier": "models"
+    },
+    {
+      "name": "Vercel",
+      "tier": "infra"
+    },
+    {
+      "name": "Anthropic",
+      "tier": "models"
+    }
   ]
 }
