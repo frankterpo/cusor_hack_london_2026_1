@@ -2746,6 +2746,431 @@ html {
   flex: 1 1 min(640px, 100%);
   min-width: 0;
 }
+#judge-modal .modal-card--judge {
+  width: min(1120px, calc(100vw - 48px));
+  background: transparent;
+  border-color: rgba(109, 201, 219, 0.38);
+  box-shadow: 0 22px 70px rgba(6, 19, 31, 0.48);
+}
+#judge-modal .modal-body.judge-review {
+  display: block;
+  height: calc(100vh - 48px);
+  max-height: calc(100vh - 48px);
+  overflow: hidden;
+  padding: 0;
+}
+.judge-submission-select--hidden {
+  display: none !important;
+}
+.judge-submission-picker {
+  width: 100%;
+  min-width: 0;
+  font-weight: 600;
+}
+.judge-video-column,
+.judge-score-rail {
+  min-width: 0;
+  min-height: 0;
+}
+.judge-video-column {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  height: 100%;
+}
+.judge-video-top {
+  position: absolute;
+  z-index: 8;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 38px;
+  gap: 12px;
+  align-items: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition:
+    opacity 0.16s ease,
+    transform 0.16s ease;
+}
+.judge-video-column:hover .judge-video-top,
+.judge-video-column:focus-within .judge-video-top,
+.judge-video-column:has(.judge-demo-card.is-peeking-controls) .judge-video-top,
+.judge-video-column:has(.judge-demo-card.is-swiping) .judge-video-top {
+  opacity: 1;
+  transform: translateY(0);
+}
+.judge-nav-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(8, 17, 28, 0.52);
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(10px);
+}
+.judge-nav-btn:hover {
+  border-color: rgba(109, 201, 219, 0.7);
+  background: rgba(109, 201, 219, 0.16);
+  color: #fff;
+  transform: translateY(-1px);
+}
+.judge-video-title-wrap {
+  min-width: 0;
+  text-align: center;
+}
+.judge-video-count {
+  margin: 0 0 4px;
+  color: rgba(255, 255, 255, 0.72);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.judge-video-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 2vw, 2rem);
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.62);
+}
+.judge-video-meta {
+  margin: 4px 0 0;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.88rem;
+}
+.judge-demo-card {
+  position: relative;
+  flex: 1;
+  min-height: 100%;
+  height: 100%;
+  border-radius: var(--r-2xl);
+  border: 1px solid rgba(109, 201, 219, 0.28);
+  background:
+    radial-gradient(circle at 20% 0%, rgba(109, 201, 219, 0.15), transparent 32%),
+    linear-gradient(145deg, #06131f 0%, #0b1724 55%, #111827 100%);
+  box-shadow: 0 24px 70px rgba(6, 19, 31, 0.34);
+  overflow: hidden;
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+  will-change: transform, opacity;
+}
+.judge-demo-card.is-swiping {
+  cursor: grabbing;
+}
+.judge-demo-card.is-swipe-release {
+  transition:
+    transform 0.18s cubic-bezier(0.2, 0.85, 0.25, 1),
+    opacity 0.18s ease;
+}
+.judge-card-swipe-layer {
+  position: absolute;
+  inset: 0 0 74px 0;
+  z-index: 5;
+  cursor: grab;
+  touch-action: none;
+  background: transparent;
+}
+.judge-demo-card.is-swiping .judge-card-swipe-layer {
+  cursor: grabbing;
+}
+.judge-panel-toggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  z-index: 7;
+  width: 30px;
+  height: 52px;
+  border: 1px solid rgba(109, 201, 219, 0.34);
+  border-radius: 999px;
+  transform: translateY(-50%);
+  background: rgba(8, 17, 28, 0.58);
+  color: rgba(255, 255, 255, 0.82);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 1.4rem;
+  line-height: 1;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+  backdrop-filter: blur(10px);
+}
+.judge-panel-toggle:hover {
+  background: rgba(109, 201, 219, 0.18);
+  border-color: rgba(109, 201, 219, 0.74);
+  transform: translateY(-50%) scale(1.04);
+}
+.judge-info-toggle {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 2;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background: rgba(8, 17, 28, 0.82);
+  color: #fff;
+  border-radius: 999px;
+  padding: 9px 13px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+}
+.judge-demo-stage {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.judge-demo-frame {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  border: 0;
+  display: block;
+  background: #000;
+}
+.judge-demo-empty {
+  width: min(440px, 86%);
+  margin: auto;
+  color: rgba(255, 255, 255, 0.86);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  line-height: 1.45;
+}
+.judge-demo-links {
+  position: absolute;
+  left: 16px;
+  bottom: 14px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  z-index: 2;
+}
+.judge-demo-links a {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  padding: 7px 10px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.judge-score-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.judge-score-rail--side {
+  margin: 8px 10px;
+  padding-right: 0;
+  overflow: visible;
+  flex-shrink: 0;
+}
+.judge-score-card {
+  position: relative;
+  border: 1px solid var(--primary-200);
+  border-radius: var(--r-lg);
+  background: var(--primary-50);
+  padding: 9px 10px 10px;
+  display: block;
+}
+.judge-score-card-main,
+.judge-score-card-queue {
+  min-width: 0;
+}
+.judge-score-card-main {
+  display: grid;
+  gap: 9px;
+}
+.judge-score-card .field {
+  position: relative;
+}
+.judge-score-card .field-label {
+  padding-right: 220px;
+  white-space: nowrap;
+}
+.judge-score-card-queue {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: auto;
+  max-width: 220px;
+  padding-left: 0;
+  text-align: right;
+  pointer-events: none;
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 9px;
+  white-space: nowrap;
+}
+#judge-score-input {
+  font-size: 1.6rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  text-align: center;
+}
+.judge-save-btn {
+  width: 100%;
+  justify-content: center;
+  min-height: 48px;
+  font-size: 1rem;
+  font-weight: 800;
+  box-shadow: 0 12px 30px rgba(56, 132, 146, 0.28);
+}
+.judge-running-total-hidden {
+  display: none;
+}
+.judge-rubric-card,
+.judge-queue-card {
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--panel);
+  padding: 9px 10px;
+}
+.judge-rubric-card--side {
+  margin: 8px 10px 0;
+  flex-shrink: 0;
+  background: var(--primary-50);
+  border-color: var(--primary-100);
+}
+.judge-rubric-card--dropdown {
+  order: 20;
+}
+.judge-rubric-summary {
+  cursor: pointer;
+  color: var(--text-strong);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  list-style-position: inside;
+}
+.judge-rubric-card[open] .judge-rubric-summary {
+  margin-bottom: 6px;
+}
+.judge-rubric-kicker {
+  margin: 0 0 6px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.judge-score-card .judge-rubric-kicker {
+  display: block;
+  margin: 0;
+  font-size: 0.65rem;
+  white-space: nowrap;
+}
+.judge-rubric-total {
+  font-family: var(--font-display);
+  color: var(--text-strong);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.judge-rubric-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.judge-rubric-list--bonus {
+  border-top: 1px dashed var(--border-subtle);
+  margin-top: 6px;
+  padding-top: 6px;
+}
+.judge-rubric-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+}
+.judge-rubric-line strong {
+  color: var(--primary-800);
+  font-family: var(--font-mono);
+}
+.modal-foot--judge {
+  padding: 0;
+  border-top: 0;
+  justify-content: space-between;
+}
+.judge-queue-stats {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  margin-bottom: 6px;
+}
+.judge-score-card .judge-queue-stats {
+  display: block;
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.judge-queue-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 92px;
+  overflow: auto;
+}
+.judge-score-card .judge-queue-list {
+  display: none;
+}
+.judge-queue-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-md);
+  background: var(--bg-subtle);
+  padding: 6px 8px;
+  cursor: pointer;
+}
+.judge-queue-item span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-strong);
+  font-weight: 600;
+}
+.judge-queue-item small {
+  color: var(--muted);
+  white-space: nowrap;
+}
+.judge-queue-item.is-active {
+  border-color: var(--primary-300);
+  box-shadow: 0 0 0 3px var(--accent-ring);
+}
+.judge-queue-item.is-scored small {
+  color: var(--primary-800);
+}
 #judge-modal.judge-side-open .judge-modal-shell {
   max-width: min(1320px, 100vw - 32px);
 }
@@ -2766,12 +3191,35 @@ html {
   overflow: hidden;
   animation: modal-in 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
+.judge-side-panel[hidden] {
+  display: none !important;
+}
+.judge-side-compact-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+.judge-side-compact-title {
+  margin: 0;
+  font-size: 0.68rem;
+  line-height: 1.1;
+  color: var(--primary-700);
+}
+.judge-side-close {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+}
 .judge-side-panel-head {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 10px;
-  padding: 16px 18px 10px;
+  gap: 8px;
+  padding: 10px 14px 7px;
   border-bottom: 1px solid var(--border-subtle);
   flex-shrink: 0;
 }
@@ -2785,7 +3233,7 @@ html {
 .judge-side-tabs {
   display: flex;
   gap: 4px;
-  padding: 8px 12px 0;
+  padding: 5px 10px 0;
   border-bottom: 1px solid var(--border-subtle);
   flex-shrink: 0;
 }
@@ -2797,7 +3245,7 @@ html {
   background: transparent;
   border: 1px solid transparent;
   border-radius: var(--r-md) var(--r-md) 0 0;
-  padding: 8px 12px;
+  padding: 6px 10px;
   cursor: pointer;
   margin-bottom: -1px;
   transition: color 0.15s, background 0.15s, border-color 0.15s;
@@ -2833,6 +3281,14 @@ html {
   gap: 8px;
   min-height: 0;
   flex: 1;
+}
+#judge-panel-submission .judge-side-scroll {
+  margin: 8px 10px 10px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  background: rgba(255, 255, 255, 0.025);
+  box-shadow: inset 0 0 0 1px rgba(109, 201, 219, 0.04);
 }
 .judge-side-section-h {
   margin: 12px 0 4px;
@@ -2923,6 +3379,15 @@ html {
     max-height: none;
     overflow: auto;
     max-width: 100%;
+  }
+  #judge-modal .modal-body.judge-review {
+    max-height: none;
+    overflow: visible;
+  }
+  .judge-demo-card,
+  .judge-demo-stage,
+  .judge-demo-frame {
+    min-height: 300px;
   }
   .judge-side-panel {
     flex: 1 1 auto;
@@ -3691,6 +4156,10 @@ html {
   border-radius: var(--r-xl);
   padding: 12px 14px;
   margin: 4px 0 2px;
+}
+.judge-submission-summary--compact,
+.judge-submission-summary--compact.is-visible {
+  display: none;
 }
 .judge-submission-summary.is-visible {
   display: block;

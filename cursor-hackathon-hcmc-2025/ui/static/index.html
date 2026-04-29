@@ -10,7 +10,7 @@
       name="description"
       content="Cursor x Briefcase London hackathon — two tracks, 10 points, five judges. AI-native agents for the modern finance stack."
     />
-    <link rel="stylesheet" href="style.css?v=79" />
+    <link rel="stylesheet" href="style.css?v=89" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -676,21 +676,21 @@
         </p>
       </div>
       <div class="rubric-grid">
-        <div class="rubric-core" aria-label="Core rubric — 100 points">
+        <div class="rubric-core" aria-label="Core rubric — 7 points">
           <div class="rubric-core-head">
             <span class="rubric-core-label">Core score</span>
-            <span class="rubric-core-total">/ 100</span>
+            <span class="rubric-core-total">/ 7</span>
           </div>
           <ol id="rubric-criteria" class="rubric-criteria"></ol>
         </div>
-        <aside class="rubric-bonus" aria-label="Bonus bucket — 30 points">
+        <aside class="rubric-bonus" aria-label="Bonus bucket — 3 points">
           <div class="rubric-bonus-head">
             <span class="rubric-bonus-label">Judge bonus bucket</span>
-            <span class="rubric-bonus-total">+ 30</span>
+            <span class="rubric-bonus-total">+ 3</span>
           </div>
           <p class="rubric-bonus-desc">
             Three buckets — 1 + 1 + 1 points. Judges score each bucket
-            independently; bonus still caps at 30 total.
+            independently; bonus still caps at 3 total.
           </p>
           <ul id="side-quests" class="side-quests"></ul>
         </aside>
@@ -867,21 +867,7 @@
               placeholder="Anything judges should know — architecture, integrations, known gaps"
             ></textarea>
           </label>
-          <p class="form-help form-help--specter">
-            <strong>Best use of Specter:</strong> Ping
-            <a
-              href="https://www.linkedin.com/in/francisco-t-334545144/"
-              target="_blank"
-              rel="noopener noreferrer"
-              >Francisco</a
-            >
-            for MCP and API access before you integrate.
-          </p>
           <footer class="modal-foot">
-            <p class="form-help">
-              Submissions are stored locally in your browser for the demo. Real
-              events write to <code>data/submissions-raw.csv</code>.
-            </p>
             <div class="modal-actions">
               <button type="button" class="btn btn-ghost" data-close-modal>
                 Cancel
@@ -906,103 +892,63 @@
       <div class="modal-backdrop" data-close-modal></div>
       <div class="judge-modal-shell">
       <div class="modal-card modal-card--judge" role="document">
-        <header class="modal-head">
-          <div>
-            <span class="eyebrow">Judge panel</span>
-            <h2 id="judge-modal-title" class="modal-title">
-              Score a submission
-            </h2>
-          </div>
-          <div class="modal-head-actions">
-            <button
-              type="button"
-              class="close-btn"
-              data-close-modal
-              aria-label="Close judge modal"
-            >
-              &times;
-            </button>
-          </div>
-        </header>
-        <form id="judge-form" class="modal-body" novalidate>
-          <div class="form-row two judge-form-row-top">
-            <label class="field">
-              <span class="field-label">Judge name <em>*</em></span>
-              <input
-                name="judge_name"
-                id="judge-name-input"
-                required
-                placeholder="e.g. Ján Stehlík"
-              />
-            </label>
-            <div class="field field--block">
-              <span class="field-label">Submission <em>*</em></span>
-              <select
-                name="submission_id"
-                id="judge-submission-select"
-                required
-                class="judge-submission-select"
-              ></select>
+        <form id="judge-form" class="modal-body judge-review" novalidate>
+          <input name="submission_id" id="judge-submission-hidden" type="hidden" required />
+          <select
+            id="judge-submission-select"
+            class="judge-submission-select judge-submission-select--hidden"
+            hidden
+            aria-hidden="true"
+            tabindex="-1"
+          ></select>
+
+          <section class="judge-video-column" aria-label="Submission demo review">
+            <div class="judge-video-top">
+              <button type="button" class="judge-nav-btn" id="judge-prev-submission" aria-label="Previous submission">&larr;</button>
+              <div class="judge-video-title-wrap">
+                <p class="judge-video-count" id="judge-video-count">0 / 0</p>
+                <h3 class="judge-video-title" id="judge-video-title">Pick a submission</h3>
+                <p class="judge-video-meta" id="judge-video-meta"></p>
+              </div>
+              <button type="button" class="judge-nav-btn" id="judge-next-submission" aria-label="Next submission">&rarr;</button>
+            </div>
+
+            <article class="judge-demo-card">
+              <div id="judge-demo-stage" class="judge-demo-stage" aria-live="polite"></div>
               <div
-                id="judge-submission-toolbar"
-                class="judge-submission-toolbar"
-                aria-live="polite"
+                class="judge-card-swipe-layer"
+                id="judge-card-swipe-layer"
+                aria-hidden="true"
               ></div>
-              <p
-                id="judge-quick-recap"
-                class="judge-quick-recap"
-                hidden
-                aria-live="polite"
-              ></p>
-            </div>
-          </div>
-          <div
-            id="judge-submission-summary"
-            class="judge-submission-summary"
-            aria-live="polite"
-          ></div>
-          <fieldset class="score-group">
-            <legend>
-              Core score <span class="score-group-cap">/ 100</span>
-            </legend>
-            <div id="judge-core-inputs" class="score-inputs"></div>
-          </fieldset>
-          <fieldset class="score-group">
-            <legend>
-              Bonus bucket <span class="score-group-cap">up to / 30</span>
-            </legend>
-            <div id="judge-bonus-inputs" class="score-inputs"></div>
-            <p class="form-help form-help--specter form-help--judge-bonus">
-              <strong>Specter bucket:</strong> Access is via
-              <a
-                href="https://www.linkedin.com/in/francisco-t-334545144/"
-                target="_blank"
-                rel="noopener noreferrer"
-                >Francisco</a
-              >. Score for standout use of Specter in the build, not for having a key in the abstract.
-            </p>
-          </fieldset>
-          <label class="field">
-            <span class="field-label">Notes for the record</span>
-            <textarea
-              name="thoughts"
-              rows="3"
-              placeholder="What did this submission nail? Where did it cut corners?"
-            ></textarea>
-          </label>
-          <footer class="modal-foot">
-            <div class="score-running">
-              <span class="score-running-label">Running total</span
-              ><span id="judge-running-total" class="score-running-num">0</span>
-              / 10
-            </div>
-            <div class="modal-actions">
-              <button type="button" class="btn btn-ghost" data-close-modal>
-                Cancel
+              <button
+                type="button"
+                class="judge-panel-toggle"
+                id="judge-panel-toggle"
+                aria-controls="judge-side-panel"
+                aria-label="Toggle judge panel"
+              >
+                <span aria-hidden="true">›</span>
               </button>
-              <button type="submit" class="btn btn-primary">Save score</button>
-            </div>
-          </footer>
+            </article>
+
+            <div
+              id="judge-submission-summary"
+              class="judge-submission-summary judge-submission-summary--compact"
+              aria-live="polite"
+            ></div>
+            <div
+              id="judge-submission-toolbar"
+              class="judge-submission-toolbar"
+              aria-live="polite"
+            ></div>
+            <p
+              id="judge-quick-recap"
+              class="judge-quick-recap"
+              hidden
+              aria-live="polite"
+            ></p>
+          </section>
+
         </form>
       </div>
       <aside
@@ -1013,6 +959,75 @@
         hidden
         aria-hidden="true"
       >
+        <header class="judge-side-compact-head">
+          <span id="judge-modal-title" class="eyebrow judge-side-compact-title">Judge panel</span>
+          <button
+            type="button"
+            class="close-btn judge-side-close"
+            data-close-modal
+            aria-label="Close judge modal"
+          >
+            &times;
+          </button>
+        </header>
+        <details class="judge-rubric-card judge-rubric-card--side">
+          <summary class="judge-rubric-summary">Rubric reminder</summary>
+          <div id="judge-rubric-reminder-side" class="judge-rubric-reminder"></div>
+        </details>
+        <section class="judge-score-rail judge-score-rail--side" aria-label="Judge scoring controls">
+          <label class="field">
+            <span class="field-label">Submission</span>
+            <select id="judge-submission-picker" class="judge-submission-picker"></select>
+          </label>
+          <label class="field">
+            <span class="field-label">Judge name <em>*</em></span>
+            <input
+              name="judge_name"
+              id="judge-name-input"
+              form="judge-form"
+              required
+              placeholder="e.g. Ján Stehlík"
+            />
+          </label>
+
+          <section class="judge-score-card">
+            <div class="judge-score-card-main">
+              <label class="field">
+                <span class="field-label">Score out of 10 <em>*</em></span>
+                <div class="judge-score-card-queue">
+                  <p class="judge-rubric-kicker">Scoring queue</p>
+                  <div id="judge-score-queue" class="judge-score-queue"></div>
+                </div>
+                <input
+                  type="number"
+                  name="judge_score"
+                  id="judge-score-input"
+                  form="judge-form"
+                  min="0"
+                  max="10"
+                  step="0.1"
+                  inputmode="decimal"
+                  required
+                  placeholder="e.g. 8.4"
+                />
+              </label>
+              <button type="submit" form="judge-form" class="btn btn-primary judge-save-btn">
+                Save score
+              </button>
+            </div>
+          </section>
+          <label class="field">
+            <span class="field-label">Notes for the record</span>
+            <textarea
+              name="thoughts"
+              form="judge-form"
+              rows="3"
+              placeholder="What did this submission nail? Where did it cut corners?"
+            ></textarea>
+          </label>
+          <span id="judge-running-total" class="score-running-num judge-running-total-hidden">0</span>
+
+        </section>
         <div class="judge-side-panel-head">
           <h3 class="judge-side-panel-title">Full view</h3>
         </div>
@@ -1650,6 +1665,6 @@
       </div>
     </div>
 
-    <script src="script.js?v=52"></script>
+    <script src="script.js?v=59"></script>
   </body>
 </html>

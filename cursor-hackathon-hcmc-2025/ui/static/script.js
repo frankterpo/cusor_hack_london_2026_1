@@ -81,6 +81,7 @@ function extractRepoName(repoUrl) {
 // Judge data cache
 let judgeMap = new Map();
 let submissionMap = new Map();
+let judgeCurrentIndex = 0;
 
 function normalizeRepoKey(repoUrl = "") {
   return repoUrl
@@ -654,10 +655,7 @@ async function loadSummary() {
       ) === index
     );
   });
-  const localSubs = getLocalList(localSubmissionsKey()).filter((s) =>
-    submissionMatchesActiveHack(s)
-  );
-  const merged = mergeRows(summaryRows, [...dedupApi, ...localSubs]);
+  const merged = mergeRows(summaryRows, dedupApi);
   window.__summaryRows = merged;
   maybeRenderSummaryTable();
 }
@@ -681,16 +679,17 @@ function maybeRenderSummaryTable() {
 function dedupeSubmissionsBySubmissionId(submissions) {
   const seen = new Set();
   const out = [];
-  for (const s of submissions || []) {
+  for (const s of [...(submissions || [])].reverse()) {
     if (!s) continue;
-    const id =
-      (s.submission_id && String(s.submission_id).trim()) ||
-      normalizeRepoKey(s.repo_url || "");
+    const repoKey = normalizeRepoKey(s.repo_url || "");
+    const projectKey = slugify(s.project_name || "");
+    const teamKey = slugify(s.team_name || "");
+    const id = repoKey || projectKey || teamKey || String(s.submission_id || "").trim();
     if (!id || seen.has(id)) continue;
     seen.add(id);
     out.push(s);
   }
-  return out;
+  return out.reverse();
 }
 
 function mergeRows(summaryRows, submissions) {
@@ -997,23 +996,29 @@ function renderSubmissionDetails(row, outputEl) {
     return;
   }
   const items = [
-    ["Project", submission.project_name || row?.repo_id || "—"],
-    ["Team", submission.team_name || "—"],
-    ["Track", submission.chosen_track || "—"],
-    ["Submitted", submission.timestamp || "—"],
-    ["Repo", submission.repo_url || row?.repo || "—"],
-    ["Demo", submission.demo_url || "—"],
+    ["Project", submission.project_name || row?.repo_id || "—", ""],
+    ["Team", submission.team_name || "—", ""],
+    ["Track", submission.chosen_track || "—", ""],
+    ["Submitted", submission.timestamp || "—", ""],
+    ["GitHub repo", submission.repo_url || row?.repo || "—", "url"],
+    ["Demo", submission.demo_url || "—", "url"],
   ];
   container.innerHTML = `
     <div class="submission-grid">
       ${items
         .map(
-          ([label, value]) =>
+          ([label, value, type]) =>
             `<div class="submission-item"><div class="submission-label">${escapeHtml(
               label
-            )}</div><div class="submission-value">${escapeHtml(
-              value
-            )}</div></div>`
+            )}</div><div class="submission-value">${
+              type === "url" && value && value !== "—"
+                ? `<a class="repo-link" href="${escapeAttr(
+                    value
+                  )}" target="_blank" rel="noopener noreferrer">${escapeHtml(
+                    value
+                  )}</a>`
+                : escapeHtml(value)
+            }</div></div>`
         )
         .join("")}
     </div>
@@ -1135,7 +1140,7 @@ function renderRubric() {
           c.description || ""
         )}</span>
       </div>
-      <span class="rubric-criterion-pts">${c.points} pts</span>
+      <span class="rubric-criterion-pts">${c.points} ${Number(c.points) === 1 ? "pt" : "pts"}</span>
     </li>
   `
     )
@@ -1154,7 +1159,7 @@ function renderSideQuests() {
         <span class="sq-name">${escapeHtml(q.name)}</span>
         <span class="sq-blurb">${escapeHtml(q.blurb || "")}</span>
       </div>
-      <span class="sq-pts">${q.points ?? 10} pts</span>
+      <span class="sq-pts">${q.points ?? 1} ${Number(q.points ?? 1) === 1 ? "pt" : "pts"}</span>
     </li>
   `
     )
@@ -1333,7 +1338,10 @@ function openModal(id) {
   }
   lastFocusedBeforeModal = document.activeElement;
   modal.classList.remove("hidden");
-  const firstInput = modal.querySelector("input, select, textarea, button");
+  const firstInput =
+    id === "judge-modal"
+      ? modal.querySelector("#judge-name-input")
+      : modal.querySelector("input:not([type=hidden]), select, textarea, button");
   if (firstInput) setTimeout(() => firstInput.focus(), 60);
   if (id === "manager-modal") {
     ensureManagerSubmissionsPanel();
@@ -1341,7 +1349,10 @@ function openModal(id) {
     renderManagerPanel();
     maybeRenderSummaryTable();
   }
-  if (id === "judge-modal") refreshJudgeSubmissionSelect();
+  if (id === "judge-modal") {
+    openJudgeSidePanel();
+    refreshJudgeSubmissionSelect();
+  }
 }
 function getJudgeApiRepoId() {
   const id = document.getElementById("judge-submission-select")?.value;
@@ -1359,7 +1370,8 @@ function getJudgeApiRepoId() {
 
 function isJudgeSidePanelOpen() {
   const p = document.getElementById("judge-side-panel");
-  return !!(p && !p.hidden);
+  const modal = document.getElementById("judge-modal");
+  return !!(p && modal?.classList.contains("judge-side-open") && !p.hidden);
 }
 
 function closeJudgeSidePanel() {
@@ -1370,6 +1382,7 @@ function closeJudgeSidePanel() {
     panel.setAttribute("aria-hidden", "true");
   }
   if (modal) modal.classList.remove("judge-side-open");
+  syncJudgePanelToggleState();
 }
 
 function openJudgeSidePanel() {
@@ -1380,6 +1393,7 @@ function openJudgeSidePanel() {
   panel.hidden = false;
   panel.setAttribute("aria-hidden", "false");
   modal.classList.add("judge-side-open");
+  syncJudgePanelToggleState();
   const repoId = getJudgeApiRepoId();
   if (repoId) {
     loadDetails(repoId, detailElsForJudgeSidePanel());
@@ -1418,14 +1432,24 @@ function syncJudgeFullViewFromSelection() {
   const sel = document.getElementById("judge-submission-select");
   if (!sel) return;
   const id = (sel.value || "").trim();
+  const hidden = document.getElementById("judge-submission-hidden");
+  if (hidden) hidden.value = id;
+  renderJudgeVideoStage();
+  renderJudgeScoreQueue();
   if (!id) {
-    closeJudgeSidePanel();
+    openJudgeSidePanel();
     return;
   }
-  openJudgeSidePanel();
+  if (isJudgeSidePanelOpen()) {
+    const repoId = getJudgeApiRepoId();
+    if (repoId) loadDetails(repoId, detailElsForJudgeSidePanel());
+  }
 }
 
 function onJudgeSubmissionSelectChanged() {
+  const selectedId = document.getElementById("judge-submission-select")?.value || "";
+  const idx = getJudgeReviewEntries().findIndex((e) => e.id === selectedId);
+  if (idx >= 0) judgeCurrentIndex = idx;
   renderJudgeSubmissionSummary();
   syncJudgeFullViewFromSelection();
 }
@@ -1444,12 +1468,11 @@ function closeModal(id) {
 }
 
 // ---------- Submit form ----------
-function handleSubmitForm(e) {
+async function handleSubmitForm(e) {
   e.preventDefault();
   const form = e.target;
   const data = Object.fromEntries(new FormData(form).entries());
   const entry = {
-    submission_id: `local-${Date.now()}`,
     submitted_at: new Date().toISOString(),
     hack_id: getActiveHackId(),
     team_name: data.team_name || "",
@@ -1460,15 +1483,27 @@ function handleSubmitForm(e) {
     team_members: data.team_members || "",
     description: data.description || "",
     notes: data.notes || "",
-    source: "local-modal",
   };
-  const list = getLocalList(localSubmissionsKey());
-  list.push(entry);
-  setLocalList(localSubmissionsKey(), list);
+  try {
+    const res = await fetch("/api/submissions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(entry),
+    });
+    const payload = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(payload.error || "Failed to save submission");
+  } catch (err) {
+    toast(err.message || "Submission failed. Supabase did not save it.");
+    return;
+  }
   form.reset();
   closeModal("submit-modal");
+  await loadSubmissionData();
+  await loadSummary();
   toast(
-    `Submission saved — ${entry.project_name || "project"} (${
+    `Submission saved to Supabase — ${
+      entry.project_name || "project"
+    } (${
       entry.chosen_track || "no track"
     })`
   );
@@ -1476,105 +1511,70 @@ function handleSubmitForm(e) {
 
 // ---------- Judge form ----------
 function buildJudgeFormSkeleton() {
-  const core = document.getElementById("judge-core-inputs");
-  const bonus = document.getElementById("judge-bonus-inputs");
-  if (!core || !bonus) return;
-  const criteria = eventFormat?.rubric?.criteria || [];
-  core.innerHTML = criteria
-    .map((c) =>
-      scoreRow({
-        key: c.id,
-        name: c.name,
-        hint: `max ${c.points}`,
-        max: c.points,
-        group: "core",
-      })
-    )
-    .join("");
-  const quests = eventFormat?.side_quests || [];
-  bonus.innerHTML = quests
-    .map((q) => {
-      const max = q.points ?? 10;
-      return scoreRow({
-        key: q.id,
-        name: q.name,
-        hint: `max ${max}`,
-        max,
-        group: "bonus",
-      });
-    })
-    .join("");
+  renderJudgeRubricReminder();
   attachScoreInputListeners();
 }
 
-function scoreRow({ key, name, hint, max, group }) {
-  const fname = `${group}_${key}`;
-  return `
-    <label class="score-row" data-score-group="${escapeAttr(group)}">
-      <span class="score-row-name">${escapeHtml(name)}<small>${escapeHtml(
-    hint
-  )}</small></span>
-      <input type="range" min="0" max="${max}" step="1" value="0" name="${escapeAttr(
-    fname
-  )}" data-max="${max}">
-      <input type="number" class="score-row-num" min="0" max="${max}" step="1" value="0" inputmode="numeric" aria-label="${escapeHtml(
-        name
-      )} — points">
-    </label>
+function renderJudgeRubricReminder() {
+  const targets = [
+    document.getElementById("judge-rubric-reminder"),
+    document.getElementById("judge-rubric-reminder-side"),
+  ].filter(Boolean);
+  if (!targets.length) return;
+  const criteria = eventFormat?.rubric?.criteria || [];
+  const quests = eventFormat?.side_quests || [];
+  const html = `
+    <div class="judge-rubric-total">7 core + 3 bonus = 10</div>
+    <div class="judge-rubric-list">
+      ${criteria
+        .map(
+          (c) => `<div class="judge-rubric-line"><span>${escapeHtml(
+            c.name
+          )}</span><strong>${escapeHtml(String(c.points))}</strong></div>`
+        )
+        .join("")}
+    </div>
+    <div class="judge-rubric-list judge-rubric-list--bonus">
+      ${quests
+        .map(
+          (q) => `<div class="judge-rubric-line"><span>${escapeHtml(
+            q.name
+          )}</span><strong>${escapeHtml(String(q.points ?? 1))}</strong></div>`
+        )
+        .join("")}
+    </div>
   `;
+  targets.forEach((target) => {
+    target.innerHTML = html;
+  });
 }
 
 function attachScoreInputListeners() {
-  const modal = document.getElementById("judge-modal");
-  if (!modal) return;
-
-  function clampNumInput(numInp) {
-    const row = numInp.closest(".score-row");
-    const range = row && row.querySelector('input[type="range"]');
-    if (!range) return;
-    const max = Number(range.dataset.max || range.getAttribute("max") || 0);
-    let v = parseInt(numInp.value, 10);
-    if (Number.isNaN(v)) v = 0;
-    v = Math.max(0, Math.min(max, v));
-    numInp.value = String(v);
-    range.value = String(v);
+  const scoreInput = document.getElementById("judge-score-input");
+  if (!scoreInput) return;
+  scoreInput.addEventListener("input", updateJudgeRunningTotal);
+  scoreInput.addEventListener("blur", () => {
+    const score = clampJudgeScore(scoreInput.value);
+    scoreInput.value = score === null ? "" : formatJudgeScore(score);
     updateJudgeRunningTotal();
-  }
-
-  modal.querySelectorAll(".score-row input[type=range]").forEach((range) => {
-    range.addEventListener("input", () => {
-      const row = range.closest(".score-row");
-      const num = row && row.querySelector(".score-row-num");
-      if (num) num.value = range.value;
-      updateJudgeRunningTotal();
-    });
-  });
-  modal.querySelectorAll(".score-row-num").forEach((numInp) => {
-    numInp.addEventListener("input", () => clampNumInput(numInp));
-    numInp.addEventListener("blur", () => clampNumInput(numInp));
   });
 }
 
 function updateJudgeRunningTotal() {
-  const coreSum = sumScoreInputs("core");
-  let bonusSum = sumScoreInputs("bonus");
-  const bonusCap = Number(eventFormat?.judge_bonus_bucket?.max_points ?? 3);
-  bonusSum = Math.min(bonusSum, bonusCap);
-  const total = coreSum + bonusSum;
+  const total = clampJudgeScore(document.getElementById("judge-score-input")?.value);
   const el = document.getElementById("judge-running-total");
-  if (el) el.textContent = String(total);
+  if (el) el.textContent = total === null ? "0" : formatJudgeScore(total);
 }
 
-function sumScoreInputs(group) {
-  let sum = 0;
-  document
-    .querySelectorAll(
-      `#judge-modal .score-row[data-score-group="${group}"] input[type=range]`
-    )
-    .forEach((input) => {
-      sum += Number(input.value) || 0;
-    });
-  return sum;
+function clampJudgeScore(value) {
+  if (value === "" || value == null) return null;
+  const n = Number(value);
+  if (Number.isNaN(n)) return null;
+  return Math.round(Math.max(0, Math.min(10, n)) * 10) / 10;
+}
+
+function formatJudgeScore(value) {
+  return Number.isInteger(value) ? String(value) : value.toFixed(1);
 }
 
 
@@ -1587,22 +1587,39 @@ function formatTrackForLabel(raw) {
 function scoredIdsForJudge(judgeName) {
   const trimmed = (judgeName || "").trim().toLowerCase();
   if (!trimmed) return new Set();
-  const scores = getLocalList(localScoresKey());
-  return new Set(
-    scores
-      .filter((s) => (s.judge_name || "").trim().toLowerCase() === trimmed)
-      .map((s) => s.submission_id)
+  const out = new Set();
+  const seenInfos = new Set();
+  judgeMap.forEach((info) => {
+    if (!info || seenInfos.has(info)) return;
+    seenInfos.add(info);
+    (info.responses || [])
+      .filter((s) => (s.judge_name || s.judge || "").trim().toLowerCase() === trimmed)
+      .forEach((s) => {
+        const repoKey = normalizeRepoKey(s.repo_url || s.repo_key || "");
+        if (repoKey) out.add(repoKey);
+        const identity = normalizeSubmissionIdentity({ sub: s });
+        if (identity) out.add(identity);
+        if (s.project_name) out.add(slugify(s.project_name));
+      });
+    });
+  return out;
+}
+
+function normalizeSubmissionIdentity(entry) {
+  if (!entry) return "";
+  const found = findSubmissionById(entry.submission_id || entry.id || "");
+  const sub = entry.sub || found?.sub || entry;
+  const row = entry.row || found?.row || null;
+  return (
+    normalizeRepoKey(sub?.repo_url || row?.repo || row?.repo_url || "") ||
+    slugify(sub?.project_name || row?.project_name || "") ||
+    slugify(sub?.team_name || row?.team_name || "") ||
+    String(entry.submission_id || entry.id || "").trim()
   );
 }
 
-function refreshJudgeSubmissionSelect() {
-  const select = document.getElementById("judge-submission-select");
-  if (!select) return;
-  const previous = select.value;
+function getJudgeReviewEntries() {
   const rows = window.__summaryRows || [];
-  const local = getLocalList(localSubmissionsKey()).filter(
-    submissionMatchesActiveHack
-  );
   const nameInput = document.getElementById("judge-name-input");
   const cachedName = (nameInput && nameInput.value) || "";
   const scored = scoredIdsForJudge(cachedName);
@@ -1612,37 +1629,41 @@ function refreshJudgeSubmissionSelect() {
     const sub = getSubmissionInfoForRow(r);
     const name = sub?.project_name || r.repo_id || extractRepoName(r.repo);
     const id = r.repo_id || name;
-    const rawTrack = sub?.chosen_track || r.chosen_track || "";
     entries.push({
       id,
       name,
-      trackLabel: formatTrackForLabel(rawTrack),
-      scored: scored.has(id),
+      trackLabel: formatTrackForLabel(sub?.chosen_track || r.chosen_track || ""),
+      scored: scored.has(id) || scored.has(normalizeSubmissionIdentity({ id, row: r, sub })),
       isLocal: false,
-    });
-  });
-  local.forEach((s) => {
-    entries.push({
-      id: s.submission_id,
-      name: s.project_name || s.submission_id,
-      trackLabel: formatTrackForLabel(s.chosen_track || ""),
-      scored: scored.has(s.submission_id),
-      isLocal: true,
+      row: r,
+      sub: sub || null,
     });
   });
 
-  entries.sort((a, b) => {
+  const deduped = [];
+  const seen = new Set();
+  for (const entry of entries) {
+    const key = normalizeSubmissionIdentity(entry);
+    if (key && seen.has(key)) continue;
+    if (key) seen.add(key);
+    deduped.push(entry);
+  }
+
+  return deduped.sort((a, b) => {
     if (a.scored !== b.scored) return a.scored ? 1 : -1;
     return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
   });
+}
+
+function refreshJudgeSubmissionSelect() {
+  const select = document.getElementById("judge-submission-select");
+  if (!select) return;
+  const picker = document.getElementById("judge-submission-picker");
+  const previous = select.value;
+  const entries = getJudgeReviewEntries();
 
   const options = ['<option value="">— pick a submission —</option>'];
-  let placedLocalSep = false;
   entries.forEach((e) => {
-    if (e.isLocal && !placedLocalSep) {
-      options.push("<option disabled>── Local (this browser) ──</option>");
-      placedLocalSep = true;
-    }
     const statusBit = e.scored ? "scored" : "unscored";
     const optTitle = `${e.name} — ${e.trackLabel} (${statusBit})`;
     options.push(
@@ -1653,12 +1674,23 @@ function refreshJudgeSubmissionSelect() {
   });
 
   select.innerHTML = options.join("");
+  if (picker) picker.innerHTML = options.join("");
   if (
     previous &&
     Array.from(select.options).some((o) => o.value === previous)
   ) {
     select.value = previous;
+    judgeCurrentIndex = Math.max(
+      0,
+      entries.findIndex((e) => e.id === previous)
+    );
+  } else if (entries.length) {
+    judgeCurrentIndex = Math.min(judgeCurrentIndex, entries.length - 1);
+    select.value = entries[judgeCurrentIndex].id;
+  } else {
+    judgeCurrentIndex = 0;
   }
+  if (picker) picker.value = select.value;
   renderJudgeSubmissionSummary();
   syncJudgeFullViewFromSelection();
 }
@@ -1671,10 +1703,6 @@ function findSubmissionById(id) {
     const rid = r.repo_id || sub?.project_name || extractRepoName(r.repo);
     if (rid === id) return { row: r, sub: sub || null };
   }
-  const local = getLocalList(localSubmissionsKey())
-    .filter(submissionMatchesActiveHack)
-    .find((s) => s.submission_id === id);
-  if (local) return { row: null, sub: local };
   return null;
 }
 
@@ -1713,18 +1741,6 @@ function buildMergedScoreEntries(submissionId, judgeInfo) {
       });
     });
   }
-  const locals = getLocalList(localScoresKey()).filter(
-    (s) => s.submission_id === submissionId
-  );
-  locals.forEach((s) => {
-    out.push({
-      source: "local",
-      judge: s.judge_name ? String(s.judge_name).trim() : "—",
-      at: s.scored_at || null,
-      total: s.total_score,
-      detail: `${s.total_score}/10`,
-    });
-  });
   out.sort((a, b) => {
     const ta = a.at ? new Date(a.at).getTime() : 0;
     const tb = b.at ? new Date(b.at).getTime() : 0;
@@ -1743,6 +1759,291 @@ function isYouScoreEntry(entry, judgeName) {
   return entry.source === "local" && judgeNamesMatch(entry.judge, judgeName);
 }
 
+function demoEmbedUrl(url) {
+  const raw = String(url || "").trim();
+  if (!raw) return "";
+  try {
+    const u = new URL(raw);
+    const host = u.hostname.replace(/^www\./, "");
+    if (host === "youtu.be") {
+      return `https://www.youtube.com/embed/${encodeURIComponent(
+        u.pathname.slice(1)
+      )}?enablejsapi=1`;
+    }
+    if (host.includes("youtube.com")) {
+      const id = u.searchParams.get("v");
+      if (id) return `https://www.youtube.com/embed/${encodeURIComponent(id)}?enablejsapi=1`;
+      if (u.pathname.startsWith("/shorts/")) {
+        return `https://www.youtube.com/embed/${encodeURIComponent(
+          u.pathname.split("/")[2] || ""
+        )}?enablejsapi=1`;
+      }
+    }
+    if (host.includes("vimeo.com")) {
+      const id = u.pathname.split("/").filter(Boolean).pop();
+      if (id) return `https://player.vimeo.com/video/${encodeURIComponent(id)}`;
+    }
+    if (host.includes("loom.com")) {
+      const parts = u.pathname.split("/").filter(Boolean);
+      const shareIndex = parts.indexOf("share");
+      const id = shareIndex >= 0 ? parts[shareIndex + 1] : parts.pop();
+      if (id) return `https://www.loom.com/embed/${encodeURIComponent(id)}`;
+    }
+  } catch {}
+  return "";
+}
+
+function setJudgeSubmissionByIndex(index) {
+  const entries = getJudgeReviewEntries();
+  if (!entries.length) {
+    judgeCurrentIndex = 0;
+    const select = document.getElementById("judge-submission-select");
+    if (select) select.value = "";
+    renderJudgeSubmissionSummary();
+    syncJudgeFullViewFromSelection();
+    return;
+  }
+  judgeCurrentIndex = (index + entries.length) % entries.length;
+  const current = entries[judgeCurrentIndex];
+  const select = document.getElementById("judge-submission-select");
+  if (select) select.value = current.id;
+  const picker = document.getElementById("judge-submission-picker");
+  if (picker) picker.value = current.id;
+  renderJudgeSubmissionSummary();
+  syncJudgeFullViewFromSelection();
+}
+
+function moveJudgeSubmission(delta) {
+  setJudgeSubmissionByIndex(judgeCurrentIndex + delta);
+}
+
+function initJudgeSwipeControls() {
+  const card = document.querySelector("#judge-modal .judge-demo-card");
+  if (!card) return;
+  const swipeLayer = document.getElementById("judge-card-swipe-layer");
+  let startX = 0;
+  let startY = 0;
+  let currentX = 0;
+  let tracking = false;
+
+  function resetCard() {
+    card.style.transform = "";
+    card.style.opacity = "";
+  }
+
+  function toggleDemoPlayback() {
+    const frame = document.querySelector("#judge-demo-stage iframe");
+    if (!frame?.contentWindow) return;
+    const src = frame.getAttribute("src") || "";
+    const playing = card.dataset.demoPlaying === "true";
+    if (src.includes("youtube.com/embed/")) {
+      frame.contentWindow.postMessage(
+        JSON.stringify({
+          event: "command",
+          func: playing ? "pauseVideo" : "playVideo",
+          args: [],
+        }),
+        "*"
+      );
+    } else if (src.includes("player.vimeo.com/video/")) {
+      frame.contentWindow.postMessage(
+        JSON.stringify({ method: playing ? "pause" : "play" }),
+        "*"
+      );
+    } else {
+      return;
+    }
+    card.dataset.demoPlaying = playing ? "false" : "true";
+  }
+
+  const startSwipe = (e) => {
+    if (e.target.closest("a, button, iframe, .judge-panel-toggle")) return;
+    e.stopPropagation();
+    tracking = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    currentX = 0;
+    card.classList.add("is-swiping");
+    card.classList.add("is-peeking-controls");
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+  };
+
+  const moveSwipe = (e) => {
+    if (!tracking) return;
+    e.stopPropagation();
+    currentX = e.clientX - startX;
+    const rotate = Math.max(-8, Math.min(8, currentX / 24));
+    const fade = Math.max(0.82, 1 - Math.abs(currentX) / 900);
+    card.style.transform = `translateX(${currentX}px) rotate(${rotate}deg)`;
+    card.style.opacity = String(fade);
+  };
+
+  const endSwipe = (e) => {
+    if (!tracking) return;
+    e.stopPropagation();
+    tracking = false;
+    card.classList.remove("is-swiping");
+    card.classList.remove("is-peeking-controls");
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    if (Math.abs(dx) < 8 && Math.abs(dy) < 8) {
+      resetCard();
+      toggleDemoPlayback();
+      return;
+    }
+    if (dy > 120 && Math.abs(dy) > Math.abs(dx) * 1.25) {
+      resetCard();
+      closeModal("judge-modal");
+      return;
+    }
+    if (!isJudgeSidePanelOpen() && dx < -100 && Math.abs(dx) > Math.abs(dy) * 1.25) {
+      resetCard();
+      openJudgeSidePanel();
+      return;
+    }
+    if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+      const direction = dx < 0 ? -1 : 1;
+      card.classList.add("is-swipe-release");
+      card.style.transform = `translateX(${direction * window.innerWidth}px) rotate(${
+        direction * 10
+      }deg)`;
+      card.style.opacity = "0";
+      window.setTimeout(() => {
+        card.classList.remove("is-swipe-release");
+        resetCard();
+        moveJudgeSubmission(dx < 0 ? 1 : -1);
+      }, 180);
+    } else {
+      card.classList.add("is-swipe-release");
+      resetCard();
+      window.setTimeout(() => card.classList.remove("is-swipe-release"), 180);
+    }
+  };
+
+  const cancelSwipe = () => {
+    tracking = false;
+    card.classList.remove("is-swiping");
+    card.classList.remove("is-peeking-controls");
+    card.classList.add("is-swipe-release");
+    resetCard();
+    window.setTimeout(() => card.classList.remove("is-swipe-release"), 180);
+  };
+
+  [card, swipeLayer].filter(Boolean).forEach((target) => {
+    target.addEventListener("pointerdown", startSwipe);
+    target.addEventListener("pointermove", moveSwipe);
+    target.addEventListener("pointerup", endSwipe);
+    target.addEventListener("pointercancel", cancelSwipe);
+  });
+}
+
+function syncJudgePanelToggleState() {
+  const toggle = document.getElementById("judge-panel-toggle");
+  if (!toggle) return;
+  const open = isJudgeSidePanelOpen();
+  toggle.classList.toggle("is-open", open);
+  toggle.setAttribute("aria-expanded", open ? "true" : "false");
+  toggle.querySelector("span").textContent = open ? "›" : "‹";
+}
+
+function initJudgePanelToggle() {
+  const toggle = document.getElementById("judge-panel-toggle");
+  if (!toggle) return;
+  toggle.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isJudgeSidePanelOpen()) closeJudgeSidePanel();
+    else openJudgeSidePanel();
+    syncJudgePanelToggleState();
+  });
+  syncJudgePanelToggleState();
+}
+
+function renderJudgeVideoStage() {
+  const title = document.getElementById("judge-video-title");
+  const meta = document.getElementById("judge-video-meta");
+  const count = document.getElementById("judge-video-count");
+  const stage = document.getElementById("judge-demo-stage");
+  const card = document.querySelector("#judge-modal .judge-demo-card");
+  if (card) card.dataset.demoPlaying = "false";
+  if (!stage) return;
+  const entries = getJudgeReviewEntries();
+  const selectedId = document.getElementById("judge-submission-select")?.value || "";
+  const index = Math.max(0, entries.findIndex((e) => e.id === selectedId));
+  if (selectedId && entries[index]) judgeCurrentIndex = index;
+  const current = entries[judgeCurrentIndex];
+
+  if (!current) {
+    if (title) title.textContent = "";
+    if (meta) meta.textContent = "";
+    if (count) count.textContent = "0 / 0";
+    stage.innerHTML = "";
+    renderJudgeScoreQueue();
+    return;
+  }
+
+  const sub = current.sub || {};
+  const demoUrl = sub.demo_url || "";
+  const repoUrl = sub.repo_url || current.row?.repo || "";
+  const embed = demoEmbedUrl(demoUrl);
+  if (title) title.textContent = current.name || "Untitled project";
+  if (meta) {
+    meta.textContent = `${current.trackLabel || "unscored"} · ${
+      current.scored ? "already scored" : "needs score"
+    }`;
+  }
+  if (count) count.textContent = `${judgeCurrentIndex + 1} / ${entries.length}`;
+
+  const links = [
+    repoUrl
+      ? `<a href="${escapeAttr(repoUrl)}" target="_blank" rel="noopener noreferrer">Repo</a>`
+      : "",
+    demoUrl
+      ? `<a href="${escapeAttr(demoUrl)}" target="_blank" rel="noopener noreferrer">Open demo</a>`
+      : "",
+  ]
+    .filter(Boolean)
+    .join("");
+
+  stage.innerHTML = embed
+    ? `<iframe class="judge-demo-frame" src="${escapeAttr(
+        embed
+      )}" title="${escapeAttr(current.name)} demo video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe><div class="judge-demo-links">${links}</div>`
+    : `<div class="judge-demo-empty"><strong>No embeddable demo video.</strong><span>Use the links below, then score from the rail.</span><div class="judge-demo-links">${links || "No demo link provided"}</div></div>`;
+}
+
+function renderJudgeScoreQueue() {
+  const target = document.getElementById("judge-score-queue");
+  if (!target) return;
+  const entries = getJudgeReviewEntries();
+  const selectedId = document.getElementById("judge-submission-select")?.value || "";
+  const done = entries.filter((e) => e.scored).length;
+  target.innerHTML = `
+    <div class="judge-queue-stats"><strong>${done}</strong> scored · <strong>${
+    entries.length - done
+  }</strong> left</div>
+    <div class="judge-queue-list">
+      ${entries
+        .map(
+          (e, idx) => `<button type="button" class="judge-queue-item ${
+            e.id === selectedId ? "is-active" : ""
+          } ${e.scored ? "is-scored" : ""}" data-judge-queue-id="${escapeAttr(
+            e.id
+          )}" data-judge-queue-index="${idx}">
+            <span>${escapeHtml(e.name)}</span>
+            <small>${escapeHtml(e.scored ? "scored" : "needs score")}</small>
+          </button>`
+        )
+        .join("")}
+    </div>
+  `;
+  target.querySelectorAll("[data-judge-queue-index]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      setJudgeSubmissionByIndex(Number(btn.getAttribute("data-judge-queue-index")));
+    });
+  });
+}
+
 function renderJudgeSubmissionToolbar() {
   const toolbar = document.getElementById("judge-submission-toolbar");
   if (!toolbar) return;
@@ -1752,7 +2053,7 @@ function renderJudgeSubmissionToolbar() {
   const judgeName = (nameInput && nameInput.value) || "";
 
   if (!id) {
-    toolbar.innerHTML = `<p class="judge-toolbar-empty">Pick a submission from the list. Unscored entries sort first.</p>`;
+    toolbar.innerHTML = "";
     return;
   }
 
@@ -1864,7 +2165,7 @@ function renderJudgeSubmissionSummary() {
   target.classList.add("is-visible");
 }
 
-function handleJudgeForm(e) {
+async function handleJudgeForm(e) {
   e.preventDefault();
   const form = e.target;
   const data = Object.fromEntries(new FormData(form).entries());
@@ -1876,33 +2177,44 @@ function handleJudgeForm(e) {
     toast("Judge name is required");
     return;
   }
+  const enteredScore = clampJudgeScore(data.judge_score);
+  if (enteredScore === null) {
+    toast("Add a score between 0 and 10");
+    return;
+  }
   try {
     localStorage.setItem(localJudgeNameKey(), data.judge_name);
   } catch {}
 
-  const coreScores = {};
-  let coreTotal = 0;
-  (eventFormat?.rubric?.criteria || []).forEach((c) => {
-    const v = Number(data[`core_${c.id}`] ?? 0);
-    coreScores[c.id] = v;
-    coreTotal += v;
-  });
-  const bonusScores = {};
-  let bonusTotal = 0;
-  (eventFormat?.side_quests || []).forEach((q) => {
-    const v = Number(data[`bonus_${q.id}`] ?? 0);
-    bonusScores[q.id] = v;
-    bonusTotal += v;
-  });
+  const coreMax = Number(eventFormat?.rubric?.core_max_points ?? 7);
   const bonusCap = Number(eventFormat?.judge_bonus_bucket?.max_points ?? 3);
-  const bonusCapped = Math.min(bonusTotal, bonusCap);
-  const grandTotal = coreTotal + bonusCapped;
+  const coreTotal = Math.min(enteredScore, coreMax);
+  const bonusCapped = Math.min(Math.max(enteredScore - coreMax, 0), bonusCap);
+  const coreScores = { overall: coreTotal };
+  const bonusScores = {};
+  const bonusTotal = bonusCapped;
+  (eventFormat?.side_quests || []).forEach((q) => {
+    bonusScores[q.id] = 0;
+  });
+  const grandTotal = enteredScore;
+  const found = findSubmissionById(data.submission_id);
+  const sub = found?.sub || {};
+  const row = found?.row || {};
+  const repoUrl = sub.repo_url || row.repo || row.repo_url || "";
+  if (!repoUrl) {
+    toast("This submission has no repo URL, so it cannot be saved to Supabase.");
+    return;
+  }
 
   const entry = {
     scored_at: new Date().toISOString(),
     hack_id: getActiveHackId(),
     judge_name: data.judge_name,
     submission_id: data.submission_id,
+    repo_url: repoUrl,
+    project_name: sub.project_name || row.project_name || "",
+    chosen_track: sub.chosen_track || row.chosen_track || "",
+    scored_track: sub.chosen_track || row.chosen_track || "",
     core_scores: coreScores,
     core_total: coreTotal,
     bonus_bucket_scores: bonusScores,
@@ -1910,19 +2222,27 @@ function handleJudgeForm(e) {
     bonus_total_capped: bonusCapped,
     total_score: grandTotal,
     thoughts: data.thoughts || "",
+    notes: data.thoughts || "",
   };
-  const list = getLocalList(localScoresKey());
-  list.push(entry);
-  setLocalList(localScoresKey(), list);
 
-  // Reset scores only — keep judge name cached for next submission
+  try {
+    const res = await fetch("/api/judges", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(entry),
+    });
+    const payload = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(payload.error || "Failed to save score");
+    await loadJudgeData();
+  } catch (err) {
+    toast(err.message || "Score failed. Supabase did not save it.");
+    return;
+  }
+
+  // Reset score only — keep judge name cached for next submission
   const scoredId = entry.submission_id;
-  form.querySelectorAll("#judge-modal .score-row").forEach((row) => {
-    const r = row.querySelector('input[type="range"]');
-    const n = row.querySelector(".score-row-num");
-    if (r) r.value = "0";
-    if (n) n.value = "0";
-  });
+  const scoreInput = document.getElementById("judge-score-input");
+  if (scoreInput) scoreInput.value = "";
   const notes = form.querySelector("textarea[name=thoughts]");
   if (notes) notes.value = "";
   updateJudgeRunningTotal();
@@ -1943,12 +2263,17 @@ function handleJudgeForm(e) {
       }
     }
     renderJudgeSubmissionSummary();
+    onJudgeSubmissionSelectChanged();
     if (isJudgeSidePanelOpen()) {
       const r = getJudgeApiRepoId();
       if (r) loadDetails(r, detailElsForJudgeSidePanel());
     }
   }
-  toast(`Score saved — ${grandTotal}/10. Your score is stored in this browser.`);
+  toast(
+    `Score saved — ${formatJudgeScore(
+      grandTotal
+    )}/10. Supabase is now the source of truth.`
+  );
 }
 
 // ---------- Manager ----------
@@ -1988,9 +2313,11 @@ function renderManagerPanel() {
   const stats = document.getElementById("manager-stats");
   const aggregates = document.getElementById("manager-aggregates");
   const rows = window.__summaryRows || [];
-  const local = getLocalList(localSubmissionsKey());
-  const scores = getLocalList(localScoresKey());
-  const tracked = rows.length + local.length;
+  const persistedScores = Array.from(judgeMap.values()).reduce(
+    (sum, info) => sum + (info?.responses?.length || 0),
+    0
+  );
+  const tracked = rows.length;
 
   const moneyMovement = rows.filter((r) =>
     trackMatchesCategory(getRowTrackLabel(r), "money-movement")
@@ -2031,8 +2358,8 @@ function renderManagerPanel() {
     <div class="manager-stat"><span class="manager-stat-num">${moneyMovement}</span><span class="manager-stat-lbl">Money mov.</span></div>
     <div class="manager-stat"><span class="manager-stat-num">${financialIntelligence}</span><span class="manager-stat-lbl">Fin. intel.</span></div>
     <div class="manager-stat"><span class="manager-stat-num">${flagged}</span><span class="manager-stat-lbl">Flagged</span></div>
-    <div class="manager-stat"><span class="manager-stat-num">${scores.length}</span><span class="manager-stat-lbl">Local scores</span></div>
-    <div class="manager-stat"><span class="manager-stat-num">${local.length}</span><span class="manager-stat-lbl">Local subs</span></div>
+    <div class="manager-stat"><span class="manager-stat-num">${persistedScores}</span><span class="manager-stat-lbl">DB scores</span></div>
+    <div class="manager-stat"><span class="manager-stat-num">0</span><span class="manager-stat-lbl">Local-only</span></div>
     <div class="manager-stat"><span class="manager-stat-num">${noTrackLabel}</span><span class="manager-stat-lbl">No track</span></div>
     <div class="manager-stat"><span class="manager-stat-num">${vagueTrack}</span><span class="manager-stat-lbl">Other track</span></div>
     <div class="manager-stat"><span class="manager-stat-num">${formatNumber(sumCommits)}</span><span class="manager-stat-lbl">Σ commits</span></div>
@@ -2293,7 +2620,7 @@ function renderLocalSubmissions() {
   const local = getLocalList(localSubmissionsKey());
   if (local.length === 0) {
     ul.innerHTML =
-      '<li style="justify-content:center;color:var(--muted);font-style:italic">None yet — try the Submit modal</li>';
+      '<li style="justify-content:center;color:var(--muted);font-style:italic">No browser-only submissions. Live submissions must be in Supabase.</li>';
     return;
   }
   ul.innerHTML = local
@@ -2313,14 +2640,15 @@ function renderLocalSubmissions() {
 }
 
 function exportSubmissionsJSON() {
-  const local = getLocalList(localSubmissionsKey());
-  const scores = getLocalList(localScoresKey());
   const rows = window.__summaryRows || [];
+  const persistedScores = Array.from(judgeMap.values()).flatMap(
+    (info) => info?.responses || []
+  );
   const payload = {
     exported_at: new Date().toISOString(),
     event: eventFormat?.event_name || "Build Finance Agents · London 2026",
-    local_submissions: local,
-    local_scores: scores,
+    storage: "supabase",
+    judge_scores: persistedScores,
     github_summary_rows: rows,
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], {
@@ -2335,7 +2663,7 @@ function exportSubmissionsJSON() {
   a.remove();
   URL.revokeObjectURL(url);
   toast(
-    `Exported ${rows.length} Git rows, ${local.length} local submissions, ${scores.length} scores`
+    `Exported ${rows.length} submissions and ${persistedScores.length} persisted scores`
   );
 }
 
@@ -2529,13 +2857,34 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         localStorage.setItem(localJudgeNameKey(), nameInput.value);
       } catch {}
-      refreshJudgeSubmissionSelect();
+      renderJudgeScoreQueue();
+      renderJudgeSubmissionToolbar();
     });
   }
   const judgeSelect = document.getElementById("judge-submission-select");
   if (judgeSelect) {
     judgeSelect.addEventListener("change", onJudgeSubmissionSelectChanged);
   }
+  const judgePicker = document.getElementById("judge-submission-picker");
+  if (judgePicker) {
+    judgePicker.addEventListener("change", () => {
+      const select = document.getElementById("judge-submission-select");
+      if (select) select.value = judgePicker.value;
+      onJudgeSubmissionSelectChanged();
+    });
+  }
+  const prevJudge = document.getElementById("judge-prev-submission");
+  if (prevJudge) prevJudge.addEventListener("click", () => moveJudgeSubmission(-1));
+  const nextJudge = document.getElementById("judge-next-submission");
+  if (nextJudge) nextJudge.addEventListener("click", () => moveJudgeSubmission(1));
+  const moreInfo = document.getElementById("judge-more-info");
+  if (moreInfo) {
+    moreInfo.addEventListener("click", () => {
+      openJudgeSidePanel();
+    });
+  }
+  initJudgeSwipeControls();
+  initJudgePanelToggle();
   document.querySelectorAll("[data-judge-side-tab]").forEach((b) => {
     b.addEventListener("click", () => {
       setActiveJudgeSideTab(
@@ -2616,6 +2965,13 @@ document.addEventListener("DOMContentLoaded", () => {
       document
         .querySelectorAll(".modal:not(.hidden)")
         .forEach((m) => closeModal(m.id));
+    } else if (
+      !document.getElementById("judge-modal")?.classList.contains("hidden") &&
+      (e.key === "ArrowLeft" || e.key === "ArrowRight") &&
+      !["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement?.tagName)
+    ) {
+      e.preventDefault();
+      moveJudgeSubmission(e.key === "ArrowRight" ? 1 : -1);
     }
   });
 

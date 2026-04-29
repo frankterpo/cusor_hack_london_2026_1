@@ -131,9 +131,9 @@
       },
       "points": {
         "difficulty": "Hard",
-        "core_points": 100,
-        "bonus_points": 20,
-        "total_recommended_points": 120
+        "core_points": 7,
+        "bonus_points": 3,
+        "total_recommended_points": 10
       },
       "title": "Build an automation that wakes up on its own"
     },
@@ -168,9 +168,9 @@
       },
       "points": {
         "difficulty": "Hard",
-        "core_points": 100,
-        "bonus_points": 15,
-        "total_recommended_points": 115
+        "core_points": 7,
+        "bonus_points": 3,
+        "total_recommended_points": 10
       },
       "title": "Wake up to merge-ready PRs"
     },
@@ -205,9 +205,9 @@
       },
       "points": {
         "difficulty": "Hard",
-        "core_points": 100,
-        "bonus_points": 10,
-        "total_recommended_points": 110
+        "core_points": 7,
+        "bonus_points": 3,
+        "total_recommended_points": 10
       },
       "title": "Ship a reviewer that can repair what it finds"
     },
@@ -243,9 +243,9 @@
       },
       "points": {
         "difficulty": "Medium",
-        "core_points": 100,
-        "bonus_points": 20,
-        "total_recommended_points": 120
+        "core_points": 7,
+        "bonus_points": 3,
+        "total_recommended_points": 10
       },
       "title": "Build a debugger that gathers evidence before acting"
     },
@@ -280,9 +280,9 @@
       },
       "points": {
         "difficulty": "Hard",
-        "core_points": 100,
-        "bonus_points": 10,
-        "total_recommended_points": 110
+        "core_points": 7,
+        "bonus_points": 3,
+        "total_recommended_points": 10
       },
       "title": "Run browser QA in parallel with subagents"
     },
@@ -312,9 +312,9 @@
       },
       "points": {
         "difficulty": "Medium",
-        "core_points": 100,
-        "bonus_points": 10,
-        "total_recommended_points": 110
+        "core_points": 7,
+        "bonus_points": 3,
+        "total_recommended_points": 10
       },
       "title": "Give agents an audit trail humans can trust"
     },
@@ -350,9 +350,9 @@
       },
       "points": {
         "difficulty": "Medium",
-        "core_points": 100,
-        "bonus_points": 20,
-        "total_recommended_points": 120
+        "core_points": 7,
+        "bonus_points": 3,
+        "total_recommended_points": 10
       },
       "title": "Package high-value workflows into discoverable skills"
     },
@@ -388,9 +388,9 @@
       },
       "points": {
         "difficulty": "Medium",
-        "core_points": 100,
-        "bonus_points": 20,
-        "total_recommended_points": 120
+        "core_points": 7,
+        "bonus_points": 3,
+        "total_recommended_points": 10
       },
       "title": "Make agents justify their decisions before they act"
     },
@@ -425,9 +425,9 @@
       },
       "points": {
         "difficulty": "Medium",
-        "core_points": 100,
-        "bonus_points": 10,
-        "total_recommended_points": 110
+        "core_points": 7,
+        "bonus_points": 3,
+        "total_recommended_points": 10
       },
       "title": "Connect agents to the systems your company actually uses"
     },
@@ -462,9 +462,9 @@
       },
       "points": {
         "difficulty": "Hard",
-        "core_points": 100,
-        "bonus_points": 15,
-        "total_recommended_points": 115
+        "core_points": 7,
+        "bonus_points": 3,
+        "total_recommended_points": 10
       },
       "title": "Coordinate a team of agents, not just one"
     },
@@ -500,9 +500,9 @@
       },
       "points": {
         "difficulty": "Hard",
-        "core_points": 100,
-        "bonus_points": 25,
-        "total_recommended_points": 125
+        "core_points": 7,
+        "bonus_points": 3,
+        "total_recommended_points": 10
       },
       "title": "Build a self-improving codebase loop"
     }
