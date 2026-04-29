@@ -22,6 +22,13 @@ function renderScoreFields() {
   const selectedSubmission = getSelectedSubmission();
   const selectedTrack = selectedSubmission?.chosen_track || "";
 
+  const otherCount = Math.max(0, judgeConfig.main_tracks.length - 1);
+  const othersPhrase =
+    otherCount <= 0
+      ? ""
+      : otherCount === 1
+        ? "The other track is shown only for context."
+        : `The other ${otherCount} tracks are shown only for context.`;
   const trackBoard = `
     <div class="track-board">
       ${judgeConfig.main_tracks.map((track) => `
@@ -32,7 +39,7 @@ function renderScoreFields() {
         </article>
       `).join("")}
     </div>
-    <div class="track-guidance">The competitor submission determines the main road. Judges score only that road out of 100. The other three roads are shown only for context.</div>
+    <div class="track-guidance">The competitor submission determines the main track. Judges score only that track out of 100. ${othersPhrase}</div>
     <div class="track-score-panel">
       <div class="track-score-title">Selected Main Track: ${escapeHtml(selectedTrack || "Track not selected")}</div>
       <div class="track-score-copy">Give one overall main-track score out of 100 for the submitted road.</div>
@@ -43,13 +50,16 @@ function renderScoreFields() {
 
   coreContainer.innerHTML = trackBoard;
 
-  bonusContainer.innerHTML = judgeConfig.side_quests.map((quest) => `
+  bonusContainer.innerHTML = judgeConfig.side_quests.map((quest) => {
+    const cap = Number.isFinite(quest.points) ? quest.points : judgeConfig.judge_bonus_bucket.max_points;
+    return `
     <div class="score-item">
       <label for="${quest.id}">${escapeHtml(quest.name)}</label>
-      <small>0-${judgeConfig.judge_bonus_bucket.max_points}</small>
-      <input class="score-input bonus-score" id="${quest.id}" type="number" min="0" max="${judgeConfig.judge_bonus_bucket.max_points}" value="0" data-id="${quest.id}">
+      <small>0-${cap}</small>
+      <input class="score-input bonus-score" id="${quest.id}" type="number" min="0" max="${cap}" value="0" data-id="${quest.id}">
     </div>
-  `).join("");
+  `;
+  }).join("");
 }
 
 function renderSubmissions() {

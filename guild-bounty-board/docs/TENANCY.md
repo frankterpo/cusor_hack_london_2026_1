@@ -46,6 +46,8 @@ Seeded rows (run migrations):
 
 Set `**DEFAULT_HACKATHON_ID`** to the UUID for the hack you are running **on that Vercel project** (e.g. London → `a0000002-…`).
 
+**Judge rubric:** Live scoring uses `public/api/_lib/judging.js` (`JUDGE_CONFIG`). The judge UI loads `public/judge-config.json`. Keep both in sync with the event rubric (for London, mirror `cursor-hackathon-hcmc-2025/data/event-format.json`). The public board’s `public/eric-bounties.json` → `hackathon_format` drives the submission track `<select>` and on-page copy — update it when tracks or bonus buckets change.
+
 ### New event checklist
 
 1. `INSERT` a row into `hackathons` (or use the Dashboard) with a new `slug` and window.

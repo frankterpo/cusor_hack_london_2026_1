@@ -7,133 +7,100 @@
     "notes": "Curated down to a smaller set of high-signal missions aligned to the new Automations and software-factory direction."
   },
   "hackathon_format": {
-    "theme": "Build Eric's Software Factory",
+    "hack_id": "cursor-live-london-q3-2026",
+    "theme": "Cursor Live · London · Q3 2026",
+    "tagline": "Human out of the loop in high-risk financial workflows",
     "main_tracks": [
       {
-        "id": "Always-On-Agents",
-        "name": "Always-On Agents",
-        "description": "Webhook and schedule driven agents that stay useful after the demo."
+        "id": "Money-Movement",
+        "name": "Money Movement",
+        "description": "Agents that actually move money. A wrong action means real money is gone."
       },
       {
-        "id": "Review-QA",
-        "name": "Review + QA",
-        "description": "Reliability systems, verifiers, incident responders, and evidence-driven debugging."
-      },
-      {
-        "id": "Agent-Runtime-Tools",
-        "name": "Agent Runtime Tools",
-        "description": "Skills, MCP tools, model routing, and decision systems that make agents more capable."
-      },
-      {
-        "id": "Software-Factory",
-        "name": "Software Factory",
-        "description": "Systems that continuously build, test, coordinate, and improve codebases."
+        "id": "Financial-Intelligence",
+        "name": "Financial Intelligence",
+        "description": "Agents that read, interpret, and explain. A wrong answer means a wrong decision downstream."
       }
     ],
     "side_challenges": [
       {
-        "id": "Best-Cursor-Native-Workflow",
-        "name": "Best Cursor-Native Workflow",
-        "bonus_points": 30,
-        "description": "Judges can award up to the full shared bonus pool here if this is the defining strength of the project."
+        "id": "Best-Use-Cursor",
+        "name": "Best use of Cursor",
+        "bonus_points": 10,
+        "description": "How effectively the build used Cursor end to end."
       },
       {
-        "id": "Best-Developer-Tool",
-        "name": "Best Developer Tool",
-        "bonus_points": 30,
-        "description": "Judges can award part or all of the shared bonus pool here based on real utility for engineering teams."
+        "id": "Best-Use-Specter",
+        "name": "Best use of Specter",
+        "bonus_points": 10,
+        "description": "Standout use of Specter's API, MCP, or market intelligence data."
       },
       {
-        "id": "Best-Reliability-System",
-        "name": "Best Reliability System",
-        "bonus_points": 30,
-        "description": "Judges can award part or all of the shared bonus pool here when verification and trust are exceptional."
-      },
-      {
-        "id": "Most-Technically-Ambitious",
-        "name": "Most Technically Ambitious",
-        "bonus_points": 30,
-        "description": "Judges can award up to the full shared bonus pool here for an unusually hard technical reach."
-      },
-      {
-        "id": "Best-Demo",
-        "name": "Best Demo",
-        "bonus_points": 30,
-        "description": "Judges can award part or all of the shared bonus pool here when the presentation quality is a standout."
-      },
-      {
-        "id": "Best-Use-of-AI-Safety",
-        "name": "Best Use of AI Safety",
-        "bonus_points": 30,
-        "description": "Judges can award part or all of the shared bonus pool here for projects that demonstrate responsible and safe AI practices.",
-        "sponsor_logo": "https://cdn-avatars.huggingface.co/v1/production/uploads/63b70085b004c84aac8d1ed8/qPB6g011-qpzt1xb9wGNQ.png"
-      },
-      {
-        "id": "Best-Use-of-Open-Claw",
-        "name": "Best Use of Open Claw",
-        "bonus_points": 30,
-        "description": "Judges can award part or all of the shared bonus pool here for projects that make excellent use of Open Claw.",
-        "sponsor_logo": "https://thumbs.dreamstime.com/b/crayfish-pixel-art-bit-sea-animal-claws-270086506.jpg"
+        "id": "Best-Use-LLM-Models",
+        "name": "Best use of LLM models",
+        "bonus_points": 10,
+        "description": "Smart use of models — APIs, routing, evals, or multi-model design."
       }
     ],
     "rubric": {
       "core_max_points": 100,
       "side_bonus_cap": 30,
+      "total_cap": 130,
       "criteria": [
         {
+          "id": "concrete_workflow_value",
           "name": "Concrete Workflow Value",
           "points": 30
         },
         {
+          "id": "track_fit",
           "name": "Track Fit",
           "points": 25
         },
         {
-          "name": "Reliability And Verification",
+          "id": "human_in_the_loop_decision",
+          "name": "Human-in-the-Loop Decision",
           "points": 20
         },
         {
+          "id": "technical_execution",
           "name": "Technical Execution",
           "points": 15
         },
         {
+          "id": "demo_clarity",
           "name": "Demo Clarity",
           "points": 10
         }
       ]
     },
+    "judge_bonus_bucket": {
+      "name": "Judge Bonus Bucket",
+      "max_points": 30,
+      "description": "Three sponsor-aligned buckets (10 + 10 + 10). 30 bonus total."
+    },
     "organizer_learnings": [
-      "Use Eric tweets as the inspiration layer, not as the final taxonomy.",
-      "Cut noisy one-off ideas and bias toward repeatable engineering workflows.",
-      "Reward demos that show trigger to agent to verification to artifact, not just a chat transcript.",
-      "A smaller track set makes judging clearer and examples more credible.",
-      "Side challenges should add energy without becoming substitute tracks."
+      "London tracks are Money Movement vs Financial Intelligence — keep submissions in one lane.",
+      "Bonus is three 10-point sponsor buckets; total bonus still caps at 30.",
+      "Judges use a single main-track score out of 100 plus the three buckets."
     ],
     "organizer_tools": [
       {
-        "name": "Cursor Automations",
-        "use": "Always-on agents triggered by schedules, PRs, Slack, incidents, or webhooks."
+        "name": "Guild judge portal",
+        "use": "/judge — scores sync to Supabase for this hackathon UUID."
       },
       {
-        "name": "Cloud Agents",
-        "use": "Background implementation, testing, and artifact generation."
+        "name": "Organizer cockpit",
+        "use": "/admin — merges analyses, submissions, and judge aggregates."
       },
       {
-        "name": "Bugbot Autofix",
-        "use": "Review and repair loop for issues detected in pull requests."
-      },
-      {
-        "name": "MCP Servers",
-        "use": "Connect business systems, observability stacks, and internal tools."
-      },
-      {
-        "name": "Subagents + Skills",
-        "use": "Parallel specialization and reusable agent capabilities."
+        "name": "DEFAULT_HACKATHON_ID",
+        "use": "Set to London UUID on the Vercel deploy (see docs/TENANCY.md)."
       }
     ],
     "judging_format": {
       "demo_length_minutes": 4,
-      "suggested_shortlisting": "Shortlist by track winners first, then compare finalists on workflow value and demo clarity."
+      "suggested_shortlisting": "Rank by total score (100 + capped 30 bonus); break ties on workflow value."
     }
   },
   "bounties": [

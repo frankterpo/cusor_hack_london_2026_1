@@ -1,34 +1,24 @@
 {
-  "event_name": "Build Eric's Software Factory",
+  "event_name": "Cursor Live · London · Q3 2026",
+  "hack_id": "cursor-live-london-q3-2026",
   "main_tracks": [
     {
-      "id": "Always-On-Agents",
-      "name": "Always-On Agents",
-      "description": "Webhook and schedule driven agents that stay useful after the demo.",
-      "label": "LIVE TRIGGERS + ALWAYS-ON ACTIONS"
+      "id": "Money-Movement",
+      "name": "Money Movement",
+      "label": "Money Movement",
+      "description": "Agents that actually move money. A wrong action means real money is gone."
     },
     {
-      "id": "Review-QA",
-      "name": "Review + QA",
-      "description": "Reliability systems, verifiers, incident responders, and evidence-driven debugging.",
-      "label": "CHECKPOINTS + QUALITY GATES"
-    },
-    {
-      "id": "Agent-Runtime-Tools",
-      "name": "Agent Runtime Tools",
-      "description": "Skills, MCP tools, model routing, and decision systems that make agents more capable.",
-      "label": "SKILLS + TOOLS + DECISION LAYERS"
-    },
-    {
-      "id": "Software-Factory",
-      "name": "Software Factory",
-      "description": "Systems that continuously build, test, coordinate, and improve codebases.",
-      "label": "PIPELINES + FLEETS + CONTINUOUS IMPROVEMENT"
+      "id": "Financial-Intelligence",
+      "name": "Financial Intelligence",
+      "label": "Financial Intelligence",
+      "description": "Agents that read, interpret, and explain. A wrong answer means a wrong decision downstream."
     }
   ],
   "rubric": {
     "core_max_points": 100,
     "side_bonus_cap": 30,
+    "total_cap": 130,
     "criteria": [
       {
         "id": "concrete_workflow_value",
@@ -41,8 +31,8 @@
         "points": 25
       },
       {
-        "id": "reliability_and_verification",
-        "name": "Reliability And Verification",
+        "id": "human_in_the_loop_decision",
+        "name": "Human-in-the-Loop Decision",
         "points": 20
       },
       {
@@ -59,36 +49,24 @@
   },
   "judge_bonus_bucket": {
     "name": "Judge Bonus Bucket",
-    "max_points": 30
+    "max_points": 30,
+    "description": "Three sponsor-aligned buckets (10 + 10 + 10 points). Judges score each bucket independently — 30 bonus total."
   },
   "side_quests": [
     {
-      "id": "best_cursor_native_workflow",
-      "name": "Best Cursor-Native Workflow"
+      "id": "best_use_cursor",
+      "name": "Best use of Cursor",
+      "points": 10
     },
     {
-      "id": "best_developer_tool",
-      "name": "Best Developer Tool"
+      "id": "best_use_specter",
+      "name": "Best use of Specter",
+      "points": 10
     },
     {
-      "id": "best_reliability_system",
-      "name": "Best Reliability System"
-    },
-    {
-      "id": "most_technically_ambitious",
-      "name": "Most Technically Ambitious"
-    },
-    {
-      "id": "best_demo",
-      "name": "Best Demo"
-    },
-    {
-      "id": "best_use_of_ai_safety",
-      "name": "Best Use of AI Safety"
-    },
-    {
-      "id": "best_use_of_open_claw",
-      "name": "Best Use of Open Claw"
+      "id": "best_use_llm_models",
+      "name": "Best use of LLM models",
+      "points": 10
     }
   ]
 }

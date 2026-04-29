@@ -1136,7 +1136,7 @@
             <img src="cursor-wordmark.png" class="logo-wordmark" alt="Cursor Wordmark">
         </div>
         <h1>GUILD BOUNTY BOARD</h1>
-        <div class="subtitle">Mission: Build Eric's Software Factory</div>
+        <div class="subtitle">Human out of the loop in high-risk financial workflows</div>
         <div class="admin-link-row">
             <button class="admin-link admin-link--gold" id="open-submissions-modal" type="button">ALL SUBMISSIONS</button>
         </div>
@@ -1336,6 +1336,20 @@
                 build: 'Multi-step systems where several agents or stages continuously plan, build, verify, and improve software.',
                 avoid: 'Do not use this road for a single automation or single verifier. This road is about pipelines and coordination.',
                 label: 'PIPELINES + FLEETS + CONTINUOUS IMPROVEMENT'
+            },
+            'Money-Movement': {
+                className: 'track-always-on',
+                artClass: 'road-art--always-on',
+                build: 'Agents that execute money movement — pay, transfer, payroll, refunds — with explicit human-in-the-loop gates where risk is high.',
+                avoid: 'Do not choose this track if the system only reads or categorizes money without executing movement.',
+                label: 'MONEY AT STAKE'
+            },
+            'Financial-Intelligence': {
+                className: 'track-review-qa',
+                artClass: 'road-art--review-qa',
+                build: 'Agents that read, interpret, explain, or flag financial data — fraud signals, categorization, bank-line QA, compliance checks.',
+                avoid: 'Do not choose this track if the hero demo is primarily pushing payments or transfers.',
+                label: 'READ · INTERPRET · DECIDE'
             }
         };
 
@@ -1428,6 +1442,22 @@
         function renderRubric(payload) {
             const panel = document.getElementById('rubric-panel');
             const format = payload.hackathon_format || {};
+            const trackCount = (format.main_tracks && format.main_tracks.length) || 0;
+            const isLondon = format.hack_id === 'cursor-live-london-q3-2026';
+            if (isLondon) {
+                panel.innerHTML = `
+                <div class="panel-title">World Map</div>
+                <div class="overview-copy">
+                    <div class="overview-lead">Pick <span style="color:var(--accent-green);">one track</span>. Build for high-risk financial workflows.</div>
+                    <br><br>
+                    Each team enters exactly <span style="color:var(--accent-green);">one main track</span> (Money Movement or Financial Intelligence).
+                    Judges also score three sponsor bonus buckets (<span style="color:var(--gold);">10 + 10 + 10</span>).
+                    <br><br>
+                    The ${trackCount || 'two'} tracks below are intentionally distinct. If a project spans both, judges pick the best fit — choose clearly on submission.
+                </div>
+                `;
+                return;
+            }
             panel.innerHTML = `
                 <div class="panel-title">World Map</div>
                 <div class="overview-copy">
@@ -1477,6 +1507,21 @@
             const rubric = (payload.hackathon_format && payload.hackathon_format.rubric) || {};
             const criteria = rubric.criteria || [];
             const cap = rubric.side_bonus_cap || 30;
+            const format = payload.hackathon_format || {};
+            const isLondon = format.hack_id === 'cursor-live-london-q3-2026';
+            const howCardCopy = isLondon
+                ? `Final score = <span style="color:var(--accent-green);">main track score (0–100)</span> + <span style="color:var(--gold);">three sponsor bonus buckets (10 + 10 + 10, ${esc(cap)} max)</span>.
+                            <br><br>
+                            Judges award one overall core score for the team's chosen track, then score Cursor, Specter, and LLM usage up to 10 each.`
+                : `Final score = <span style="color:var(--accent-green);">main road score</span> + <span style="color:var(--gold);">judge bonus bucket</span>.
+                            <br><br>
+                            Every team can earn up to <span style="color:var(--accent-green);">100 core points</span> on its chosen road.
+                            Side quests draw from one judge bonus bucket capped at <span style="color:var(--gold);">+${esc(cap)} pts</span>.`;
+            const maxCardCopy = isLondon
+                ? `100 core points on the chosen track.<br>
+                            Up to ${esc(cap)} bonus points from three 10-point buckets (Cursor · Specter · LLMs).`
+                : `100 core points from one road.<br>
+                            Up to ${esc(cap)} bonus points total from side quests, whether concentrated in one or spread across several.`;
 
             panel.innerHTML = `
                 <div class="panel-title">Points System</div>
@@ -1484,10 +1529,7 @@
                     <div class="point-card">
                         <div class="point-card-title">HOW TEAMS SCORE</div>
                         <div class="point-card-copy">
-                            Final score = <span style="color:var(--accent-green);">main road score</span> + <span style="color:var(--gold);">judge bonus bucket</span>.
-                            <br><br>
-                            Every team can earn up to <span style="color:var(--accent-green);">100 core points</span> on its chosen road.
-                            Side quests draw from one judge bonus bucket capped at <span style="color:var(--gold);">+${esc(cap)} pts</span>.
+                            ${howCardCopy}
                         </div>
                     </div>
                     <div class="point-card">
@@ -1500,8 +1542,7 @@
                         <div class="point-card-title">SCORING MAX</div>
                         <div class="point-total">100 + ${esc(cap)}</div>
                         <div class="point-card-copy">
-                            100 core points from one road.<br>
-                            Up to ${esc(cap)} bonus points total from side quests, whether concentrated in one or spread across several.
+                            ${maxCardCopy}
                         </div>
                     </div>
                 </div>
@@ -1542,8 +1583,16 @@
 
         function renderCoins(payload) {
             const container = document.getElementById('coin-panel');
-            const sideChallenges = ((payload.hackathon_format && payload.hackathon_format.side_challenges) || [])
+            const format = payload.hackathon_format || {};
+            const isLondon = format.hack_id === 'cursor-live-london-q3-2026';
+            const sideChallenges = ((format && format.side_challenges) || [])
                 .filter((c) => c.id !== 'Most-Technically-Ambitious' && c.id !== 'Best-Demo');
+            const cap = (format.rubric && format.rubric.side_bonus_cap) || 30;
+            const coinNote = isLondon
+                ? `Three judge bonus buckets — Cursor, Specter, and LLM models — each scored <span style="color:var(--gold);">0–10</span> (<span style="color:var(--gold);">${esc(cap)}</span> bonus total capped). Example: <span style="color:var(--gold);">10 + 10 + 10</span>, <span style="color:var(--gold);">10 + 8 + 7</span>.`
+                : `Bonus coins are scored from a single judge bonus bucket: <span style="color:var(--gold);">0 to +${esc(cap)} pts total</span>.
+                    A team can win the full bonus by dominating one side quest, or collect smaller bonuses across several side quests.
+                    Example splits: <span style="color:var(--gold);">30</span>, <span style="color:var(--gold);">20 + 10</span>, <span style="color:var(--gold);">15 + 10 + 5</span>.`;
             container.innerHTML = `
                 <div class="panel-title">Side-Quest Coins</div>
                 <div class="coin-strip">
@@ -1558,9 +1607,7 @@
                     `).join('')}
                 </div>
                 <div class="coin-note">
-                    Bonus coins are scored from a single judge bonus bucket: <span style="color:var(--gold);">0 to +${esc((payload.hackathon_format && payload.hackathon_format.rubric && payload.hackathon_format.rubric.side_bonus_cap) || 30)} pts total</span>.
-                    A team can win the full bonus by dominating one side quest, or collect smaller bonuses across several side quests.
-                    Example splits: <span style="color:var(--gold);">30</span>, <span style="color:var(--gold);">20 + 10</span>, <span style="color:var(--gold);">15 + 10 + 5</span>.
+                    ${coinNote}
                 </div>
             `;
         }
@@ -1569,6 +1616,11 @@
             try {
                 const resp = await fetch('eric-bounties.json');
                 const payload = await resp.json();
+                const subEl = document.querySelector('.header .subtitle');
+                const hf = payload.hackathon_format || {};
+                if (subEl && hf.hack_id === 'cursor-live-london-q3-2026' && hf.tagline) {
+                    subEl.textContent = hf.tagline;
+                }
                 renderRubric(payload);
                 renderPoints(payload);
                 renderRoads(payload);
