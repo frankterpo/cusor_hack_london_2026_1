@@ -26,63 +26,63 @@
       {
         "id": "Best-Use-Cursor",
         "name": "Best use of Cursor",
-        "bonus_points": 10,
+        "bonus_points": 1,
         "description": "How effectively the build used Cursor end to end."
       },
       {
         "id": "Best-Use-Specter",
         "name": "Best use of Specter",
-        "bonus_points": 10,
+        "bonus_points": 1,
         "description": "Standout use of Specter's API, MCP, or market intelligence data."
       },
       {
         "id": "Best-Use-LLM-Models",
         "name": "Best use of LLM models",
-        "bonus_points": 10,
+        "bonus_points": 1,
         "description": "Smart use of models — APIs, routing, evals, or multi-model design."
       }
     ],
     "rubric": {
-      "core_max_points": 100,
-      "side_bonus_cap": 30,
-      "total_cap": 130,
+      "core_max_points": 7,
+      "side_bonus_cap": 3,
+      "total_cap": 10,
       "criteria": [
         {
           "id": "concrete_workflow_value",
           "name": "Concrete Workflow Value",
-          "points": 30
+          "points": 2
         },
         {
           "id": "track_fit",
           "name": "Track Fit",
-          "points": 25
+          "points": 2
         },
         {
           "id": "human_in_the_loop_decision",
           "name": "Human-in-the-Loop Decision",
-          "points": 20
+          "points": 1
         },
         {
           "id": "technical_execution",
           "name": "Technical Execution",
-          "points": 15
+          "points": 1
         },
         {
           "id": "demo_clarity",
           "name": "Demo Clarity",
-          "points": 10
+          "points": 1
         }
       ]
     },
     "judge_bonus_bucket": {
       "name": "Judge Bonus Bucket",
-      "max_points": 30,
-      "description": "Three sponsor-aligned buckets (10 + 10 + 10). 30 bonus total."
+      "max_points": 3,
+      "description": "Three sponsor-aligned buckets (1 + 1 + 1 points). Judges score each bucket independently — 3 bonus total."
     },
     "organizer_learnings": [
-      "London tracks are Money Movement vs Financial Intelligence — keep submissions in one lane.",
-      "Bonus is three 10-point sponsor buckets; total bonus still caps at 30.",
-      "Judges use a single main-track score out of 100 plus the three buckets."
+      "London scoring is 10 points total: 7 core + 3 sponsor bonus.",
+      "Five core criteria total 7 points: 2 + 2 + 1 + 1 + 1.",
+      "Three bonus buckets total 3 points: Cursor + Specter + LLM models."
     ],
     "organizer_tools": [
       {
@@ -100,7 +100,7 @@
     ],
     "judging_format": {
       "demo_length_minutes": 4,
-      "suggested_shortlisting": "Rank by total score (100 + capped 30 bonus); break ties on workflow value."
+      "suggested_shortlisting": "Rank by total score out of 10; break ties on workflow value and human-in-the-loop clarity."
     }
   },
   "bounties": [

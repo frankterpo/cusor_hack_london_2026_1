@@ -24,40 +24,41 @@
       }
     ],
     "rubric": {
-      "core_max_points": 100,
-      "side_bonus_cap": 30,
+      "core_max_points": 7,
+      "side_bonus_cap": 3,
       "criteria": [
         {
           "id": "concrete_workflow_value",
           "name": "Concrete Workflow Value",
-          "points": 30
+          "points": 2
         },
         {
           "id": "track_fit",
           "name": "Track Fit",
-          "points": 25
+          "points": 2
         },
         {
           "id": "reliability_and_verification",
           "name": "Reliability And Verification",
-          "points": 20
+          "points": 1
         },
         {
           "id": "technical_execution",
           "name": "Technical Execution",
-          "points": 15
+          "points": 1
         },
         {
           "id": "demo_clarity",
           "name": "Demo Clarity",
-          "points": 10
+          "points": 1
         }
-      ]
+      ],
+      "total_cap": 10
     },
     "judge_bonus_bucket": {
       "name": "Judge Bonus Bucket",
-      "max_points": 30,
-      "description": "Judges may allocate up to 30 total bonus points across one or more side quests."
+      "max_points": 3,
+      "description": "Three sponsor-aligned buckets (1 + 1 + 1 points). Judges score each bucket independently — 3 bonus total."
     },
     "side_quests": [
       {
@@ -127,21 +128,21 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
         "core_total": 5.5,
-        "bonus_total": 0.0,
+        "bonus_total": 0,
         "grand_total": 5.5
       },
       "average_score": 5.5
@@ -206,21 +207,21 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
         "core_total": 7.333,
-        "bonus_total": 0.0,
+        "bonus_total": 0,
         "grand_total": 7.333
       },
       "average_score": 7.333
@@ -284,21 +285,21 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
         "core_total": 5.667,
-        "bonus_total": 0.0,
+        "bonus_total": 0,
         "grand_total": 5.667
       },
       "average_score": 5.667
@@ -362,24 +363,24 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
-        "core_total": 6.0,
-        "bonus_total": 0.0,
-        "grand_total": 6.0
+        "core_total": 6,
+        "bonus_total": 0,
+        "grand_total": 6
       },
-      "average_score": 6.0
+      "average_score": 6
     },
     "https://github.com/thsunkid/lightshow-threejs": {
       "project": "Spotlightify",
@@ -424,24 +425,24 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
-        "core_total": 8.0,
-        "bonus_total": 0.0,
-        "grand_total": 8.0
+        "core_total": 8,
+        "bonus_total": 0,
+        "grand_total": 8
       },
-      "average_score": 8.0
+      "average_score": 8
     },
     "https://github.com/PhanMai010203/testcase": {
       "project": "generate testcase",
@@ -502,24 +503,24 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
-        "core_total": 6.0,
-        "bonus_total": 0.0,
-        "grand_total": 6.0
+        "core_total": 6,
+        "bonus_total": 0,
+        "grand_total": 6
       },
-      "average_score": 6.0
+      "average_score": 6
     },
     "https://github.com/knamnguyen/duma.so": {
       "project": "Duma",
@@ -580,24 +581,24 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
-        "core_total": 8.0,
-        "bonus_total": 0.0,
-        "grand_total": 8.0
+        "core_total": 8,
+        "bonus_total": 0,
+        "grand_total": 8
       },
-      "average_score": 8.0
+      "average_score": 8
     },
     "https://github.com/huyencute11/hackathon": {
       "project": "3Wolfs",
@@ -658,21 +659,21 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
         "core_total": 6.667,
-        "bonus_total": 0.0,
+        "bonus_total": 0,
         "grand_total": 6.667
       },
       "average_score": 6.667
@@ -720,21 +721,21 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
         "core_total": 4.5,
-        "bonus_total": 0.0,
+        "bonus_total": 0,
         "grand_total": 4.5
       },
       "average_score": 4.5
@@ -766,24 +767,24 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
-        "core_total": 7.0,
-        "bonus_total": 0.0,
-        "grand_total": 7.0
+        "core_total": 7,
+        "bonus_total": 0,
+        "grand_total": 7
       },
-      "average_score": 7.0
+      "average_score": 7
     },
     "https://github.com/SubaruLenz/Hackathon-backend": {
       "project": "AI personal finance assistant",
@@ -846,24 +847,24 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
-        "core_total": 5.0,
-        "bonus_total": 0.0,
-        "grand_total": 5.0
+        "core_total": 5,
+        "bonus_total": 0,
+        "grand_total": 5
       },
-      "average_score": 5.0
+      "average_score": 5
     },
     "https://github.com/nvbinh15/hoggle": {
       "project": "Hoggle",
@@ -908,24 +909,24 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
-        "core_total": 9.0,
-        "bonus_total": 0.0,
-        "grand_total": 9.0
+        "core_total": 9,
+        "bonus_total": 0,
+        "grand_total": 9
       },
-      "average_score": 9.0
+      "average_score": 9
     },
     "https://github.com/finalFlash159/exam-hub-cursor-hackathon": {
       "project": "ExamBuddy",
@@ -970,24 +971,24 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
-        "core_total": 8.0,
-        "bonus_total": 0.0,
-        "grand_total": 8.0
+        "core_total": 8,
+        "bonus_total": 0,
+        "grand_total": 8
       },
-      "average_score": 8.0
+      "average_score": 8
     },
     "https://github.com/dxv2k/upvotify": {
       "project": "Upvotify",
@@ -1032,21 +1033,21 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
         "core_total": 7.5,
-        "bonus_total": 0.0,
+        "bonus_total": 0,
         "grand_total": 7.5
       },
       "average_score": 7.5
@@ -1094,21 +1095,21 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
         "core_total": 8.5,
-        "bonus_total": 0.0,
+        "bonus_total": 0,
         "grand_total": 8.5
       },
       "average_score": 8.5
@@ -1156,24 +1157,24 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
-        "core_total": 6.0,
-        "bonus_total": 0.0,
-        "grand_total": 6.0
+        "core_total": 6,
+        "bonus_total": 0,
+        "grand_total": 6
       },
-      "average_score": 6.0
+      "average_score": 6
     },
     "https://github.com/meteordefect/olyetta": {
       "project": "OLYETTA",
@@ -1218,24 +1219,24 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
-        "core_total": 8.0,
-        "bonus_total": 0.0,
-        "grand_total": 8.0
+        "core_total": 8,
+        "bonus_total": 0,
+        "grand_total": 8
       },
-      "average_score": 8.0
+      "average_score": 8
     },
     "https://github.com/KCBF/CKHack": {
       "project": "Eduflow",
@@ -1281,24 +1282,24 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
-        "core_total": 7.0,
-        "bonus_total": 0.0,
-        "grand_total": 7.0
+        "core_total": 7,
+        "bonus_total": 0,
+        "grand_total": 7
       },
-      "average_score": 7.0
+      "average_score": 7
     },
     "https://github.com/vincenthsh/cursor-hcmc": {
       "project": "Cacophony",
@@ -1343,21 +1344,21 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
         "core_total": 8.5,
-        "bonus_total": 0.0,
+        "bonus_total": 0,
         "grand_total": 8.5
       },
       "average_score": 8.5
@@ -1405,21 +1406,21 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
         "core_total": 7.5,
-        "bonus_total": 0.0,
+        "bonus_total": 0,
         "grand_total": 7.5
       },
       "average_score": 7.5
@@ -1467,21 +1468,21 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
         "core_total": 7.5,
-        "bonus_total": 0.0,
+        "bonus_total": 0,
         "grand_total": 7.5
       },
       "average_score": 7.5
@@ -1530,24 +1531,24 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
-        "core_total": 8.0,
-        "bonus_total": 0.0,
-        "grand_total": 8.0
+        "core_total": 8,
+        "bonus_total": 0,
+        "grand_total": 8
       },
-      "average_score": 8.0
+      "average_score": 8
     },
     "https://github.com/CursorHackathonDevAI2025VN/finding-team-game": {
       "project": "HackTeamMatch",
@@ -1592,24 +1593,24 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
-        "core_total": 6.0,
-        "bonus_total": 0.0,
-        "grand_total": 6.0
+        "core_total": 6,
+        "bonus_total": 0,
+        "grand_total": 6
       },
-      "average_score": 6.0
+      "average_score": 6
     },
     "https://github.com/GenyoNguyen/YouTubeLM": {
       "project": "YouTubeLM",
@@ -1654,24 +1655,24 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
-        "core_total": 7.0,
-        "bonus_total": 0.0,
-        "grand_total": 7.0
+        "core_total": 7,
+        "bonus_total": 0,
+        "grand_total": 7
       },
-      "average_score": 7.0
+      "average_score": 7
     },
     "https://github.com/lenhatquang97/hackathon-repo": {
       "project": "1800-CreditCrawler",
@@ -1716,24 +1717,24 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
-        "core_total": 6.0,
-        "bonus_total": 0.0,
-        "grand_total": 6.0
+        "core_total": 6,
+        "bonus_total": 0,
+        "grand_total": 6
       },
-      "average_score": 6.0
+      "average_score": 6
     },
     "https://github.com/vphuocthinh2006/Smart-Resume-Analyzer": {
       "project": "AI JOB FINDING ASSISTANT",
@@ -1778,24 +1779,24 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
-        "core_total": 6.0,
-        "bonus_total": 0.0,
-        "grand_total": 6.0
+        "core_total": 6,
+        "bonus_total": 0,
+        "grand_total": 6
       },
-      "average_score": 6.0
+      "average_score": 6
     },
     "https://github.com/HhaMinh0310/workdate.dev": {
       "project": "Really want a girlfriend:))",
@@ -1840,24 +1841,24 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
-        "core_total": 6.0,
-        "bonus_total": 0.0,
-        "grand_total": 6.0
+        "core_total": 6,
+        "bonus_total": 0,
+        "grand_total": 6
       },
-      "average_score": 6.0
+      "average_score": 6
     },
     "https://github.com/billmnguyen/fretlab": {
       "project": "FretLab",
@@ -1902,24 +1903,24 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
-        "core_total": 8.0,
-        "bonus_total": 0.0,
-        "grand_total": 8.0
+        "core_total": 8,
+        "bonus_total": 0,
+        "grand_total": 8
       },
-      "average_score": 8.0
+      "average_score": 8
     },
     "https://github.com/lethanhan97/cursor-hackathon-hcmc-2025-cuso-cru": {
       "project": "The CủSỏ Cru",
@@ -1964,24 +1965,24 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
-        "core_total": 8.0,
-        "bonus_total": 0.0,
-        "grand_total": 8.0
+        "core_total": 8,
+        "bonus_total": 0,
+        "grand_total": 8
       },
-      "average_score": 8.0
+      "average_score": 8
     },
     "https://github.com/Travis-Houston/Luminus.ai.git": {
       "project": "Luminus.ai",
@@ -2026,24 +2027,24 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
-        "core_total": 6.0,
-        "bonus_total": 0.0,
-        "grand_total": 6.0
+        "core_total": 6,
+        "bonus_total": 0,
+        "grand_total": 6
       },
-      "average_score": 6.0
+      "average_score": 6
     },
     "https://github.com/CrimsonDisk/Find-it": {
       "project": "Find it!",
@@ -2088,21 +2089,21 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
         "core_total": 4.5,
-        "bonus_total": 0.0,
+        "bonus_total": 0,
         "grand_total": 4.5
       },
       "average_score": 4.5
@@ -2151,21 +2152,21 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
         "core_total": 6.5,
-        "bonus_total": 0.0,
+        "bonus_total": 0,
         "grand_total": 6.5
       },
       "average_score": 6.5
@@ -2213,21 +2214,21 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
         "core_total": 5.5,
-        "bonus_total": 0.0,
+        "bonus_total": 0,
         "grand_total": 5.5
       },
       "average_score": 5.5
@@ -2275,24 +2276,24 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
-        "core_total": 6.0,
-        "bonus_total": 0.0,
-        "grand_total": 6.0
+        "core_total": 6,
+        "bonus_total": 0,
+        "grand_total": 6
       },
-      "average_score": 6.0
+      "average_score": 6
     },
     "https://github.com/trandinhduc/CursorHKT_Git": {
       "project": "VN Support",
@@ -2321,24 +2322,24 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
-        "core_total": 7.0,
-        "bonus_total": 0.0,
-        "grand_total": 7.0
+        "core_total": 7,
+        "bonus_total": 0,
+        "grand_total": 7
       },
-      "average_score": 7.0
+      "average_score": 7
     },
     "https://github.com/huythanhnguyen/hackathon_cursor_29_Nov": {
       "project": "BillionaireTwin (Thanh/Giang/Dung)",
@@ -2384,21 +2385,21 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
         "core_total": 4.5,
-        "bonus_total": 0.0,
+        "bonus_total": 0,
         "grand_total": 4.5
       },
       "average_score": 4.5
@@ -2446,24 +2447,24 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
-        "core_total": 5.0,
-        "bonus_total": 0.0,
-        "grand_total": 5.0
+        "core_total": 5,
+        "bonus_total": 0,
+        "grand_total": 5
       },
-      "average_score": 5.0
+      "average_score": 5
     },
     "https://github.com/itsmesailee/Off-Clock": {
       "project": "Off Clock",
@@ -2509,24 +2510,24 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
-        "core_total": 6.0,
-        "bonus_total": 0.0,
-        "grand_total": 6.0
+        "core_total": 6,
+        "bonus_total": 0,
+        "grand_total": 6
       },
-      "average_score": 6.0
+      "average_score": 6
     },
     "https://github.com/ltrphung0620/CursorAI-Hackathon/tree/dc09c52451be103c6e53643d688a0a512b9341ce/V2H": {
       "project": "SmartPrep AI",
@@ -2571,21 +2572,21 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
         "core_total": 5.5,
-        "bonus_total": 0.0,
+        "bonus_total": 0,
         "grand_total": 5.5
       },
       "average_score": 5.5
@@ -2633,21 +2634,21 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
         "core_total": 4.5,
-        "bonus_total": 0.0,
+        "bonus_total": 0,
         "grand_total": 4.5
       },
       "average_score": 4.5
@@ -2695,24 +2696,24 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
-        "core_total": 5.0,
-        "bonus_total": 0.0,
-        "grand_total": 5.0
+        "core_total": 5,
+        "bonus_total": 0,
+        "grand_total": 5
       },
-      "average_score": 5.0
+      "average_score": 5
     },
     "https://github.com/agent-kali/menu-oi": {
       "project": "Menu Oi",
@@ -2757,21 +2758,21 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
         "core_total": 6.5,
-        "bonus_total": 0.0,
+        "bonus_total": 0,
         "grand_total": 6.5
       },
       "average_score": 6.5
@@ -2819,21 +2820,21 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
         "core_total": 6.5,
-        "bonus_total": 0.0,
+        "bonus_total": 0,
         "grand_total": 6.5
       },
       "average_score": 6.5
@@ -2881,21 +2882,21 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
         "core_total": 5.5,
-        "bonus_total": 0.0,
+        "bonus_total": 0,
         "grand_total": 5.5
       },
       "average_score": 5.5
@@ -2943,21 +2944,21 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
         "core_total": 7.5,
-        "bonus_total": 0.0,
+        "bonus_total": 0,
         "grand_total": 7.5
       },
       "average_score": 7.5
@@ -3006,21 +3007,21 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
         "core_total": 8.5,
-        "bonus_total": 0.0,
+        "bonus_total": 0,
         "grand_total": 8.5
       },
       "average_score": 8.5
@@ -3069,24 +3070,24 @@
       "legacy_mode": true,
       "averages": {
         "core_scores": {
-          "concrete_workflow_value": 0.0,
-          "track_fit": 0.0,
-          "reliability_and_verification": 0.0,
-          "technical_execution": 0.0,
-          "demo_clarity": 0.0
+          "concrete_workflow_value": 0,
+          "track_fit": 0,
+          "reliability_and_verification": 0,
+          "technical_execution": 0,
+          "demo_clarity": 0
         },
         "bonus_bucket_scores": {
-          "best_cursor_native_workflow": 0.0,
-          "best_developer_tool": 0.0,
-          "best_reliability_system": 0.0,
-          "most_technically_ambitious": 0.0,
-          "best_demo": 0.0
+          "best_cursor_native_workflow": 0,
+          "best_developer_tool": 0,
+          "best_reliability_system": 0,
+          "most_technically_ambitious": 0,
+          "best_demo": 0
         },
-        "core_total": 5.0,
-        "bonus_total": 0.0,
-        "grand_total": 5.0
+        "core_total": 5,
+        "bonus_total": 0,
+        "grand_total": 5
       },
-      "average_score": 5.0
+      "average_score": 5
     }
   },
   "unmapped_responses": []

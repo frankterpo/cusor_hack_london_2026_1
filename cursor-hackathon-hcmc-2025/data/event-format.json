@@ -38,64 +38,64 @@
     }
   ],
   "rubric": {
-    "core_max_points": 100,
-    "side_bonus_cap": 30,
-    "total_cap": 130,
+    "core_max_points": 7,
+    "side_bonus_cap": 3,
+    "total_cap": 10,
     "criteria": [
       {
         "id": "concrete_workflow_value",
         "name": "Concrete Workflow Value",
-        "points": 30,
+        "points": 2,
         "description": "Does it replace or compress a real finance workflow a human does today?"
       },
       {
         "id": "track_fit",
         "name": "Track Fit",
-        "points": 25,
+        "points": 2,
         "description": "How purely does the submission embody its chosen track (money movement vs financial intelligence)?"
       },
       {
         "id": "human_in_the_loop_decision",
         "name": "Human-in-the-Loop Decision",
-        "points": 20,
+        "points": 1,
         "description": "Does the system know when a human should be in the loop vs not? Thresholds, confidence gates, escalation paths."
       },
       {
         "id": "technical_execution",
         "name": "Technical Execution",
-        "points": 15,
+        "points": 1,
         "description": "Architecture quality, tool design, latency, integrations that actually work."
       },
       {
         "id": "demo_clarity",
         "name": "Demo Clarity",
-        "points": 10,
+        "points": 1,
         "description": "Can the judge, in 90 seconds, see exactly what this agent does and why it matters?"
       }
     ]
   },
   "judge_bonus_bucket": {
     "name": "Judge Bonus Bucket",
-    "max_points": 30,
-    "description": "Three sponsor-aligned buckets (10 + 10 + 10 points). Judges score each bucket independently — 30 bonus total."
+    "max_points": 3,
+    "description": "Three sponsor-aligned buckets (1 + 1 + 1 points). Judges score each bucket independently — 3 bonus total."
   },
   "side_quests": [
     {
       "id": "best_use_cursor",
       "name": "Best use of Cursor",
-      "points": 10,
+      "points": 1,
       "blurb": "How effectively the build used Cursor — editor, agents, and workflow — end to end."
     },
     {
       "id": "best_use_specter",
       "name": "Best use of Specter",
-      "points": 10,
+      "points": 1,
       "blurb": "Standout use of Specter's API, MCP, or data for market intelligence in the product."
     },
     {
       "id": "best_use_llm_models",
       "name": "Best use of LLM models",
-      "points": 10,
+      "points": 1,
       "blurb": "Smart or effective use of models — APIs, routing, evals, or multi-model design."
     }
   ],

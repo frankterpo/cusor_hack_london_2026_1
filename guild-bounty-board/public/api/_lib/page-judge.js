@@ -2,7 +2,7 @@ module.exports = `
   <header>
     <div class="logo-block">
       <div class="logo">Cursor Guild Judge Portal</div>
-      <div class="meta">Score projects on the 100 + 30 model</div>
+      <div class="meta">Score projects on the 7 + 3 = 10 model</div>
     </div>
     <div class="header-links">
       <a class="board-link" href="/">Hack Board</a>
@@ -11,70 +11,69 @@ module.exports = `
   </header>
 
   <main class="judge-main">
-    <section class="panel full-width">
-      <div class="panel-header">
-        <h2>Submit A Judge Score</h2>
-      </div>
-      <div class="judge-layout">
-        <div class="judge-column">
-          <div class="section">
-            <h3>Judge</h3>
-            <div class="box">
-              <label class="field">
-                <span>Judge Name</span>
-                <input id="judge-name" type="text" placeholder="Your name">
-              </label>
-            </div>
+    <section class="judge-shell">
+      <section class="judge-stage panel">
+        <div class="judge-stage-top">
+          <button id="prev-submission" class="nav-button" type="button" aria-label="Previous submission">&larr;</button>
+          <div>
+            <div id="submission-position" class="submission-position">0 / 0</div>
+            <h2 id="submission-title">Loading submissions...</h2>
+            <div id="submission-meta" class="submission-meta"></div>
           </div>
+          <button id="next-submission" class="nav-button" type="button" aria-label="Next submission">&rarr;</button>
+        </div>
 
-          <div class="section">
-            <h3>Select Submission</h3>
-            <div class="box">
-              <label class="field">
-                <span>Project</span>
-                <select id="submission-select"></select>
-              </label>
-              <div id="submission-summary" class="submission-summary"></div>
-            </div>
+        <div class="submission-card" id="submission-card">
+          <div class="submission-card-face submission-card-face--front">
+            <button id="flip-details" class="info-button" type="button">More info</button>
+            <div id="demo-panel" class="demo-panel"></div>
+          </div>
+          <div class="submission-card-face submission-card-face--back">
+            <button id="flip-back" class="info-button" type="button">Back to demo</button>
+            <div id="detail-panel" class="detail-panel"></div>
           </div>
         </div>
 
-        <div class="judge-column judge-column-wide">
-          <div class="section">
-            <h3>Main Track Score</h3>
-            <div id="core-fields" class="box form-grid"></div>
-          </div>
-
-          <div class="section">
-            <h3>Judge Bonus Bucket</h3>
-            <div id="bonus-fields" class="box form-grid"></div>
-            <div class="score-callout" id="bonus-counter">
-              Bonus Bucket 0/30
-            </div>
-            <div class="score-callout">
-              Combined side-quest bonus is capped at <strong>30</strong>.
-            </div>
-          </div>
-
-          <div class="section">
-            <h3>Notes</h3>
-            <div class="box">
-              <label class="field">
-                <span>Optional Notes</span>
-                <textarea id="judge-notes" rows="5" placeholder="Anything judges or organizers should know"></textarea>
-              </label>
-            </div>
-          </div>
-
-          <div class="section">
-            <div class="box totals-box">
-              <div id="totals-output" class="totals-output">Core 0/100 &bull; Bonus 0/30 &bull; Total 0/130</div>
-              <button id="submit-score" class="action-button">Submit Score</button>
-              <div id="submit-status" class="status-text"></div>
-            </div>
-          </div>
+        <div class="judge-stage-footer">
+          <button id="prev-submission-bottom" class="action-button action-button--secondary" type="button">Previous</button>
+          <button id="next-submission-bottom" class="action-button action-button--secondary" type="button">Next</button>
         </div>
-      </div>
+      </section>
+
+      <aside class="judge-sidebar">
+        <section class="panel judge-panel">
+          <h3>Judge</h3>
+          <label class="field">
+            <span>Judge Name (enter once)</span>
+            <input id="judge-name" type="text" placeholder="Your name">
+          </label>
+        </section>
+
+        <section class="panel judge-panel rubric-panel">
+          <h3>Rubric Reminder</h3>
+          <div id="rubric-summary" class="rubric-summary"></div>
+        </section>
+
+        <section class="panel judge-panel">
+          <h3>Score This Project</h3>
+          <div class="score-section-title">Core: 7 points</div>
+          <div id="core-fields" class="score-fields"></div>
+          <div class="score-section-title">Bonus: 3 points</div>
+          <div id="bonus-fields" class="score-fields"></div>
+          <label class="field">
+            <span>Optional Notes</span>
+            <textarea id="judge-notes" rows="4" placeholder="Short note for tie-breaks or organizer context"></textarea>
+          </label>
+          <div id="totals-output" class="totals-output">Core 0/7 &bull; Bonus 0/3 &bull; Total 0/10</div>
+          <button id="submit-score" class="action-button" type="button">Save Score</button>
+          <div id="submit-status" class="status-text"></div>
+        </section>
+
+        <section class="panel judge-panel">
+          <h3>Scoring Queue</h3>
+          <div id="score-queue" class="score-queue"></div>
+        </section>
+      </aside>
     </section>
   </main>
 `;

@@ -388,7 +388,7 @@ function buildJudgeTooltip(info) {
     if (info.legacy_mode) {
       return `#${idx + 1}: ${r.total_score}${thought}`;
     }
-    return `#${idx + 1}: ${r.total_score}/130 (core ${r.core_total}, bonus ${
+    return `#${idx + 1}: ${r.total_score}/10 (core ${r.core_total}, bonus ${
       r.bonus_total_capped
     })${thought}`;
   });
@@ -402,7 +402,7 @@ function renderJudgeCell(info) {
   const avg = Number(
     (info.averages && info.averages.grand_total) ?? info.average_score ?? 0
   ).toFixed(1);
-  const cap = info.legacy_mode ? "" : '<span class="judge-count">/130</span>';
+  const cap = info.legacy_mode ? "" : '<span class="judge-count">/10</span>';
   const tooltip = escapeAttr(buildJudgeTooltip(info));
   return `<span class="judge-chip" title="${tooltip}">${avg}${cap}<span class="judge-count"> · ${info.responses.length}</span></span>`;
 }
@@ -416,7 +416,7 @@ function judgeImportResponsesListHtml(info) {
         : "";
       const scoreLine = info.legacy_mode
         ? `#${idx + 1} • ${r.total_score}`
-        : `#${idx + 1} • ${r.total_score}/130 (core ${r.core_total}, bonus ${
+        : `#${idx + 1} • ${r.total_score}/10 (core ${r.core_total}, bonus ${
             r.bonus_total_capped
           })`;
       return `<div class="judge-row"><div class="judge-score-pill">${scoreLine}</div>${thought}</div>`;
@@ -464,7 +464,7 @@ function judgeAggregateBlockHtml(info) {
   return `
     <div class="judge-summary">
       <div class="judge-score-pill highlight" title="Average of imported judge scores (${info.responses.length} response${info.responses.length !== 1 ? "s" : ""})."><span class="judge-score-avg-label">Avg</span> ${grandAvg}${
-    info.legacy_mode ? "" : "/130"
+    info.legacy_mode ? "" : "/10"
   }</div>
       <div class="judge-meta">${info.responses.length} response${
     info.responses.length !== 1 ? "s" : ""
@@ -475,8 +475,8 @@ function judgeAggregateBlockHtml(info) {
         ? ""
         : `
       <div class="judge-summary">
-        <div class="judge-score-pill">Core ${coreAvg}/100</div>
-        <div class="judge-score-pill">Bonus ${bonusAvg}/30</div>
+        <div class="judge-score-pill">Core ${coreAvg}/7</div>
+        <div class="judge-score-pill">Bonus ${bonusAvg}/3</div>
       </div>
       <div class="judge-list">${criterionList}</div>
       <div class="judge-list">${bonusList}</div>
@@ -1558,7 +1558,7 @@ function attachScoreInputListeners() {
 function updateJudgeRunningTotal() {
   const coreSum = sumScoreInputs("core");
   let bonusSum = sumScoreInputs("bonus");
-  const bonusCap = Number(eventFormat?.judge_bonus_bucket?.max_points ?? 30);
+  const bonusCap = Number(eventFormat?.judge_bonus_bucket?.max_points ?? 3);
   bonusSum = Math.min(bonusSum, bonusCap);
   const total = coreSum + bonusSum;
   const el = document.getElementById("judge-running-total");
@@ -1701,7 +1701,7 @@ function buildMergedScoreEntries(submissionId, judgeInfo) {
           : `Panel import #${idx + 1}`;
       const detail = judgeInfo.legacy_mode
         ? `${r.total_score}`
-        : `${r.total_score}/130 (core ${r.core_total ?? "—"}, bonus ${
+        : `${r.total_score}/10 (core ${r.core_total ?? "—"}, bonus ${
             r.bonus_total_capped ?? "—"
           })`;
       out.push({
@@ -1722,7 +1722,7 @@ function buildMergedScoreEntries(submissionId, judgeInfo) {
       judge: s.judge_name ? String(s.judge_name).trim() : "—",
       at: s.scored_at || null,
       total: s.total_score,
-      detail: `${s.total_score}/130`,
+      detail: `${s.total_score}/10`,
     });
   });
   out.sort((a, b) => {
@@ -1894,7 +1894,7 @@ function handleJudgeForm(e) {
     bonusScores[q.id] = v;
     bonusTotal += v;
   });
-  const bonusCap = Number(eventFormat?.judge_bonus_bucket?.max_points ?? 30);
+  const bonusCap = Number(eventFormat?.judge_bonus_bucket?.max_points ?? 3);
   const bonusCapped = Math.min(bonusTotal, bonusCap);
   const grandTotal = coreTotal + bonusCapped;
 
@@ -1948,7 +1948,7 @@ function handleJudgeForm(e) {
       if (r) loadDetails(r, detailElsForJudgeSidePanel());
     }
   }
-  toast(`Score saved — ${grandTotal}/130. Your score is stored in this browser.`);
+  toast(`Score saved — ${grandTotal}/10. Your score is stored in this browser.`);
 }
 
 // ---------- Manager ----------

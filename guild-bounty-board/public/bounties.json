@@ -37,53 +37,54 @@
       {
         "id": "Golden-Buzzer",
         "name": "Golden Buzzer",
-        "bonus_points": 15,
+        "bonus_points": 1,
         "description": "Standout wow-factor project selected by judges."
       },
       {
         "id": "Zero-Manual-Run",
         "name": "Zero Manual Run",
-        "bonus_points": 10,
+        "bonus_points": 1,
         "description": "End-to-end build/test loop with near-zero manual edits."
       },
       {
         "id": "Community-Choice",
         "name": "Community Choice",
-        "bonus_points": 10,
+        "bonus_points": 1,
         "description": "Participant vote winner."
       },
       {
         "id": "Best-Newcomer",
         "name": "Best Newcomer Team",
-        "bonus_points": 5,
+        "bonus_points": 1,
         "description": "Best submission from first-time hackathon participants."
       }
     ],
     "rubric": {
-      "core_max_points": 100,
-      "side_bonus_cap": 30,
+      "core_max_points": 7,
+      "side_bonus_cap": 3,
       "criteria": [
         {
           "name": "Implementation Quality",
-          "points": 30
+          "points": 2
         },
         {
           "name": "Challenge Fit",
-          "points": 25
+          "points": 2
         },
         {
           "name": "Innovation",
-          "points": 20
+          "points": 1
         },
         {
           "name": "Demo Clarity",
-          "points": 15
+          "points": 1
         },
         {
           "name": "Open Source Readiness",
-          "points": 10
+          "points": 1
         }
-      ]
+      ],
+      "total_cap": 10
     },
     "organizer_learnings": [
       "Team size: 1-4 builders. Require individual registration for fair credit assignment.",
