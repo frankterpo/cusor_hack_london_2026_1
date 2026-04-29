@@ -294,7 +294,7 @@ async function renderSummaryTable(rows) {
       <td style="text-align:center">${flagChip(row.has_bulk_commits)}</td>
       <td style="text-align:center">${flagChip(row.has_large_initial_commit_after_t0)}</td>
       <td style="text-align:center">${flagChip(row.has_merge_commits)}</td>
-      <td style="text-align:center">${(submission?.uses_white_circle || row.uses_white_circle) ? '<span style="color:#3dffa3;font-weight:bold;">YES</span>' : '<span style="color:#555;">NO</span>'}</td>
+      <td style="text-align:center">${(submission?.uses_specter || row.uses_specter) ? '<span style="color:#3dffa3;font-weight:bold;">YES</span>' : '<span style="color:#555;">NO</span>'}</td>
       <td>${getAIPreview(aiText)}</td>
     `;
     tr.addEventListener("click", () => openDrawer(repoId));

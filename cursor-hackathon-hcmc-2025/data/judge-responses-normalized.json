@@ -88,10 +88,10 @@
         "blurb": "How effectively the build used Cursor — editor, agents, and workflow — end to end."
       },
       {
-        "id": "best_use_white_circle",
-        "name": "Best use of White Circle",
+        "id": "best_use_specter",
+        "name": "Best use of Specter",
         "points": 8,
-        "blurb": "Standout use of White Circle for safety, policy, or guardrails in the product."
+        "blurb": "Standout use of Specter's API, MCP, or data for market intelligence in the product."
       },
       {
         "id": "best_use_financial_practices",
@@ -183,8 +183,8 @@
         "tier": "design-partner"
       },
       {
-        "name": "White Circle",
-        "tier": "ai-safety"
+        "name": "Specter",
+        "tier": "market-intelligence"
       },
       {
         "name": "OpenAI",
@@ -253,7 +253,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -331,7 +331,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -408,7 +408,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -485,7 +485,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -546,7 +546,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -623,7 +623,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -700,7 +700,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -777,7 +777,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -838,7 +838,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -883,7 +883,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -962,7 +962,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -1023,7 +1023,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -1084,7 +1084,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -1145,7 +1145,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -1206,7 +1206,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -1267,7 +1267,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -1328,7 +1328,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -1390,7 +1390,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -1451,7 +1451,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -1512,7 +1512,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -1573,7 +1573,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -1635,7 +1635,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -1696,7 +1696,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -1757,7 +1757,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -1818,7 +1818,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -1879,7 +1879,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -1940,7 +1940,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -2001,7 +2001,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -2062,7 +2062,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -2123,7 +2123,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -2184,7 +2184,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -2246,7 +2246,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -2307,7 +2307,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -2368,7 +2368,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -2413,7 +2413,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -2475,7 +2475,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -2536,7 +2536,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -2598,7 +2598,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -2659,7 +2659,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -2720,7 +2720,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -2781,7 +2781,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -2842,7 +2842,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -2903,7 +2903,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -2964,7 +2964,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -3025,7 +3025,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -3087,7 +3087,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },
@@ -3149,7 +3149,7 @@
         },
         "bonus_bucket_scores": {
           "best_use_cursor": 0.0,
-          "best_use_white_circle": 0.0,
+          "best_use_specter": 0.0,
           "best_use_financial_practices": 0.0,
           "best_use_llm_models": 0.0
         },

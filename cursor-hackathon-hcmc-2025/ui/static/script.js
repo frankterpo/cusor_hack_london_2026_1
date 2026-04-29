@@ -2386,6 +2386,122 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Modal open triggers
+  // Cursor SDK bonus: JS-controlled fixed popover so it cannot be clipped by cards.
+  const subtrackSdkPopovers = [];
+
+  function positionSubtrackSdkPopover(btn, pop) {
+    const gap = 8;
+    const margin = 14;
+    const rect = btn.getBoundingClientRect();
+    const width = Math.min(292, window.innerWidth - margin * 2);
+    pop.style.width = `${width}px`;
+    pop.style.left = `${Math.min(Math.max(margin, rect.right - width), window.innerWidth - width - margin)}px`;
+
+    const height = pop.offsetHeight || 0;
+    const above = rect.top - height - gap;
+    const below = rect.bottom + gap;
+    pop.style.top = `${above >= margin ? above : Math.min(below, window.innerHeight - height - margin)}px`;
+  }
+
+  function closeAllSubtrackSdkPopovers(exceptWrap) {
+    subtrackSdkPopovers.forEach((item) => {
+      if (exceptWrap && item.wrap === exceptWrap) return;
+      item.pinned = false;
+      item.wrap.classList.remove("subtrack-sdk-open");
+      item.pop.classList.remove("subtrack-sdk-popover--open");
+      item.pop.dataset.pinned = "false";
+      item.btn.setAttribute("aria-expanded", "false");
+    });
+  }
+
+  function openSubtrackSdkPopover(item, pinned) {
+    closeAllSubtrackSdkPopovers(item.wrap);
+    item.pinned = !!pinned;
+    item.wrap.classList.add("subtrack-sdk-open");
+    item.pop.classList.add("subtrack-sdk-popover--open");
+    item.pop.dataset.pinned = item.pinned ? "true" : "false";
+    item.btn.setAttribute("aria-expanded", "true");
+    positionSubtrackSdkPopover(item.btn, item.pop);
+  }
+
+  function maybeCloseSubtrackSdkPopover(item) {
+    window.setTimeout(() => {
+      const active = document.activeElement;
+      const hasFocus = item.wrap.contains(active) || item.pop.contains(active);
+      const isHovering = item.wrap.matches(":hover") || item.pop.matches(":hover");
+      if (item.pinned || hasFocus || isHovering) return;
+      closeAllSubtrackSdkPopovers();
+    }, 80);
+  }
+
+  document.querySelectorAll(".subtrack-info-wrap").forEach((wrap) => {
+    const btn = wrap.querySelector(".subtrack-info-btn");
+    const pop = btn && document.getElementById(btn.getAttribute("aria-controls") || "");
+    if (!btn || !pop) return;
+    if (pop.parentElement !== document.body) {
+      document.body.appendChild(pop);
+    }
+    const item = { wrap, btn, pop, pinned: false };
+    subtrackSdkPopovers.push(item);
+
+    btn.addEventListener("mouseenter", () => {
+      if (!item.pinned) openSubtrackSdkPopover(item, false);
+    });
+    btn.addEventListener("focus", () => {
+      if (!item.pinned) openSubtrackSdkPopover(item, false);
+    });
+    wrap.addEventListener("mouseleave", () => maybeCloseSubtrackSdkPopover(item));
+    pop.addEventListener("mouseenter", () => {
+      if (!item.pinned) openSubtrackSdkPopover(item, false);
+    });
+    pop.addEventListener("mouseleave", () => maybeCloseSubtrackSdkPopover(item));
+    pop.addEventListener("click", (e) => e.stopPropagation());
+    pop.addEventListener("focusout", () => maybeCloseSubtrackSdkPopover(item));
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (item.pinned) {
+        closeAllSubtrackSdkPopovers();
+      } else {
+        openSubtrackSdkPopover(item, true);
+      }
+    });
+  });
+  document.addEventListener("click", (e) => {
+    const t = e.target;
+    if (
+      t &&
+      typeof t.closest === "function" &&
+      (t.closest(".subtrack-info-wrap") || t.closest(".subtrack-sdk-popover"))
+    ) {
+      return;
+    }
+    closeAllSubtrackSdkPopovers();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    const open = document.querySelector(".subtrack-info-wrap.subtrack-sdk-open .subtrack-info-btn");
+    closeAllSubtrackSdkPopovers();
+    if (open) open.focus();
+  });
+  window.addEventListener("resize", () => {
+    subtrackSdkPopovers.forEach((item) => {
+      if (item.wrap.classList.contains("subtrack-sdk-open")) {
+        positionSubtrackSdkPopover(item.btn, item.pop);
+      }
+    });
+  });
+  window.addEventListener(
+    "scroll",
+    () => {
+      subtrackSdkPopovers.forEach((item) => {
+        if (item.wrap.classList.contains("subtrack-sdk-open")) {
+          positionSubtrackSdkPopover(item.btn, item.pop);
+        }
+      });
+    },
+    true
+  );
+
   document.querySelectorAll("[data-open-modal]").forEach((btn) => {
     btn.addEventListener("click", () => openModal(btn.dataset.openModal));
   });
@@ -2536,8 +2652,15 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   (function initContextLightbox() {
-    const N = 11;
+    const N = 12;
     const GALLERY = [
+      {
+        src: "context-signals/12-cursor-sdk.png?v=1",
+        href: "https://x.com/cursor_ai/status/2049499866217185492?s=20",
+        href2: null,
+        title: "Cursor SDK",
+        desc: "Programmatic agents with the same runtime, harness, and models as Cursor—CI/CD, bespoke automations, or embedded in products.",
+      },
       {
         src: "context-signals/01.png?v=3",
         href: "https://x.com/RogoAI/status/2044445676134654303",

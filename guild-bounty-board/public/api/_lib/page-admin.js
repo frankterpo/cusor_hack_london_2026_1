@@ -82,7 +82,7 @@ module.exports = `
               <th class="th-flag">Bulk</th>
               <th class="th-flag">Init</th>
               <th class="th-flag">Merge</th>
-              <th class="th-flag">WC</th>
+              <th class="th-flag" title="Heuristic: repo text suggests Specter API/MCP">Specter</th>
               <th class="th-ai">AI Summary</th>
             </tr>
           </thead>

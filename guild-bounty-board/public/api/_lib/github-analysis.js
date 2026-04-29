@@ -275,31 +275,32 @@ function buildSummaryRow(repoId, repoUrl, defaultBranch, metrics, t0, t1) {
   };
 }
 
-async function searchRepoForWhiteCircle(owner, repo) {
+/** Heuristic: repo references Specter (TrySpecter API, MCP, or branding). */
+async function searchRepoForSpecter(owner, repo) {
   try {
-    // Fetch full tree recursively
     const treeRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/trees/HEAD?recursive=1`, { headers: getGitHubHeaders() });
     if (!treeRes.ok) return false;
     const treeData = await treeRes.json();
     const files = (treeData.tree || []).filter(t => t.type === "blob").map(t => t.path);
 
-    // Check filenames (cheap)
+    const filePat = /tryspecter|specterhq|specter[_-]?mcp|api\.tryspecter/i;
     for (const f of files) {
-      if (/whitecircle|white[_-]circle/i.test(f)) return true;
+      if (filePat.test(f)) return true;
     }
 
-    // Check contents of likely files
     const codeExts = /\.(py|js|ts|tsx|jsx|md|json|yml|yaml|env|toml|txt|sh)$/i;
     const toCheck = files.filter(f => codeExts.test(f)).slice(0, 50);
 
+    const contentPat =
+      /tryspecter\.com|api\.tryspecter|specterhq|specter\s*mcp|\bmcp\b[^\n]{0,120}specter|specter[^\n]{0,120}\bmcp\b/i;
     for (const path of toCheck) {
       try {
         const fileRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`, { headers: getGitHubHeaders() });
         if (!fileRes.ok) continue;
         const fileData = await fileRes.json();
         if (fileData.content) {
-          const content = Buffer.from(fileData.content, "base64").toString("utf-8").toLowerCase();
-          if (/whitecircle|white[_-]circle/i.test(content)) return true;
+          const content = Buffer.from(fileData.content, "base64").toString("utf-8");
+          if (contentPat.test(content)) return true;
         }
       } catch (_) {}
     }
@@ -324,7 +325,7 @@ async function analyzeGitHubRepo(repoUrl, settingsOverride = null) {
   const t1 = parseIsoDatetime(settings.event_t1);
   const metrics = computeMetrics(commitDetails, t0, t1, settings);
   const commits = metrics.commits.map((commit) => ({ ...commit, repo_id: parsedRepo.repoId }));
-  const usesWhiteCircle = await searchRepoForWhiteCircle(parsedRepo.owner, parsedRepo.repo);
+  const usesSpecter = await searchRepoForSpecter(parsedRepo.owner, parsedRepo.repo);
 
   return {
     repo_id: parsedRepo.repoId,
@@ -347,7 +348,7 @@ async function analyzeGitHubRepo(repoUrl, settingsOverride = null) {
     flags: metrics.flags,
     analysis_settings: settings,
     commits,
-    uses_white_circle: usesWhiteCircle,
+    uses_specter: usesSpecter,
     summary_row: buildSummaryRow(parsedRepo.repoId, parsedRepo.normalizedUrl, defaultBranch, metrics, t0, t1),
   };
 }

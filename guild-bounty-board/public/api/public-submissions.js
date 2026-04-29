@@ -21,7 +21,7 @@ module.exports = async (req, res) => {
       chosen_track: s.chosen_track || "",
       repo_url: s.repo_url || "",
       demo_url: s.demo_url || "",
-      uses_white_circle: s.uses_white_circle === true,
+      uses_specter: s.uses_specter === true,
     }));
     return sendJson(res, 200, { submissions: safe });
   } catch (error) {

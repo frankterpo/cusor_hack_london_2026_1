@@ -57,7 +57,7 @@ module.exports = async (req, res) => {
           ai_generated_at: analysis.ai_generated_at || null,
           ai_error: analysis.ai_error || "",
           default_branch: analysis.default_branch || "",
-          uses_white_circle: analysis.uses_white_circle === true,
+          uses_specter: analysis.uses_specter === true,
           total_commits: summaryRow.total_commits || 0,
           total_commits_before_t0: summaryRow.total_commits_before_t0 || 0,
           total_commits_during_event: summaryRow.total_commits_during_event || 0,

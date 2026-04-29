@@ -116,7 +116,7 @@ module.exports = async (req, res) => {
         analyzed_at: analysis.generated_at,
         analysis_error: "",
         default_branch: analysis.default_branch || "",
-        uses_white_circle: analysis.uses_white_circle === true,
+        uses_specter: analysis.uses_specter === true,
         ai_text: analysis.ai_text || "",
         ai_model: analysis.ai_model || "",
         ai_generated_at: analysis.ai_generated_at || null,
