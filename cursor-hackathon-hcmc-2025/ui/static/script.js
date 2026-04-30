@@ -127,6 +127,19 @@ function normalizeJudgeName(s) {
     .trim();
 }
 
+/**
+ * Bidirectional fuzzy match — same logic as getJudgeIndex but for any pair.
+ * Handles "Jan" ↔ "Ján Stehlík" (substring). Used by coverage view so a
+ * panel judge's chip turns green even when they typed a short form.
+ */
+function judgeMatchesPool(typedName, poolName) {
+  const a = normalizeJudgeName(typedName);
+  const b = normalizeJudgeName(poolName);
+  if (!a || !b) return false;
+  if (a === b) return true;
+  return a.includes(b) || b.includes(a);
+}
+
 function getJudgePool() {
   const list = eventFormat && Array.isArray(eventFormat.judges) ? eventFormat.judges : [];
   return list.filter((j) => j && j.name);
@@ -2009,19 +2022,19 @@ function renderJudgeCoverageChips(allEntries) {
   const chips = [];
 
   if (selected) {
-    const scoredSet = new Set((selected.scoredBy || []).map(normalizeJudgeName));
+    const scorers = selected.scoredBy || [];
     pool.forEach((j) => {
-      const has = scoredSet.has(normalizeJudgeName(j.name));
+      const has = scorers.some((nm) => judgeMatchesPool(nm, j.name));
       chips.push(
         `<span class="judge-cov-chip ${has ? "is-scored" : "is-pending"}" title="${escapeAttr(
           (has ? "Scored: " : "Awaiting: ") + j.name
         )}">${has ? "✓ " : ""}${escapeHtml(j.name)}</span>`
       );
     });
-    // Walk-in (non-configured) judges who scored this submission
-    const poolNorm = new Set(pool.map((j) => normalizeJudgeName(j.name)));
-    (selected.scoredBy || []).forEach((name) => {
-      if (!poolNorm.has(normalizeJudgeName(name))) {
+    // Walk-in scorers: nobody in the panel matches this name
+    scorers.forEach((name) => {
+      const matches = pool.some((j) => judgeMatchesPool(name, j.name));
+      if (!matches) {
         chips.push(
           `<span class="judge-cov-chip is-extra" title="${escapeAttr(
             "Scored (walk-in): " + name
@@ -2031,7 +2044,7 @@ function renderJudgeCoverageChips(allEntries) {
     });
     const totalConfigured = pool.length;
     const scoredFromPool = pool.filter((j) =>
-      scoredSet.has(normalizeJudgeName(j.name))
+      scorers.some((nm) => judgeMatchesPool(nm, j.name))
     ).length;
     host.innerHTML = `<span class="judge-cov-meta">${escapeHtml(selected.name)} · ${scoredFromPool}/${totalConfigured} of panel scored</span>${chips.join(
       ""
@@ -2043,37 +2056,36 @@ function renderJudgeCoverageChips(allEntries) {
       host.innerHTML = "";
       return;
     }
-    const counts = {};
-    pool.forEach((j) => {
-      counts[normalizeJudgeName(j.name)] = 0;
-    });
-    let walkIn = 0;
-    const poolNorm = new Set(pool.map((j) => normalizeJudgeName(j.name)));
+    const poolCounts = pool.map(() => 0);
+    const walkInCounts = new Map();
     allEntries.forEach((e) => {
       (e.scoredBy || []).forEach((nm) => {
-        const k = normalizeJudgeName(nm);
-        if (k in counts) counts[k] += 1;
-        else if (!poolNorm.has(k)) walkIn += 1;
+        const matchedIdx = pool.findIndex((j) => judgeMatchesPool(nm, j.name));
+        if (matchedIdx !== -1) {
+          poolCounts[matchedIdx] += 1;
+        } else {
+          walkInCounts.set(nm, (walkInCounts.get(nm) || 0) + 1);
+        }
       });
     });
-    pool.forEach((j) => {
-      const k = normalizeJudgeName(j.name);
-      const c = counts[k];
+    pool.forEach((j, i) => {
+      const c = poolCounts[i];
       chips.push(
         `<span class="judge-cov-chip ${c > 0 ? "is-scored" : "is-pending"}" title="${escapeAttr(
           `${j.name}: ${c}/${totalSubs} scored`
         )}">${escapeHtml(j.name)} <em>${c}/${totalSubs}</em></span>`
       );
     });
+    Array.from(walkInCounts.entries()).forEach(([nm, c]) => {
+      chips.push(
+        `<span class="judge-cov-chip is-extra" title="${escapeAttr(
+          `${nm}: ${c}/${totalSubs} scored (walk-in)`
+        )}">+ ${escapeHtml(nm)} <em>${c}/${totalSubs}</em></span>`
+      );
+    });
     host.innerHTML = `<span class="judge-cov-meta">Pick a submission to see who scored it. Across ${totalSubs}:</span>${chips.join(
       ""
-    )}${
-      walkIn
-        ? `<span class="judge-cov-chip is-extra" title="${escapeAttr(
-            "Walk-in scores: " + walkIn
-          )}">+ ${walkIn} walk-in</span>`
-        : ""
-    }`;
+    )}`;
   }
 }
 
