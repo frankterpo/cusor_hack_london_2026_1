@@ -68,6 +68,23 @@ module.exports = async (req, res) => {
     if (submission.repo_key === TEMPLATE_REPO_KEY) {
       return sendJson(res, 400, { error: "Please replace the example/template repository URL with your real project repository." });
     }
+    if (!submission.demo_url) {
+      return sendJson(res, 400, {
+        error: "Demo URL is required — paste a YouTube/Loom/recording link.",
+      });
+    }
+    try {
+      const u = new URL(submission.demo_url);
+      if (!/^https?:$/.test(u.protocol)) {
+        return sendJson(res, 400, {
+          error: "Demo URL must be a full https:// link.",
+        });
+      }
+    } catch (_e) {
+      return sendJson(res, 400, {
+        error: "Demo URL must be a valid URL (e.g. https://youtu.be/xxxx).",
+      });
+    }
 
     let nextSubmission = {
       ...submission,

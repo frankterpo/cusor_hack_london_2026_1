@@ -1530,6 +1530,24 @@ async function handleSubmitForm(e) {
   e.preventDefault();
   const form = e.target;
   const data = Object.fromEntries(new FormData(form).entries());
+  const demoUrl = String(data.demo_url || "").trim();
+  const focusDemo = () => {
+    const demoInput = form.querySelector('input[name="demo_url"]');
+    if (demoInput) demoInput.focus();
+  };
+  if (!demoUrl) {
+    toast("Demo URL is required — paste a YouTube/Loom/recording link.");
+    focusDemo();
+    return;
+  }
+  try {
+    const u = new URL(demoUrl);
+    if (!/^https?:$/.test(u.protocol)) throw new Error("Invalid demo URL");
+  } catch {
+    toast("Demo URL must be a full https:// link.");
+    focusDemo();
+    return;
+  }
   const entry = {
     submitted_at: new Date().toISOString(),
     hack_id: getActiveHackId(),
@@ -1537,7 +1555,7 @@ async function handleSubmitForm(e) {
     project_name: data.project_name || "",
     repo_url: data.github_url || "",
     chosen_track: data.chosen_track || "",
-    demo_url: data.demo_url || "",
+    demo_url: demoUrl,
     team_members: data.team_members || "",
     description: data.description || "",
     notes: data.notes || "",
@@ -3015,6 +3033,15 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("[data-open-modal]").forEach((btn) => {
     btn.addEventListener("click", () => openModal(btn.dataset.openModal));
   });
+  const requestedModal = new URLSearchParams(window.location.search).get("open");
+  const modalByRequest = {
+    submit: "submit-modal",
+    judge: "judge-modal",
+    manager: "manager-modal",
+  };
+  if (modalByRequest[requestedModal]) {
+    window.setTimeout(() => openModal(modalByRequest[requestedModal]), 120);
+  }
   document.querySelectorAll("[data-close-modal]").forEach((el) => {
     el.addEventListener("click", () => {
       const modal = el.closest(".modal");
