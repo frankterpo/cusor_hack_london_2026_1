@@ -2139,7 +2139,7 @@ html {
   background: var(--primary-900);
 }
 
-/* Submit project: loading ring + spinner */
+/* Submit project: loading glow + inline spinner (no spinning border) */
 .btn-submit-project {
   position: relative;
   display: inline-flex;
@@ -2149,7 +2149,6 @@ html {
   min-width: 11.5rem;
   overflow: visible;
 }
-.btn-submit-project .btn-submit-ring,
 .btn-submit-project .btn-submit-aura,
 .btn-submit-project .btn-submit-spinner {
   display: none;
@@ -2157,34 +2156,11 @@ html {
 .btn-submit-project.is-loading {
   cursor: wait;
 }
-.btn-submit-project.is-loading .btn-submit-ring,
 .btn-submit-project.is-loading .btn-submit-aura {
   display: block;
 }
 .btn-submit-project.is-loading .btn-submit-spinner {
   display: block;
-}
-.btn-submit-project .btn-submit-ring {
-  position: absolute;
-  inset: -4px;
-  border-radius: calc(var(--r-md) + 3px);
-  pointer-events: none;
-  background: conic-gradient(
-    from 0deg,
-    transparent 0deg 55deg,
-    rgba(255, 255, 255, 0.95) 72deg,
-    rgba(196, 181, 253, 0.9) 110deg,
-    rgba(125, 211, 252, 0.85) 150deg,
-    transparent 200deg 360deg
-  );
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  mask-composite: exclude;
-  padding: 2px;
-  opacity: 0.92;
-  animation: submit-btn-ring-spin 1.1s linear infinite;
-  z-index: 1;
 }
 .btn-submit-project .btn-submit-aura {
   position: absolute;
@@ -2223,11 +2199,6 @@ html {
 .btn-submit-project.is-loading .btn-submit-label {
   letter-spacing: 0.02em;
   opacity: 0.96;
-}
-@keyframes submit-btn-ring-spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 @keyframes submit-btn-aura-pulse {
   0%,
@@ -4714,7 +4685,6 @@ html {
   .toast--success .toast-meta {
     animation: none;
   }
-  .btn-submit-project .btn-submit-ring,
   .btn-submit-project .btn-submit-aura,
   .btn-submit-project .btn-submit-spinner {
     animation: none !important;
