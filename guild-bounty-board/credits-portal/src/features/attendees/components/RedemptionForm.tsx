@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { AttendeeAutocomplete } from './AttendeeAutocomplete';
-import { maskEmail } from '@/lib/utils';
 import type { AttendeeForSuggestion } from '../hooks/useAttendees';
 import type { AttendeeValidationResponse } from '../model';
 
@@ -18,22 +17,17 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
   const [error, setError] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [selectedAttendee, setSelectedAttendee] = useState<AttendeeForSuggestion | null>(null);
-  const [expectedEmail, setExpectedEmail] = useState<string | null>(null);
+  const [selectedAttendee, setSelectedAttendee] =
+    useState<AttendeeForSuggestion | null>(null);
+  const [emailHint, setEmailHint] = useState<string | null>(null);
   const effectiveProjectId = selectedAttendee?.projectId || projectId;
 
   const handleAttendeeSelect = (attendee: AttendeeForSuggestion | null) => {
     setSelectedAttendee(attendee);
     setError(null);
+    setEmailHint(null);
     if (attendee) {
       setName(attendee.name);
-      setCurrentStep('name');
-      setExpectedEmail(attendee.email);
-      setEmail(attendee.email);
-    } else {
-      setCurrentStep('name');
-      setExpectedEmail(null);
-      setEmail('');
     }
   };
 
@@ -61,49 +55,14 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
       });
       const result = await response.json();
       const validationData = result.data as AttendeeValidationResponse;
-      if (!result.success || !validationData.isValid) throw new Error(validationData.error || 'Name validation failed');
-      if (validationData.hasAlreadyRedeemed && validationData.cursorUrl) {
-        const params = new URLSearchParams({
-          cursorUrl: validationData.cursorUrl,
-          name: name.trim(),
-        });
-        window.location.href = `/credits/success?${params.toString()}`;
-        return;
-      }
-      if (validationData.hasAlreadyRedeemed) {
-        throw new Error(
-          'A code is already assigned to this guest, but the referral link could not be loaded. Ask an organizer.'
-        );
+      if (!result.success || !validationData.isValid) {
+        throw new Error(validationData.error || 'Name validation failed');
       }
       const resolved = validationData.resolvedName?.trim() || name.trim();
-      const resolvedEmail = validationData.expectedEmail || selectedAttendee?.email || '';
       setName(resolved);
-      setExpectedEmail(resolvedEmail || null);
-      if (resolvedEmail) setEmail(resolvedEmail);
-
-      if (!resolvedEmail) {
-        throw new Error('This attendee is missing an email in the checked-in guest list. Ask an organizer.');
-      }
-
-      const redeemResponse = await fetch('/credits/api/redeem', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: resolved,
-          email: resolvedEmail.toLowerCase().trim(),
-          projectId: effectiveProjectId,
-          eventId: effectiveProjectId ? undefined : 'sample-event-1',
-        }),
-      });
-      const redeemResult = await redeemResponse.json();
-      if (!redeemResult.success) {
-        throw new Error(redeemResult.error || 'Failed to claim code');
-      }
-      const params = new URLSearchParams({
-        cursorUrl: redeemResult.data.cursorUrl,
-        name: redeemResult.data.name || resolved,
-      });
-      window.location.href = `/credits/success?${params.toString()}`;
+      setEmailHint(validationData.expectedEmail?.trim() || null);
+      setEmail('');
+      setCurrentStep('email');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Validation failed');
     } finally {
@@ -112,8 +71,8 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
   };
 
   const validateEmailStep = async () => {
-    const emailForValidation = (expectedEmail || email).toLowerCase().trim();
-    if (!emailForValidation) {
+    const typed = email.trim().toLowerCase();
+    if (!typed) {
       setError('Please enter your email address');
       return;
     }
@@ -126,14 +85,16 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
         body: JSON.stringify({
           step: 'email',
           name: name.trim(),
-          email: emailForValidation,
+          email: typed,
           projectId: effectiveProjectId,
           eventId: effectiveProjectId ? undefined : 'sample-event-1',
         }),
       });
       const result = await response.json();
       const validationData = result.data as AttendeeValidationResponse;
-      if (!result.success || !validationData.isValid) throw new Error(validationData.error || 'Email validation failed');
+      if (!result.success || !validationData.isValid) {
+        throw new Error(validationData.error || 'Email validation failed');
+      }
       if (validationData.hasAlreadyRedeemed && validationData.cursorUrl) {
         const params = new URLSearchParams({
           cursorUrl: validationData.cursorUrl,
@@ -141,11 +102,6 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
         });
         window.location.href = `/credits/success?${params.toString()}`;
         return;
-      }
-      if (validationData.hasAlreadyRedeemed) {
-        throw new Error(
-          'A code is already assigned to this guest, but the referral link could not be loaded. Ask an organizer.'
-        );
       }
       setCurrentStep('ready');
     } catch (err) {
@@ -156,7 +112,6 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
   };
 
   const handleRedemption = async () => {
-    const emailForRedemption = (expectedEmail || email).toLowerCase().trim();
     setIsLoading(true);
     setError(null);
     try {
@@ -165,14 +120,17 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: name.trim(),
-          email: emailForRedemption,
+          email: email.trim().toLowerCase(),
           projectId: effectiveProjectId,
           eventId: effectiveProjectId ? undefined : 'sample-event-1',
         }),
       });
       const result = await response.json();
       if (!result.success) throw new Error(result.error || 'Failed to claim code');
-      const params = new URLSearchParams({ cursorUrl: result.data.cursorUrl, name: result.data.name });
+      const params = new URLSearchParams({
+        cursorUrl: result.data.cursorUrl,
+        name: result.data.name || name.trim(),
+      });
       window.location.href = `/credits/success?${params.toString()}`;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Redemption failed');
@@ -184,7 +142,7 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
   const resetToNameStep = () => {
     setCurrentStep('name');
     setEmail('');
-    setExpectedEmail(null);
+    setEmailHint(null);
     setError(null);
   };
 
@@ -194,10 +152,13 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="font-display text-sm font-semibold text-primary">Attendee info</h3>
+        <h3 className="font-display text-sm font-semibold text-primary">
+          Attendee info
+        </h3>
         <p className="mt-1 text-sm text-muted-foreground">
-          {currentStep === 'name' && 'Select your checked-in name'}
-          {currentStep === 'email' && 'Step 2: Confirm your email'}
+          {currentStep === 'name' && 'Step 1: Find your checked-in name'}
+          {currentStep === 'email' &&
+            'Step 2: Confirm the email you registered with'}
           {currentStep === 'ready' && 'Ready to claim your code'}
         </p>
       </div>
@@ -220,7 +181,7 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
                 disabled={!selectedAttendee || isLoading}
                 className="btn-event-primary w-full py-3 text-sm disabled:opacity-50"
               >
-                {isLoading ? 'Claiming…' : 'Claim my Cursor credits'}
+                {isLoading ? 'Checking…' : 'Continue'}
               </button>
             </>
           ) : (
@@ -240,21 +201,23 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
 
         {(currentStep === 'email' || currentStep === 'ready') && (
           <div className="space-y-3">
-            <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-muted-foreground">Email</label>
-            {expectedEmail && (
+            <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Email
+            </label>
+            {emailHint && (
               <p className="text-sm text-muted-foreground">
-                Match: <span className="font-medium text-accent-foreground">{maskEmail(expectedEmail)}</span>
+                Hint:{' '}
+                <span className="font-medium text-accent-foreground">
+                  {emailHint}
+                </span>
               </p>
             )}
             <input
               type="email"
               autoComplete="email"
-              placeholder="Enter your email address"
+              placeholder="Enter your registered email address"
               value={email}
-              onChange={(e) => {
-                if (!expectedEmail) setEmail(e.target.value);
-              }}
-              readOnly={!!expectedEmail}
+              onChange={(e) => setEmail(e.target.value)}
               disabled={currentStep === 'ready' || isLoading}
               className={inputClass}
             />
@@ -274,7 +237,7 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
                   disabled={!email.trim() || isLoading}
                   className="btn-event-primary flex-1 py-2.5 text-sm disabled:opacity-50"
                 >
-                  {isLoading ? 'Validating…' : 'Verify'}
+                  {isLoading ? 'Verifying…' : 'Verify email'}
                 </button>
               )}
             </div>
@@ -284,7 +247,7 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
         {currentStep === 'ready' && (
           <div className="space-y-4">
             <div className="rounded-md border border-primary/40 bg-primary/10 px-3 py-3 text-sm text-foreground">
-              Name and email verified. Ready to claim your Cursor code.
+              Name and email verified. Ready to claim your Cursor credits.
             </div>
             <button
               type="button"
@@ -292,13 +255,15 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
               disabled={isLoading}
               className="btn-event-primary w-full py-3.5 text-sm disabled:opacity-50"
             >
-              {isLoading ? 'Claiming…' : 'Claim my Cursor code'}
+              {isLoading ? 'Claiming…' : 'Claim my Cursor credits'}
             </button>
           </div>
         )}
 
         {error && currentStep !== 'name' && (
-          <div className="rounded-md border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</div>
+          <div className="rounded-md border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            {error}
+          </div>
         )}
       </div>
     </div>

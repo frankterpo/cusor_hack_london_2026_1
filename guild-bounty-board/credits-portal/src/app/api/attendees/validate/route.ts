@@ -28,6 +28,19 @@ function findStaticAssignment(nameInput: string, emailInput?: string) {
   });
 }
 
+function maskedEmail(em: string): string {
+  const at = em.indexOf('@');
+  if (at <= 1) return em.replace(/.(?=.{2})/g, '*');
+  const local = em.slice(0, at);
+  const domain = em.slice(at + 1);
+  const dot = domain.lastIndexOf('.');
+  const dHead = dot > 0 ? domain.slice(0, dot) : domain;
+  const dTail = dot > 0 ? domain.slice(dot) : '';
+  return `${local[0]}${'*'.repeat(Math.max(local.length - 1, 1))}@${'*'.repeat(
+    Math.max(dHead.length, 1)
+  )}${dTail}`;
+}
+
 async function findAttendeeInProject(
   projectId: string,
   nameInput: string,
@@ -149,9 +162,8 @@ async function validateNameStep(
           isValid: true,
           attendeeId: staticAssignment.attendeeId,
           resolvedName: staticAssignment.name,
-          expectedEmail: staticAssignment.email,
-          hasAlreadyRedeemed: Boolean(staticAssignment.cursorUrl),
-          cursorUrl: staticAssignment.cursorUrl || undefined,
+          expectedEmail: maskedEmail(staticAssignment.email),
+          hasAlreadyRedeemed: false,
           error: undefined,
         };
         return NextResponse.json({ success: true, data: response });
@@ -185,18 +197,13 @@ async function validateNameStep(
       return NextResponse.json({ success: true, data: response });
     }
 
-    const cursorUrl = hasAlreadyRedeemed
-      ? await cursorUrlAlreadyAssigned(attendeeDoc.id, attendeeData as Record<string, unknown>)
-      : undefined;
-
     const resolvedName = String(attendeeData.name ?? name).trim();
     const response: AttendeeValidationResponse = {
       isValid: true,
       attendeeId: attendeeDoc.id,
       resolvedName,
-      expectedEmail: String(attendeeData.email ?? '').trim(),
-      hasAlreadyRedeemed,
-      cursorUrl: cursorUrl || undefined,
+      expectedEmail: maskedEmail(String(attendeeData.email ?? '').trim()),
+      hasAlreadyRedeemed: false,
       error: undefined,
     };
 
