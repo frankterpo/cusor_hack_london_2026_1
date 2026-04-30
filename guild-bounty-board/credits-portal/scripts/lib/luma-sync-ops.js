@@ -26,18 +26,35 @@ function pick(obj, ...keys) {
   return undefined;
 }
 
+/** Strip outer quotes from .env paste; Luma admin API requires the full Cookie header string. */
+function normalizeLumaCookie(raw) {
+  let c = String(raw ?? "").trim();
+  if (
+    (c.startsWith("'") && c.endsWith("'")) ||
+    (c.startsWith('"') && c.endsWith('"'))
+  )
+    c = c.slice(1, -1).trim();
+  return c;
+}
+
 async function lumaFetch(url, cookieHeader) {
+  const origin =
+    process.env.LUMA_ORIGIN_HEADER || "https://luma.com";
+  const referer =
+    process.env.LUMA_REFERER ||
+    `${origin.replace(/\/$/, "")}/`;
   const res = await fetch(url, {
     headers: {
       accept: "application/json",
       ...(cookieHeader
         ? { cookie: cookieHeader, Cookie: cookieHeader }
         : {}),
+      "accept-language": process.env.LUMA_ACCEPT_LANGUAGE || "en-US,en;q=0.9",
       "user-agent":
         process.env.LUMA_USER_AGENT ||
-        "guild-bounty-luma-sync/1.0 (+ops private)",
-      referer: "https://lu.ma/",
-      origin: "https://lu.ma",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+      referer,
+      origin,
     },
   });
   const text = await res.text();
@@ -48,8 +65,16 @@ async function lumaFetch(url, cookieHeader) {
     json = null;
   }
   if (!res.ok) {
+    let hint = "";
+    if (res.status === 401 && String(url).includes("/event/admin/")) {
+      hint =
+        "\n\nHint: /user/profile/events may work without a session, but /event/admin/get-guests does not.\n" +
+        "Use the FULL Cookie string from DevTools on an api2.luma.com request (or pnpm ops:luma:cookie-from-chrome).\n" +
+        "In .env.local use LUMA_COOKIE=... with no surrounding quotes, or a single double-quoted value.\n" +
+        "Re-copy from a tab open at https://luma.com/event/manage/.../guests while logged in as host, then run sync immediately (cf_bm cookies expire).";
+    }
     const err = new Error(
-      `Luma HTTP ${res.status} ${res.statusText} for ${url}\n${text.slice(0, 500)}`
+      `Luma HTTP ${res.status} ${res.statusText} for ${url}\n${text.slice(0, 500)}${hint}`
     );
     err.status = res.status;
     throw err;
@@ -396,6 +421,8 @@ async function assignCodesForEligibleAttendees(
       !!x.lumaGuestApiId;
     if (!unredeemed) continue;
     if (!eligibleFlag) continue;
+    /** Only pair Cursor referral links with people who actually checked in (Luma or Firebase). */
+    if (!priorHadCheckedInFirestore(x)) continue;
     const em = normEmail(x.email);
     if (emailAllowlist && !emailAllowlist.has(em)) continue;
     pendingDocs.push(d);
@@ -494,8 +521,11 @@ async function computeAttendeeBalances(db, projectId) {
     if (x.hasRedeemedCode) redeemed += 1;
     else {
       notRed += 1;
-      if (x.lumaEligibleCheckedIn === true || x.source === "luma")
-        lumaUnredeemed += 1;
+      const lumaTagged =
+        x.lumaEligibleCheckedIn === true ||
+        x.source === "luma" ||
+        !!x.lumaGuestApiId;
+      if (lumaTagged && priorHadCheckedInFirestore(x)) lumaUnredeemed += 1;
     }
   }
   return {
@@ -516,8 +546,14 @@ async function runLumaCreditsSync(cli) {
     throw new Error("--project-id=<Firestore projects doc id>");
   if (!cli.dryRun && missing?.length)
     throw new Error("Missing Firebase env: " + missing.join(", "));
-  const cookie = process.env.LUMA_COOKIE?.trim();
+  const cookie = normalizeLumaCookie(process.env.LUMA_COOKIE);
   if (!cookie) throw new Error("Set LUMA_COOKIE in credits-portal/.env.local");
+  if (cookie.length < 80) {
+    console.warn(
+      `Warning: LUMA_COOKIE is only ${cookie.length} characters — expected a long browser Cookie header.\n` +
+        `If sync fails with 401, paste the full string from DevTools (Request Headers → cookie), not just luma.auth-session-key.\n`
+    );
+  }
 
   let app = cli.firebaseAppInstance || null;
   if (
@@ -605,7 +641,10 @@ async function runLumaCreditsSync(cli) {
     console.log(
       `Distinct late‑join emails tracked this run (for allowance): ${lateJoinerEmails ? lateJoinerEmails.size : 0}`
     );
-  } else console.log("Assignment scope: all unredeemed Luma-eligible attendees");
+  } else
+    console.log(
+      "Assignment scope: all unredeemed Luma-eligible attendees with checkedInAt set"
+    );
   console.log(`Luma checked-in guests considered: ${checkedIn.length}`);
   if (!cli.skipUpsert && !cli.dryRun && db) {
     console.log(`Inserted attendees (new docs): ${inserted}`);
@@ -727,6 +766,7 @@ Env: LUMA_COOKIE (required)`);
 
 module.exports = {
   LUMA_ORIGIN,
+  normalizeLumaCookie,
   lumaFetch,
   fetchHostingEventApi,
   fetchLumaProfileEvents,

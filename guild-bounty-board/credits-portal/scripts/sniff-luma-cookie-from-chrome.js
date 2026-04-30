@@ -120,9 +120,22 @@ function createCdpClient(wsCtor, wsUrl) {
   return { ready, send, close, ws };
 }
 
+/** Same cookie name may appear for multiple domains; last entry wins (CDP order). */
+function dedupeCookiesLastWins(cookies) {
+  if (!Array.isArray(cookies)) return [];
+  const byName = new Map();
+  for (const c of cookies) {
+    const name = String(c?.name || "");
+    if (!name) continue;
+    byName.set(name, c);
+  }
+  return Array.from(byName.values());
+}
+
 function buildCookieHeader(cookies) {
   if (!Array.isArray(cookies)) return "";
-  return cookies.map((c) => `${c.name}=${c.value}`).join("; ");
+  const list = dedupeCookiesLastWins(cookies);
+  return list.map((c) => `${c.name}=${c.value}`).join("; ");
 }
 
 /** @returns {readonly string[]} */
@@ -359,9 +372,15 @@ async function sniffFlow(printShellExport, hosts, port) {
     await client.ready;
     await client.send("Network.enable", {});
     const result = await client.send("Network.getCookies", {
-      urls: ["https://api2.luma.com/", "https://lu.ma/", "https://www.lu.ma/"],
+      urls: [
+        "https://api2.luma.com/",
+        "https://luma.com/",
+        "https://www.luma.com/",
+        "https://lu.ma/",
+        "https://www.lu.ma/",
+      ],
     });
-    const cookies = result?.cookies || [];
+    const cookies = dedupeCookiesLastWins(result?.cookies || []);
 
     const sessionCookie = cookies.find(
       (c) => String(c?.name || "") === "luma.auth-session-key"
@@ -370,8 +389,8 @@ async function sniffFlow(printShellExport, hosts, port) {
 
     if (!header.trim()) {
       console.warn(
-        "Chrome returned zero cookies for Luma URLs. Open https://lu.ma in a tab\n" +
-          "while logged in, then rerun (or rerun with --wait-for-login --launch-chrome)."
+        "Chrome returned zero cookies for Luma URLs. Open https://luma.com or https://lu.ma in a tab\n" +
+          "while logged in (e.g. event manage → guests), then rerun (or --wait-for-login --launch-chrome)."
       );
     }
 

@@ -108,7 +108,7 @@ export default function AdminDashboard() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="font-display text-2xl font-semibold text-foreground">Dashboard</h1>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={() => router.push('/credits/admin/uploads')}>
+          <Button variant="outline" onClick={() => router.push('/admin/uploads')}>
             Upload Data
           </Button>
           <Button onClick={fetchDashboardData}>Refresh</Button>
@@ -160,7 +160,7 @@ export default function AdminDashboard() {
                 ))}
 
                 {stats.recentRedemptions.length > 5 && (
-                  <Button variant="outline" size="sm" className="mt-2 w-full" onClick={() => router.push('/credits/admin/codes')}>
+                  <Button variant="outline" size="sm" className="mt-2 w-full" onClick={() => router.push('/admin/codes')}>
                     View codes & redemptions
                   </Button>
                 )}
@@ -177,13 +177,13 @@ export default function AdminDashboard() {
             <CardDescription>Common admin tasks</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Button className="w-full justify-start" variant="outline" onClick={() => router.push('/credits/admin/uploads')}>
+            <Button className="w-full justify-start" variant="outline" onClick={() => router.push('/admin/uploads')}>
               Upload New Codes
             </Button>
-            <Button className="w-full justify-start" variant="outline" onClick={() => router.push('/credits/admin/uploads')}>
+            <Button className="w-full justify-start" variant="outline" onClick={() => router.push('/admin/uploads')}>
               Upload Attendee List
             </Button>
-            <Button className="w-full justify-start" variant="outline" onClick={() => router.push('/credits/admin/codes')}>
+            <Button className="w-full justify-start" variant="outline" onClick={() => router.push('/admin/codes')}>
               View All Codes
             </Button>
             <Button className="w-full justify-start" variant="outline" onClick={openTestRedeem}>

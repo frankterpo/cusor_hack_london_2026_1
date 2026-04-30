@@ -38,6 +38,7 @@ const {
   fetchLumaProfileEvents,
   hostingEventSummaries,
   fetchLumaEventGet,
+  normalizeLumaCookie,
 } = require("./lib/luma-sync-ops.js");
 const { parseCodesCSV } = require("./lib/parse-codes-csv.cjs");
 const { insertHackathon, patchHackathon } = require("./lib/supabase-hackathons.cjs");
@@ -131,7 +132,7 @@ async function listFirestoreProjects(app) {
 }
 
 async function main() {
-  const cookie = process.env.LUMA_COOKIE?.trim();
+  const cookie = normalizeLumaCookie(process.env.LUMA_COOKIE);
   const { firebaseConfig, missing } = firebaseApp();
   if (!cookie)
     throw new Error(

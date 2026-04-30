@@ -37,7 +37,7 @@ export function SuccessContent() {
         </div>
 
         <p className="mt-8 text-center text-sm">
-          <Link href="/credits" className="text-primary hover:underline">
+          <Link href="/" className="text-primary hover:underline">
             ← Back to credits home
           </Link>
         </p>

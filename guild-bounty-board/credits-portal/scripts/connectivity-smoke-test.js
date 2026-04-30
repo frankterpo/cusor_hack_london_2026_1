@@ -54,6 +54,7 @@ const {
 const {
   fetchLumaProfileEvents,
   hostingEventSummaries,
+  normalizeLumaCookie,
 } = require("./lib/luma-sync-ops.js");
 
 const {
@@ -103,7 +104,7 @@ async function sbRest(method, path_, body, extraHeaders = {}) {
 }
 
 async function testLuma() {
-  const cookie = process.env.LUMA_COOKIE?.trim();
+  const cookie = normalizeLumaCookie(process.env.LUMA_COOKIE);
   const username =
     process.env.LUMA_USERNAME?.trim() || "usr-O4svXJrJEipJn5G";
 

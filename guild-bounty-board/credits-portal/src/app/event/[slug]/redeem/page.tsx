@@ -55,7 +55,7 @@ export default function ProjectRedeemPage() {
           <p className="mt-3 text-sm text-muted-foreground">
             {error || 'The event you are looking for is not available for code redemption.'}
           </p>
-          <Link href="/credits" className="mt-6 inline-block text-sm font-medium text-primary hover:underline">
+          <Link href="/" className="mt-6 inline-block text-sm font-medium text-primary hover:underline">
             ← Back to credits home
           </Link>
         </div>

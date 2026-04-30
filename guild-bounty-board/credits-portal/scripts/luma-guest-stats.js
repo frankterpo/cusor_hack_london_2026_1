@@ -16,6 +16,7 @@ const {
   fetchHostingEventApi,
   fetchAllEventGuests,
   isLumaCheckedIn,
+  normalizeLumaCookie,
   pick,
 } = require("./lib/luma-sync-ops.js");
 
@@ -34,7 +35,7 @@ function parseArgs() {
 
 function main() {
   const cli = parseArgs();
-  const cookie = process.env.LUMA_COOKIE?.trim();
+  const cookie = normalizeLumaCookie(process.env.LUMA_COOKIE);
   const username =
     cli.username ||
     process.env.LUMA_USERNAME?.trim() ||

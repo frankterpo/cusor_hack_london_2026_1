@@ -81,7 +81,7 @@ export default function AdminProjects() {
     }));
 
     // Navigate to dashboard
-    router.push('/credits/admin/dashboard');
+    router.push('/admin/dashboard');
   };
 
   const generateSlug = (name: string) => {
@@ -129,7 +129,7 @@ export default function AdminProjects() {
           slug: result.data.slug
         }));
 
-        router.push('/credits/admin/dashboard');
+        router.push('/admin/dashboard');
       } else {
         setError(result.error || 'Failed to create project');
       }
@@ -204,7 +204,7 @@ export default function AdminProjects() {
   const handleLogout = () => {
     localStorage.removeItem('admin_authenticated');
     localStorage.removeItem('admin_selected_project');
-    router.push('/credits/admin');
+    router.push('/admin');
   };
 
   if (isLoading) {

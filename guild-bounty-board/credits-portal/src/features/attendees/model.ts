@@ -71,8 +71,12 @@ export type AttendeeValidationStep = z.infer<typeof AttendeeValidationStepSchema
 export const AttendeeValidationResponseSchema = z.object({
   isValid: z.boolean(),
   attendeeId: z.string().optional(),
+  /** Firestore display name — use for step 2+ so API name/email lookup stays consistent */
+  resolvedName: z.string().optional(),
   expectedEmail: z.string().optional(),
   hasAlreadyRedeemed: z.boolean().default(false),
+  /** Present when ops or a prior flow already assigned a Cursor referral URL */
+  cursorUrl: z.string().optional(),
   error: z.string().optional(),
 });
 

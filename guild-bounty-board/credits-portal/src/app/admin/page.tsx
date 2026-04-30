@@ -15,9 +15,9 @@ export default function AdminPage() {
     if (isAuthenticated) {
       const selectedProject = localStorage.getItem('admin_selected_project');
       if (selectedProject) {
-        router.push('/credits/admin/dashboard');
+        router.push('/admin/dashboard');
       } else {
-        router.push('/credits/admin/projects');
+        router.push('/admin/projects');
       }
     }
   }, [router]);
@@ -38,7 +38,7 @@ export default function AdminPage() {
 
       if (result.success) {
         localStorage.setItem('admin_authenticated', 'true');
-        router.push('/credits/admin/projects');
+        router.push('/admin/projects');
       } else {
         setError('Invalid password');
       }

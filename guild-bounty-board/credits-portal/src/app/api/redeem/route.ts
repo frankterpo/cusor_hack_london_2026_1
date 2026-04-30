@@ -6,27 +6,90 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { collection, query, where, getDocs, addDoc, runTransaction, doc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  runTransaction,
+  doc,
+  limit,
+} from 'firebase/firestore';
+import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { AttendeeRedemptionSchema } from '@/features/attendees/model';
 import type { ApiResponse } from '@/lib/types';
 
+function normEmail(em: string) {
+  return em.trim().toLowerCase();
+}
+
+async function findRedemptionForAttendee(
+  projectId: string,
+  attendeeId: string,
+  name: string,
+  email: string
+) {
+  const byId = await getDocs(
+    query(
+      collection(db, 'redemptions'),
+      where('projectId', '==', projectId),
+      where('attendeeId', '==', attendeeId),
+      limit(1)
+    )
+  );
+  if (!byId.empty) return byId;
+
+  const wantE = normEmail(email);
+  const wantN = name.trim().toLowerCase();
+  const pool = await getDocs(
+    query(collection(db, 'redemptions'), where('projectId', '==', projectId))
+  );
+  const hit = pool.docs.find((d) => {
+    const x = d.data();
+    return (
+      normEmail(String(x.attendeeEmail || '')) === wantE &&
+      String(x.attendeeName || '')
+        .trim()
+        .toLowerCase() === wantN
+    );
+  });
+  if (hit) {
+    return {
+      empty: false,
+      docs: [hit],
+    } as Awaited<ReturnType<typeof getDocs>>;
+  }
+
+  if (projectId === 'sample-event-1') {
+    return await getDocs(
+      query(
+        collection(db, 'redemptions'),
+        where('attendeeName', '==', name.trim()),
+        where('attendeeEmail', '==', email.toLowerCase().trim())
+      )
+    );
+  }
+
+  return byId;
+}
+
 /**
  * POST /api/redeem
- * 
+ *
  * Redeems a code for a validated attendee.
  * Expects attendee to be pre-validated through the validation endpoint.
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    
+
     // Validate input data
     const validatedData = AttendeeRedemptionSchema.parse(body);
-    
+
     // Handle backward compatibility: use eventId if projectId not provided
     const projectId = validatedData.projectId || validatedData.eventId || 'sample-event-1';
-    
+
     // Final validation: check attendee exists and hasn't redeemed
     const attendeesRef = collection(db, 'attendees');
     let attendeeQuery = query(
@@ -35,14 +98,16 @@ export async function POST(request: NextRequest) {
       where('name', '==', validatedData.name.trim()),
       where('email', '==', validatedData.email.toLowerCase().trim())
     );
-    
+
     let attendeeSnapshot = await getDocs(attendeeQuery);
-    
+
     // Only fall back to legacy query if we're specifically dealing with legacy eventId
-    if (attendeeSnapshot.empty && 
-        projectId === 'sample-event-1' && 
-        !validatedData.projectId && 
-        validatedData.eventId === 'sample-event-1') {
+    if (
+      attendeeSnapshot.empty &&
+      projectId === 'sample-event-1' &&
+      !validatedData.projectId &&
+      validatedData.eventId === 'sample-event-1'
+    ) {
       attendeeQuery = query(
         attendeesRef,
         where('name', '==', validatedData.name.trim()),
@@ -50,8 +115,29 @@ export async function POST(request: NextRequest) {
       );
       attendeeSnapshot = await getDocs(attendeeQuery);
     }
-    
-    if (attendeeSnapshot.empty) {
+
+    let attendeeDoc: QueryDocumentSnapshot<DocumentData> | undefined;
+
+    if (!attendeeSnapshot.empty) {
+      attendeeDoc = attendeeSnapshot.docs[0];
+    } else {
+      const all = await getDocs(
+        query(attendeesRef, where('projectId', '==', projectId))
+      );
+      const wantN = validatedData.name.trim().toLowerCase();
+      const wantE = normEmail(validatedData.email);
+      attendeeDoc = all.docs.find((d) => {
+        const x = d.data();
+        return (
+          String(x.name || '')
+            .trim()
+            .toLowerCase() === wantN &&
+          normEmail(String(x.email || '')) === wantE
+        );
+      });
+    }
+
+    if (!attendeeDoc) {
       const response: ApiResponse = {
         success: false,
         error: 'Attendee not found. Please validate your information first.',
@@ -59,42 +145,34 @@ export async function POST(request: NextRequest) {
       };
       return NextResponse.json(response, { status: 404 });
     }
-    
-    const attendeeDoc = attendeeSnapshot.docs[0];
-    const attendeeData = attendeeDoc.data();
-    
-    // Check if already redeemed
-    const redemptionsRef = collection(db, 'redemptions');
-    let existingRedemptionQuery = query(
-      redemptionsRef,
-      where('projectId', '==', projectId),
-      where('attendeeName', '==', validatedData.name.trim()),
-      where('attendeeEmail', '==', validatedData.email.toLowerCase().trim())
+
+    const existingRedemptionSnapshot = await findRedemptionForAttendee(
+      projectId,
+      attendeeDoc.id,
+      validatedData.name,
+      validatedData.email
     );
-    
-    let existingRedemptionSnapshot = await getDocs(existingRedemptionQuery);
-    
-    // Only fall back to legacy query if we're specifically dealing with legacy eventId
-    // and there's no specific projectId in the request
-    if (existingRedemptionSnapshot.empty && 
-        projectId === 'sample-event-1' && 
-        !validatedData.projectId && 
-        validatedData.eventId === 'sample-event-1') {
-      existingRedemptionQuery = query(
-        redemptionsRef,
-        where('attendeeName', '==', validatedData.name.trim()),
-        where('attendeeEmail', '==', validatedData.email.toLowerCase().trim())
-      );
-      existingRedemptionSnapshot = await getDocs(existingRedemptionQuery);
-    }
-    
+
     if (!existingRedemptionSnapshot.empty) {
+      const red = existingRedemptionSnapshot.docs[0].data() as Record<
+        string,
+        unknown
+      >;
+      const cursorUrl = String(red.codeUrl || red.cursorUrl || '');
+      const codeVal = String(red.codeValue || red.code || '');
       const response: ApiResponse = {
-        success: false,
-        error: 'You have already redeemed a code. Each attendee can only redeem one code.',
+        success: true,
+        data: {
+          code: codeVal,
+          cursorUrl: cursorUrl || undefined,
+          name: validatedData.name,
+          email: validatedData.email,
+          redemptionId: existingRedemptionSnapshot.docs[0].id,
+          fromPriorAssignment: true,
+        },
         timestamp: new Date(),
       };
-      return NextResponse.json(response, { status: 400 });
+      return NextResponse.json(response);
     }
     
     // Get available code

@@ -108,6 +108,14 @@ export function AttendeeAutocomplete({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // After step name→email, parent disables input; never keep the absolute "no match" panel open.
+  useEffect(() => {
+    if (disabled) {
+      setIsOpen(false);
+      setFocusedIndex(-1);
+    }
+  }, [disabled]);
+
   return (
     <div className="relative">
       <Label htmlFor="attendee-name">Attendee Name</Label>
@@ -121,7 +129,9 @@ export function AttendeeAutocomplete({
           value={value}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
-          onFocus={() => value.length >= 1 && setIsOpen(true)}
+          onFocus={() => {
+            if (!disabled && value.length >= 1) setIsOpen(true);
+          }}
           disabled={disabled || isLoading}
           className={error ? 'border-red-500' : ''}
         />
@@ -140,7 +150,7 @@ export function AttendeeAutocomplete({
       )}
 
       {/* Suggestions dropdown */}
-      {isOpen && suggestions.length > 0 && (
+      {!disabled && isOpen && suggestions.length > 0 && (
         <ul
           ref={listRef}
           className="absolute z-50 mt-1 w-full rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg max-h-60 overflow-auto"
@@ -164,11 +174,18 @@ export function AttendeeAutocomplete({
         </ul>
       )}
 
-      {/* No results message */}
-      {isOpen && value.length >= 1 && suggestions.length === 0 && !isLoading && (
-        <div className="absolute z-50 mt-1 w-full rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg">
-          <div className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
-            No attendees found matching "{value}"
+      {/* No results message (only while actively editing name; avoids overlap on later steps) */}
+      {!disabled &&
+        isOpen &&
+        value.length >= 1 &&
+        suggestions.length === 0 &&
+        !isLoading && (
+        <div className="absolute z-50 mt-2 w-full rounded-lg border border-primary/25 bg-secondary shadow-lg">
+          <div className="px-4 py-3 text-sm text-muted-foreground">
+            <span className="block font-medium text-foreground">No attendee match yet.</span>
+            <span className="mt-1 block">
+              Check the spelling or ask an organizer to sync the latest checked-in guest list.
+            </span>
           </div>
         </div>
       )}

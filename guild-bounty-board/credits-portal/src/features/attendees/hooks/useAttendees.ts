@@ -1,8 +1,8 @@
 /**
  * Hook for fetching and managing attendee data
- * 
- * Provides auto-suggestion capabilities for the redemption form
- * by fetching attendees who haven't redeemed codes yet.
+ *
+ * Redemption name suggestions: checked-in guests only (hasCheckedIn from API).
+ * Ops may pre-assign codes (hasRedeemed); those names still appear in the picker.
  */
 
 import { useState, useEffect } from 'react';
@@ -12,6 +12,8 @@ export interface AttendeeForSuggestion {
   name: string;
   email: string;
   hasRedeemed: boolean;
+  /** From API: only checked-in guests are eligible for the redeem name picker */
+  hasCheckedIn?: boolean;
 }
 
 export function useAttendees(projectId?: string) {
@@ -44,13 +46,15 @@ export function useAttendees(projectId?: string) {
     }
   };
 
-  // Get attendees who haven't redeemed codes for suggestions
-  const availableAttendees = attendees.filter(attendee => !attendee.hasRedeemed);
+  /** Checked-in guests only (for redeem name search). Legacy rows without flag still show. */
+  const checkedInForRedeem = attendees.filter(
+    (a) => a.hasCheckedIn !== false
+  );
 
-  // Find attendee by exact name match
+  // Find attendee by exact name match (checked-in pool so ops pre-assign does not hide names)
   const findAttendeeByName = (name: string): AttendeeForSuggestion | null => {
     const trimmedName = name.trim();
-    return attendees.find(
+    return checkedInForRedeem.find(
       attendee => attendee.name.toLowerCase() === trimmedName.toLowerCase()
     ) || null;
   };
@@ -60,7 +64,7 @@ export function useAttendees(projectId?: string) {
     if (!input || input.length < 1) return [];
 
     const searchWords = input.toLowerCase().trim().split(/\s+/).filter(w => w.length > 0);
-    return availableAttendees
+    return checkedInForRedeem
       .filter(attendee => {
         const name = attendee.name.toLowerCase();
         return searchWords.every(word => name.includes(word));
@@ -70,7 +74,6 @@ export function useAttendees(projectId?: string) {
 
   return {
     attendees,
-    availableAttendees,
     isLoading,
     error,
     findAttendeeByName,

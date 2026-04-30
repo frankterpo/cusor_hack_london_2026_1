@@ -25,6 +25,7 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
     setSelectedAttendee(attendee);
     setError(null);
     if (attendee) {
+      setName(attendee.name);
       setCurrentStep('email');
       setExpectedEmail(attendee.email);
     } else {
@@ -58,7 +59,21 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
       const result = await response.json();
       const validationData = result.data as AttendeeValidationResponse;
       if (!result.success || !validationData.isValid) throw new Error(validationData.error || 'Name validation failed');
-      if (validationData.hasAlreadyRedeemed) throw new Error('You have already redeemed a code.');
+      if (validationData.hasAlreadyRedeemed && validationData.cursorUrl) {
+        const params = new URLSearchParams({
+          cursorUrl: validationData.cursorUrl,
+          name: name.trim(),
+        });
+        window.location.href = `/credits/success?${params.toString()}`;
+        return;
+      }
+      if (validationData.hasAlreadyRedeemed) {
+        throw new Error(
+          'A code is already assigned to this guest, but the referral link could not be loaded. Ask an organizer.'
+        );
+      }
+      const resolved = validationData.resolvedName?.trim();
+      if (resolved) setName(resolved);
       setExpectedEmail(validationData.expectedEmail || null);
       setCurrentStep('email');
     } catch (err) {
@@ -94,7 +109,19 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
       const result = await response.json();
       const validationData = result.data as AttendeeValidationResponse;
       if (!result.success || !validationData.isValid) throw new Error(validationData.error || 'Email validation failed');
-      if (validationData.hasAlreadyRedeemed) throw new Error('You have already redeemed a code.');
+      if (validationData.hasAlreadyRedeemed && validationData.cursorUrl) {
+        const params = new URLSearchParams({
+          cursorUrl: validationData.cursorUrl,
+          name: name.trim(),
+        });
+        window.location.href = `/credits/success?${params.toString()}`;
+        return;
+      }
+      if (validationData.hasAlreadyRedeemed) {
+        throw new Error(
+          'A code is already assigned to this guest, but the referral link could not be loaded. Ask an organizer.'
+        );
+      }
       setCurrentStep('ready');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Validation failed');
@@ -151,23 +178,37 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
 
       <div className="space-y-6">
         <div className="space-y-3">
-          <AttendeeAutocomplete
-            value={name}
-            onChange={setName}
-            onAttendeeSelect={handleAttendeeSelect}
-            error={currentStep === 'name' ? error : undefined}
-            disabled={currentStep !== 'name' || isLoading}
-            projectId={projectId}
-          />
-          {currentStep === 'name' && (
-            <button
-              type="button"
-              onClick={validateNameStep}
-              disabled={!selectedAttendee || isLoading}
-              className="btn-event-primary w-full py-3 text-sm disabled:opacity-50"
-            >
-              {isLoading ? 'Validating…' : 'Continue'}
-            </button>
+          {currentStep === 'name' ? (
+            <>
+              <AttendeeAutocomplete
+                value={name}
+                onChange={setName}
+                onAttendeeSelect={handleAttendeeSelect}
+                error={error ?? undefined}
+                disabled={isLoading}
+                projectId={projectId}
+              />
+              <button
+                type="button"
+                onClick={validateNameStep}
+                disabled={!selectedAttendee || isLoading}
+                className="btn-event-primary w-full py-3 text-sm disabled:opacity-50"
+              >
+                {isLoading ? 'Validating…' : 'Continue'}
+              </button>
+            </>
+          ) : (
+            <div className="space-y-2">
+              <span className="mb-1 block text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Name
+              </span>
+              <div
+                className="rounded-md border border-input bg-muted/25 px-3 py-2.5 text-sm text-foreground"
+                aria-label="Confirmed attendee name"
+              >
+                {name}
+              </div>
+            </div>
           )}
         </div>
 

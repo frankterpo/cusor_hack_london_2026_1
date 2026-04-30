@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/firebase';
 import { collection, getDocs, query, where } from 'firebase/firestore';
+import { hasMeaningfulCheckedIn } from '@/lib/attendee-checked-in';
 
 /**
  * Public API route for fetching attendees during redemption flow
@@ -17,13 +18,17 @@ export async function GET(request: NextRequest) {
       try {
         const legacyAttendeesSnapshot = await getDocs(collection(db, 'attendees'));
         const legacyAttendees = legacyAttendeesSnapshot.docs
-          .filter(doc => !doc.data().projectId) // Only get truly legacy data (no projectId field)
-          .map(doc => ({
-            id: doc.id,
-            name: doc.data().name,
-            email: doc.data().email,
-            hasRedeemed: doc.data().hasRedeemedCode || false,
-          }))
+          .filter((doc) => !doc.data().projectId) // Only get truly legacy data (no projectId field)
+          .map((doc) => {
+            const data = doc.data();
+            return {
+              id: doc.id,
+              name: data.name,
+              email: data.email,
+              hasRedeemed: data.hasRedeemedCode || false,
+              hasCheckedIn: hasMeaningfulCheckedIn(data as Record<string, unknown>),
+            };
+          })
           .filter(attendee => attendee.name && attendee.email);
 
         if (legacyAttendees.length > 0) {
@@ -46,15 +51,16 @@ export async function GET(request: NextRequest) {
     );
 
     // Process attendees
-    const attendees = attendeesSnapshot.docs.map(doc => {
+    const attendees = attendeesSnapshot.docs.map((doc) => {
       const data = doc.data();
       return {
         id: doc.id,
         name: data.name,
         email: data.email,
         hasRedeemed: data.hasRedeemedCode || false,
+        hasCheckedIn: hasMeaningfulCheckedIn(data as Record<string, unknown>),
       };
-    }).filter(attendee => attendee.name && attendee.email);
+    }).filter((attendee) => attendee.name && attendee.email);
 
     return NextResponse.json({ 
       success: true, 
