@@ -4,6 +4,18 @@
   "outputDirectory": "dist",
   "framework": null,
   "cleanUrls": true,
+  "routes": [
+    {
+      "src": "/credits-portal/(.*)",
+      "dest": "${CREDITS_APP_URL}/credits/$1",
+      "env": ["CREDITS_APP_URL"]
+    },
+    {
+      "src": "/credits-portal",
+      "dest": "${CREDITS_APP_URL}/credits/event/cursor-hackathon-london-2026/redeem",
+      "env": ["CREDITS_APP_URL"]
+    }
+  ],
   "headers": [
     {
       "source": "/api/repo/(.*)/ai",

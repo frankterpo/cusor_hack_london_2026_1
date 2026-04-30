@@ -13,7 +13,7 @@ export default function RedeemPage() {
           <p className="mt-2 text-sm text-muted-foreground">Demo project — use event slug URLs in production.</p>
         </div>
         <div className="panel-event">
-          <RedemptionForm projectId="4ULX4IY2qIMwnKe7x1LK" />
+          <RedemptionForm projectId="cursor-hackathon-london-2026-1" />
         </div>
       </div>
     </div>

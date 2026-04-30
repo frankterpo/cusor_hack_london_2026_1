@@ -1259,8 +1259,49 @@ function setLocalList(key, value) {
 let lastFocusedBeforeModal = null;
 const GATED_MODALS = new Set(["judge-modal", "manager-modal"]);
 const AUTH_KEY = "bfa_auth";
+const AUTH_JUDGE_NAME_KEY = "bfa_auth_judge_name";
 const AUTH_CODE = "BCFTW123!";
 let pendingGatedModalId = null;
+
+function readStoredJudgeName() {
+  try {
+    const s = sessionStorage.getItem(AUTH_JUDGE_NAME_KEY);
+    if (s != null && String(s).trim()) return String(s).trim();
+  } catch {}
+  if (!isAuthed()) return "";
+  try {
+    const c = localStorage.getItem(localJudgeNameKey());
+    if (c != null && String(c).trim()) return String(c).trim();
+  } catch {}
+  return "";
+}
+
+function syncJudgeNameToDom(name) {
+  const t = String(name || "").trim();
+  const hidden = document.getElementById("judge-name-hidden");
+  if (hidden) hidden.value = t;
+  const display = document.getElementById("judge-display-name");
+  if (display) display.textContent = t || "—";
+}
+
+function writeStoredJudgeName(name) {
+  const t = String(name || "").trim();
+  try {
+    if (t) sessionStorage.setItem(AUTH_JUDGE_NAME_KEY, t);
+    else sessionStorage.removeItem(AUTH_JUDGE_NAME_KEY);
+  } catch {}
+  try {
+    if (t) localStorage.setItem(localJudgeNameKey(), t);
+  } catch {}
+  syncJudgeNameToDom(t);
+}
+
+function getJudgeNameForUi() {
+  const hidden = document.getElementById("judge-name-hidden");
+  const fromHidden = hidden && String(hidden.value || "").trim();
+  if (fromHidden) return fromHidden;
+  return readStoredJudgeName();
+}
 
 function isAuthed() {
   try {
@@ -1279,7 +1320,10 @@ function applyAuthState() {
   document.querySelectorAll(".organizer-gate").forEach((el) => {
     el.hidden = authed;
   });
-  if (authed) maybeRenderSummaryTable();
+  if (authed) {
+    syncJudgeNameToDom(readStoredJudgeName());
+    maybeRenderSummaryTable();
+  }
 }
 
 /** Clone submissions panel from template — not in DOM until Manager opens (no landing leak). */
@@ -1342,7 +1386,7 @@ function openModal(id) {
   modal.classList.remove("hidden");
   const firstInput =
     id === "judge-modal"
-      ? modal.querySelector("#judge-name-input")
+      ? modal.querySelector("#judge-submission-picker")
       : modal.querySelector("input:not([type=hidden]), select, textarea, button");
   if (firstInput) setTimeout(() => firstInput.focus(), 60);
   if (id === "manager-modal") {
@@ -1641,8 +1685,7 @@ function normalizeSubmissionIdentity(entry) {
 
 function getJudgeReviewEntries() {
   const rows = window.__summaryRows || [];
-  const nameInput = document.getElementById("judge-name-input");
-  const cachedName = (nameInput && nameInput.value) || "";
+  const cachedName = getJudgeNameForUi();
   const scored = scoredIdsForJudge(cachedName);
   const entries = [];
 
@@ -2069,9 +2112,8 @@ function renderJudgeSubmissionToolbar() {
   const toolbar = document.getElementById("judge-submission-toolbar");
   if (!toolbar) return;
   const select = document.getElementById("judge-submission-select");
-  const nameInput = document.getElementById("judge-name-input");
   const id = select?.value || "";
-  const judgeName = (nameInput && nameInput.value) || "";
+  const judgeName = getJudgeNameForUi();
 
   if (!id) {
     toolbar.innerHTML = "";
@@ -2093,9 +2135,8 @@ function renderJudgeSubmissionSummary() {
   const recap = document.getElementById("judge-quick-recap");
   if (!target) return;
   const select = document.getElementById("judge-submission-select");
-  const nameInput = document.getElementById("judge-name-input");
   const id = select?.value || "";
-  const judgeName = (nameInput && nameInput.value) || "";
+  const judgeName = getJudgeNameForUi();
   if (!id) {
     target.innerHTML = "";
     target.classList.remove("is-visible");
@@ -2130,7 +2171,7 @@ function renderJudgeSubmissionSummary() {
     ? scoredIdsForJudge(judgeName).has(id)
     : false;
   const youPill = !judgeName.trim()
-    ? `<span class="judge-sub-pill judge-sub-pill-you judge-sub-pill-muted" title="Enter your name above">You · —</span>`
+    ? `<span class="judge-sub-pill judge-sub-pill-you judge-sub-pill-muted" title="Your name is set when you unlock the judge panel">You · —</span>`
     : `<span class="judge-sub-pill judge-sub-pill-you ${
         youScored ? "is-on" : ""
       }" title="Your saves in this browser">You · ${
@@ -2203,9 +2244,7 @@ async function handleJudgeForm(e) {
     toast("Add a score between 0 and 10");
     return;
   }
-  try {
-    localStorage.setItem(localJudgeNameKey(), data.judge_name);
-  } catch {}
+  writeStoredJudgeName(data.judge_name);
 
   const coreMax = Number(eventFormat?.rubric?.core_max_points ?? 7);
   const bonusCap = Number(eventFormat?.judge_bonus_bucket?.max_points ?? 3);
@@ -2989,21 +3028,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const judgeForm = document.getElementById("judge-form");
   if (judgeForm) judgeForm.addEventListener("submit", handleJudgeForm);
 
-  // Restore cached judge name + react to select/name changes in judge modal
-  const nameInput = document.getElementById("judge-name-input");
-  if (nameInput) {
-    try {
-      const cached = localStorage.getItem(localJudgeNameKey());
-      if (cached) nameInput.value = cached;
-    } catch {}
-    nameInput.addEventListener("input", () => {
-      try {
-        localStorage.setItem(localJudgeNameKey(), nameInput.value);
-      } catch {}
-      renderJudgeScoreQueue();
-      renderJudgeSubmissionToolbar();
-    });
-  }
   const judgeSelect = document.getElementById("judge-submission-select");
   if (judgeSelect) {
     judgeSelect.addEventListener("change", onJudgeSubmissionSelectChanged);
@@ -3042,26 +3066,40 @@ document.addEventListener("DOMContentLoaded", () => {
   if (passwordForm) {
     passwordForm.addEventListener("submit", (e) => {
       e.preventDefault();
-      const input = passwordForm.querySelector("input[name=password]");
+      const pwInput = passwordForm.querySelector("input[name=password]");
+      const gateNameInput = passwordForm.querySelector("#password-judge-name");
       const errorEl = document.getElementById("password-error");
-      const value = (input && input.value) || "";
+      const nameVal = (gateNameInput && gateNameInput.value.trim()) || "";
+      const value = (pwInput && pwInput.value) || "";
+      if (nameVal.length < 2) {
+        if (errorEl) {
+          errorEl.textContent =
+            "Enter your full name (at least 2 characters).";
+        }
+        if (gateNameInput) gateNameInput.focus();
+        return;
+      }
       if (value === AUTH_CODE) {
         try {
           sessionStorage.setItem(AUTH_KEY, AUTH_CODE);
         } catch {}
+        writeStoredJudgeName(nameVal);
         passwordForm.reset();
         if (errorEl) errorEl.textContent = "";
         applyAuthState();
         closeModal("password-modal");
         const next = pendingGatedModalId;
         pendingGatedModalId = null;
+        renderJudgeScoreQueue();
+        renderJudgeSubmissionToolbar();
+        renderJudgeSubmissionSummary();
         if (next) setTimeout(() => openModal(next), 80);
         toast("Unlocked — judge + manager panels available");
       } else {
         if (errorEl) errorEl.textContent = "Wrong code. Try again.";
-        if (input) {
-          input.value = "";
-          input.focus();
+        if (pwInput) {
+          pwInput.value = "";
+          pwInput.focus();
         }
       }
     });

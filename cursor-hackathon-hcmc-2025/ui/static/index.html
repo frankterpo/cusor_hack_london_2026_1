@@ -10,7 +10,7 @@
       name="description"
       content="Cursor x Briefcase London hackathon — two tracks, 10 points, five judges. AI-native agents for the modern finance stack."
     />
-    <link rel="stylesheet" href="style.css?v=95" />
+    <link rel="stylesheet" href="style.css?v=99" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -122,33 +122,58 @@
 
     <main id="site-content" tabindex="-1">
     <section id="tracks" class="tracks">
-      <div class="tracks-header">
-        <span class="eyebrow">London · April 30 · 2026</span>
-        <h1 class="tracks-title">
-          Two tracks.
-          <span class="tracks-title-accent">One finance stack.</span>
-        </h1>
-        <p class="tracks-sub">
-          Human out of the loop in high risk financial workflows
-        </p>
-        <div class="tracks-stats" aria-label="Event stats at a glance">
-          <div class="tstat">
-            <span class="tstat-num">2</span
-            ><span class="tstat-lbl">tracks</span>
-          </div>
-          <div class="tstat">
-            <span class="tstat-num">10</span
-            ><span class="tstat-lbl">max score</span>
-          </div>
-          <div class="tstat">
-            <span class="tstat-num">3</span
-            ><span class="tstat-lbl">podium places</span>
-          </div>
-          <div class="tstat">
-            <span class="tstat-num">5</span
-            ><span class="tstat-lbl">judges</span>
+      <div class="tracks-hero-row">
+        <div class="tracks-header">
+          <span class="eyebrow">London · April 30 · 2026</span>
+          <h1 class="tracks-title">
+            Two tracks.
+            <span class="tracks-title-accent">One finance stack.</span>
+          </h1>
+          <p class="tracks-sub">
+            Human out of the loop in high risk financial workflows
+          </p>
+          <div class="tracks-stats" aria-label="Event stats at a glance">
+            <div class="tstat">
+              <span class="tstat-num">2</span
+              ><span class="tstat-lbl">tracks</span>
+            </div>
+            <div class="tstat">
+              <span class="tstat-num">10</span
+              ><span class="tstat-lbl">max score</span>
+            </div>
+            <div class="tstat">
+              <span class="tstat-num">3</span
+              ><span class="tstat-lbl">podium places</span>
+            </div>
+            <div class="tstat">
+              <span class="tstat-num">5</span
+              ><span class="tstat-lbl">judges</span>
+            </div>
           </div>
         </div>
+
+        <aside
+          class="site-qr-card"
+          aria-label="QR code and link to the live event site"
+        >
+          <span class="site-qr-eyebrow">Live site</span>
+          <a
+            class="site-qr-link"
+            href="https://cusor-hack-london-2026-1.vercel.app"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+                class="site-qr-img"
+                src="site-qr.svg"
+                alt="QR code that opens the live hackathon site"
+                width="380"
+                height="380"
+                decoding="async"
+              />
+          </a>
+          <span class="site-qr-url">cusor-hack-london-2026-1.vercel.app</span>
+        </aside>
       </div>
 
       <div id="context" class="context context--in-tracks" aria-labelledby="context-title">
@@ -982,16 +1007,23 @@
             <span class="field-label">Submission</span>
             <select id="judge-submission-picker" class="judge-submission-picker"></select>
           </label>
-          <label class="field">
-            <span class="field-label">Judge name <em>*</em></span>
+          <div class="field judge-session-field">
+            <span class="field-label">Judging as</span>
+            <p
+              id="judge-display-name"
+              class="judge-session-banner"
+              aria-live="polite"
+            >
+              —
+            </p>
             <input
+              type="hidden"
               name="judge_name"
-              id="judge-name-input"
+              id="judge-name-hidden"
               form="judge-form"
-              required
-              placeholder="e.g. Ján Stehlík"
+              value=""
             />
-          </label>
+          </div>
 
           <section class="judge-score-card">
             <div class="judge-score-card-main">
@@ -1399,8 +1431,21 @@
         <form id="password-form" class="modal-body" novalidate>
           <p class="form-help" style="margin-top: 0">
             Judge &amp; Hack Manager panels are password-protected. Ask the
-            organizers for the code.
+            organizers for the code. Judges: use the name you want shown on
+            scores.
           </p>
+          <label class="field">
+            <span class="field-label">Judge / organizer full name <em>*</em></span>
+            <input
+              name="gate_judge_name"
+              id="password-judge-name"
+              type="text"
+              autocomplete="name"
+              required
+              minlength="2"
+              placeholder="e.g. Ján Stehlík"
+            />
+          </label>
           <label class="field">
             <span class="field-label">Access code <em>*</em></span>
             <input

@@ -1,5 +1,13 @@
 const { sendJson } = require("./_lib/storage");
-const { getSitePassword, createToken, verifyAuth, setAuthCookie } = require("./_lib/auth");
+const {
+  getSitePassword,
+  createToken,
+  verifyAuth,
+  setAuthCookie,
+  setJudgeNameCookie,
+  clearJudgeNameCookie,
+  getJudgeNameFromCookies,
+} = require("./_lib/auth");
 
 function getBody(req) {
   if (!req.body) return {};
@@ -20,15 +28,22 @@ module.exports = async (req, res) => {
   try {
     if (req.method === "GET") {
       const result = verifyAuth(req);
-      return sendJson(res, 200, { authenticated: result.valid });
+      const judgeName = result.valid ? getJudgeNameFromCookies(req) : "";
+      return sendJson(res, 200, { authenticated: result.valid, judge_name: judgeName });
     }
 
     if (req.method === "POST") {
       const body = getBody(req);
       const password = String(body.password || "").trim();
+      const judgeName = String(body.judge_name || "").trim().slice(0, 200);
+      const judgeProvided = Object.prototype.hasOwnProperty.call(body, "judge_name");
 
       if (!password) {
         return sendJson(res, 400, { ok: false, error: "Password required" });
+      }
+
+      if (judgeProvided && (!judgeName || judgeName.length < 2)) {
+        return sendJson(res, 400, { ok: false, error: "Enter your full name (at least 2 characters)" });
       }
 
       let sitePassword;
@@ -55,7 +70,16 @@ module.exports = async (req, res) => {
         });
       }
       setAuthCookie(res, token);
-      return sendJson(res, 200, { ok: true, token });
+      if (judgeProvided) {
+        setJudgeNameCookie(res, judgeName);
+      } else {
+        clearJudgeNameCookie(res);
+      }
+      return sendJson(res, 200, {
+        ok: true,
+        token,
+        judge_name: judgeProvided ? judgeName : "",
+      });
     }
 
     return sendJson(res, 405, { error: "Method not allowed" });

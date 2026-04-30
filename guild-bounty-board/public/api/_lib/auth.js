@@ -106,11 +106,49 @@ function setAuthCookie(res, token) {
   );
 }
 
+function appendSetCookie(res, cookieLine) {
+  const prev = res.getHeader("Set-Cookie");
+  if (prev) {
+    const list = Array.isArray(prev) ? [...prev, cookieLine] : [prev, cookieLine];
+    res.setHeader("Set-Cookie", list);
+  } else {
+    res.setHeader("Set-Cookie", cookieLine);
+  }
+}
+
+/** Session-scoped judge display name (same Max-Age as auth). HttpOnly; UI reads via GET /api/auth. */
+function setJudgeNameCookie(res, judgeName) {
+  const maxAge = Math.floor(TOKEN_MAX_AGE_MS / 1000);
+  const safe = String(judgeName || "").trim().slice(0, 200);
+  const encoded = encodeURIComponent(safe);
+  const judgeCookie = `judge_name=${encoded}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=${maxAge}`;
+  appendSetCookie(res, judgeCookie);
+}
+
+function clearJudgeNameCookie(res) {
+  appendSetCookie(res, "judge_name=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0");
+}
+
+function getJudgeNameFromCookies(req) {
+  const cookies = parseCookies(req);
+  const raw = cookies.judge_name;
+  if (!raw || typeof raw !== "string") return "";
+  try {
+    return decodeURIComponent(raw).trim();
+  } catch (_) {
+    return String(raw).trim();
+  }
+}
+
 module.exports = {
   getSitePassword,
   getAuthSecret,
   createToken,
   verifyToken,
   verifyAuth,
+  parseCookies,
   setAuthCookie,
+  setJudgeNameCookie,
+  clearJudgeNameCookie,
+  getJudgeNameFromCookies,
 };

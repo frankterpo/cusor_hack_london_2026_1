@@ -43,10 +43,7 @@ module.exports = `
       <aside class="judge-sidebar">
         <section class="panel judge-panel">
           <h3>Judge</h3>
-          <label class="field">
-            <span>Judge Name (enter once)</span>
-            <input id="judge-name" type="text" placeholder="Your name">
-          </label>
+          <p id="judge-display-name" class="judge-session-banner" aria-live="polite"></p>
         </section>
 
         <section class="panel judge-panel rubric-panel">

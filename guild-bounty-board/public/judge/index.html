@@ -38,10 +38,11 @@
 <body>
   <div id="auth-loading" class="auth-loading">Loading...</div>
   <div id="login-gate" class="auth-gate">
-    <h2>Judge Portal - Enter Password</h2>
+    <h2>Judge Portal – sign in</h2>
     <form id="auth-form" style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+      <input type="text" id="judge-name-input" placeholder="Your full name" required autocomplete="name" maxlength="200">
       <input type="password" id="password-input" placeholder="Password" required autocomplete="current-password">
-      <button type="submit">Enter</button>
+      <button type="submit">Enter judge portal</button>
       <p id="auth-error" class="auth-error"></p>
     </form>
   </div>
@@ -58,7 +59,7 @@
         try {
           const res = await fetch('/api/auth', { credentials: 'same-origin' });
           const data = await res.json();
-          return data.authenticated === true;
+          return data.authenticated === true && String(data.judge_name || '').trim().length >= 2;
         } catch (_) {
           return false;
         }
@@ -93,12 +94,13 @@
         e.preventDefault();
         errorEl.style.display = 'none';
         const pw = document.getElementById('password-input').value;
+        const fullName = document.getElementById('judge-name-input').value.trim();
         try {
           const res = await fetch('/api/auth', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'same-origin',
-            body: JSON.stringify({ password: pw })
+            body: JSON.stringify({ password: pw, judge_name: fullName })
           });
           const data = await res.json();
           if (data.ok) {

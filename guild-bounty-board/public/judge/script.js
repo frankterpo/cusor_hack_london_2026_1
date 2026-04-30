@@ -3,6 +3,8 @@ let submissions = [];
 let judgeData = { responses: [], by_repo: {} };
 let currentIndex = 0;
 let analysisCache = new Map();
+/** Set from GET /api/auth after gate; matches HttpOnly cookie. */
+let sessionJudgeName = "";
 
 async function fetchJson(url) {
   const response = await fetch(url, { cache: "no-store", credentials: "same-origin" });
@@ -28,7 +30,7 @@ function getCurrentSubmission() {
 }
 
 function getJudgeName() {
-  return document.getElementById("judge-name").value.trim();
+  return String(sessionJudgeName || "").trim();
 }
 
 function getOwnResponse(submission) {
@@ -320,7 +322,7 @@ async function submitJudgeScore() {
   const submission = getCurrentSubmission();
   const { coreRaw, bonusRaw, coreValid, bonusValid, total } = getValidationState();
   if (!judgeName) {
-    setSubmitStatus("Enter your judge name once first.", true);
+    setSubmitStatus("Session expired. Sign in again from the judge portal with your name.", true);
     return;
   }
   if (!submission) {
@@ -340,7 +342,6 @@ async function submitJudgeScore() {
     return;
   }
 
-  localStorage.setItem("judge_name", judgeName);
   setSubmitStatus("Saving...");
   const response = await fetch("/api/judges", {
     method: "POST",
@@ -369,6 +370,15 @@ async function submitJudgeScore() {
 }
 
 async function loadPage() {
+  const authPayload = await fetch("/api/auth", { credentials: "same-origin" }).then((r) => r.json()).catch(() => ({}));
+  sessionJudgeName = String(authPayload.judge_name || "").trim();
+  const displayEl = document.getElementById("judge-display-name");
+  if (displayEl) {
+    displayEl.innerHTML = sessionJudgeName
+      ? `Judging as <strong>${escapeHtml(sessionJudgeName)}</strong>`
+      : "";
+  }
+
   judgeConfig = await fetchJson("/judge-config.json");
   const [submissionsPayload, judgesPayload] = await Promise.all([
     fetchJson("/api/submissions"),
@@ -379,15 +389,7 @@ async function loadPage() {
   renderRubric();
   renderScoreFields();
 
-  const cachedName = localStorage.getItem("judge_name");
-  if (cachedName) document.getElementById("judge-name").value = cachedName;
-
   renderSubmission();
-
-  document.getElementById("judge-name").addEventListener("input", (event) => {
-    localStorage.setItem("judge_name", event.target.value.trim());
-    renderSubmission();
-  });
   document.addEventListener("input", (event) => {
     if (event.target.classList.contains("score-input")) updateTotals();
   });

@@ -780,9 +780,80 @@ header {
   padding: 56px 28px 24px;
 }
 
-.tracks-header {
+/* Two columns: copy (min 0 for overflow) + QR — never wraps to a second row above 520px */
+.tracks-hero-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: clamp(24px, 4vw, 56px);
   margin-bottom: 28px;
-  max-width: 720px;
+}
+
+.tracks-header {
+  margin-bottom: 0;
+  min-width: 0;
+}
+
+.site-qr-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: clamp(10px, 1.2vw, 16px);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+  text-align: center;
+  width: max-content;
+  max-width: 100%;
+  justify-self: end;
+}
+
+.site-qr-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--primary-300);
+}
+
+.site-qr-link {
+  display: block;
+  line-height: 0;
+  border-radius: var(--r-md);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.site-qr-link:focus-visible {
+  outline: 2px solid var(--primary-500);
+  outline-offset: 4px;
+}
+
+.site-qr-link:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 1px var(--primary-500);
+}
+
+.site-qr-img {
+  /* Dedicated right column — can grow without forcing a wrap */
+  width: min(100%, clamp(220px, 28vw, 400px));
+  height: auto;
+  aspect-ratio: 1;
+  display: block;
+  border-radius: var(--r-sm);
+}
+
+.site-qr-url {
+  font-family: var(--font-mono);
+  font-size: clamp(0.68rem, 1.4vw, 0.78rem);
+  color: var(--muted);
+  word-break: break-all;
+  max-width: min(100%, 380px);
+  line-height: 1.35;
 }
 
 .tracks-title {
@@ -3004,6 +3075,18 @@ html {
   overflow: visible;
   flex-shrink: 0;
 }
+.judge-session-field .judge-session-banner {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: var(--r-md, 8px);
+  border: 1px solid var(--primary-200);
+  background: var(--primary-50);
+  font-weight: 600;
+  line-height: 1.35;
+  min-height: 2.5rem;
+  display: flex;
+  align-items: center;
+}
 .judge-score-card {
   position: relative;
   border: 1px solid var(--primary-200);
@@ -4054,6 +4137,29 @@ html {
     margin-left: 0;
     margin-top: 6px;
     font-size: 0.88em;
+  }
+}
+
+@media (max-width: 520px) {
+  .tracks-hero-row {
+    grid-template-columns: 1fr;
+    row-gap: 24px;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .tracks-header {
+    max-width: 100%;
+  }
+
+  .site-qr-card {
+    justify-self: center;
+    width: 100%;
+    max-width: min(400px, 100%);
+  }
+
+  .site-qr-img {
+    width: min(100%, clamp(220px, 72vw, 340px));
   }
 }
 
