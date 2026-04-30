@@ -2139,82 +2139,19 @@ html {
   background: var(--primary-900);
 }
 
-/* Submit project: loading glow + inline spinner (no spinning border) */
+/* Submit project: loading = disabled + cursor only (no animated border/glow) */
 .btn-submit-project {
-  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.55rem;
   min-width: 11.5rem;
-  overflow: visible;
-}
-.btn-submit-project .btn-submit-aura,
-.btn-submit-project .btn-submit-spinner {
-  display: none;
 }
 .btn-submit-project.is-loading {
   cursor: wait;
-}
-.btn-submit-project.is-loading .btn-submit-aura {
-  display: block;
-}
-.btn-submit-project.is-loading .btn-submit-spinner {
-  display: block;
-}
-.btn-submit-project .btn-submit-aura {
-  position: absolute;
-  inset: -10px;
-  border-radius: calc(var(--r-md) + 8px);
-  pointer-events: none;
-  background: radial-gradient(
-    ellipse 70% 60% at 50% 50%,
-    rgba(167, 139, 250, 0.35),
-    transparent 65%
-  );
-  opacity: 0;
-  animation: submit-btn-aura-pulse 1.4s ease-in-out infinite;
-  z-index: 0;
-}
-.btn-submit-project .btn-submit-label,
-.btn-submit-project .btn-submit-spinner {
-  position: relative;
-  z-index: 2;
-}
-.btn-submit-project.is-loading .btn-submit-aura {
-  opacity: 1;
-}
-.btn-submit-project .btn-submit-spinner {
-  position: relative;
-  width: 1.05em;
-  height: 1.05em;
-  flex-shrink: 0;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.25);
-  border-top-color: rgba(255, 255, 255, 0.95);
-  border-right-color: rgba(196, 181, 253, 0.85);
-  animation: submit-spinner-rotate 0.65s linear infinite;
-  box-shadow: 0 0 10px rgba(125, 211, 252, 0.35);
+  opacity: 0.88;
 }
 .btn-submit-project.is-loading .btn-submit-label {
   letter-spacing: 0.02em;
-  opacity: 0.96;
-}
-@keyframes submit-btn-aura-pulse {
-  0%,
-  100% {
-    transform: scale(0.96);
-    opacity: 0.65;
-  }
-  50% {
-    transform: scale(1.03);
-    opacity: 1;
-  }
-}
-@keyframes submit-spinner-rotate {
-  to {
-    transform: rotate(360deg);
-  }
 }
 .btn-ghost {
   background: var(--panel);
@@ -4684,10 +4621,6 @@ html {
   .toast--success .toast-detail,
   .toast--success .toast-meta {
     animation: none;
-  }
-  .btn-submit-project .btn-submit-aura,
-  .btn-submit-project .btn-submit-spinner {
-    animation: none !important;
   }
   .confetti-piece {
     animation-duration: 0.01ms !important;

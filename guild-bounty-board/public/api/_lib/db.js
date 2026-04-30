@@ -9,6 +9,15 @@ const DEFAULT_HACKATHON_ID =
   process.env.DEFAULT_HACKATHON_ID ||
   "a0000001-0000-4000-8000-000000000001";
 
+/** Slug matching `hacks.json` `active_hack_id` (UI filters on this, not the UUID). */
+const ACTIVE_HACK_SLUG =
+  process.env.ACTIVE_HACK_SLUG || "cursor-live-london-q3-2026";
+
+function withClientHackFields(row) {
+  if (!row) return row;
+  return { ...row, hack_id: ACTIVE_HACK_SLUG, timestamp: row.submitted_at };
+}
+
 async function supabaseRest(path, options = {}) {
   const url = getEnv("SUPABASE_PROJECT_URL");
   const key = getEnv("SUPABASE_SERVICE_ROLE_SECRET");
@@ -36,7 +45,7 @@ async function getSubmissions() {
   const rows = await supabaseRest(
     `/submissions?hackathon_id=eq.${hid}&order=submitted_at.desc.nullsfirst`
   );
-  return (rows || []).map(r => ({ ...r, timestamp: r.submitted_at }));
+  return (rows || []).map((r) => withClientHackFields(r));
 }
 
 async function upsertSubmission(row) {
@@ -80,7 +89,8 @@ async function upsertSubmission(row) {
     headers: { Prefer: "return=representation,resolution=merge-duplicates" },
     body: JSON.stringify(payload),
   });
-  return result && result[0] ? { ...result[0], timestamp: result[0].submitted_at } : payload;
+  if (result && result[0]) return withClientHackFields(result[0]);
+  return withClientHackFields({ ...payload, submitted_at: payload.submitted_at });
 }
 
 // --- Judge Responses ---

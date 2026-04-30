@@ -106,8 +106,10 @@ function submissionMatchesActiveHack(sub) {
   if (!sub || typeof sub !== "object") return false;
   const active = String(getActiveHackId() || "").trim();
   const h = String(sub.hack_id || "").trim();
-  if (!h) return false;
-  return h === active;
+  if (h) return h === active;
+  // Legacy rows from API: only `hackathon_id` (UUID). GET is scoped to the default hackathon.
+  if (String(sub.hackathon_id || "").trim()) return !!active;
+  return false;
 }
 
 function hackStorageSlug() {
