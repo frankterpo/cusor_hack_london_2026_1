@@ -1010,21 +1010,32 @@
             <select id="judge-submission-picker" class="judge-submission-picker"></select>
           </label>
           <div
-            id="judge-mine-toggle-wrap"
-            class="judge-mine-toggle-wrap"
-            hidden
-            aria-hidden="true"
+            id="judge-coverage-wrap"
+            class="judge-coverage-wrap"
+            aria-live="polite"
           >
-            <label class="judge-mine-toggle">
-              <input type="checkbox" id="judge-mine-only" checked />
-              <span>Show only my assigned submissions</span>
-            </label>
+            <p class="judge-coverage-label">Judge coverage</p>
+            <div id="judge-coverage-chips" class="judge-coverage-chips"></div>
             <p
               id="judge-queue-stats"
               class="judge-queue-stats"
               aria-live="polite"
             ></p>
           </div>
+          <details
+            id="judge-mine-toggle-wrap"
+            class="judge-mine-toggle-wrap"
+            hidden
+            aria-hidden="true"
+          >
+            <summary class="judge-mine-toggle-summary">
+              Filter to my assigned slice (advanced)
+            </summary>
+            <label class="judge-mine-toggle">
+              <input type="checkbox" id="judge-mine-only" />
+              <span>Show only my assigned 12</span>
+            </label>
+          </details>
           <div class="field judge-session-field">
             <span class="field-label">Judging as</span>
             <p
@@ -1731,6 +1742,6 @@
       </div>
     </div>
 
-    <script src="script.js?v=98"></script>
+    <script src="script.js?v=99"></script>
   </body>
 </html>

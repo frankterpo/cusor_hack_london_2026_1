@@ -197,8 +197,25 @@ function isAssignedToCurrentJudge(entry) {
 
 function isJudgeMineOnlyChecked() {
   const cb = document.getElementById("judge-mine-only");
-  if (!cb) return true; // Default ON before checkbox renders
+  if (!cb) return false; // Default OFF — judges self-coordinate via coverage view
   return !!cb.checked;
+}
+
+/** Names of judges (configured + walk-in) who scored this submission. */
+function scoredJudgeNamesForRow(row) {
+  const info = getJudgeInfoForRow(row);
+  if (!info || !Array.isArray(info.responses)) return [];
+  const seen = new Set();
+  const out = [];
+  info.responses.forEach((r) => {
+    const raw = String(r.judge_name || r.judge || "").trim();
+    if (!raw) return;
+    const k = normalizeJudgeName(raw);
+    if (seen.has(k)) return;
+    seen.add(k);
+    out.push(raw);
+  });
+  return out;
 }
 
 /**
@@ -1651,8 +1668,10 @@ function syncJudgeFullViewFromSelection() {
 
 function onJudgeSubmissionSelectChanged() {
   const selectedId = document.getElementById("judge-submission-select")?.value || "";
-  const idx = getJudgeReviewEntries().findIndex((e) => e.id === selectedId);
+  const allEntries = getJudgeReviewEntries();
+  const idx = allEntries.findIndex((e) => e.id === selectedId);
   if (idx >= 0) judgeCurrentIndex = idx;
+  renderJudgeCoverageChips(allEntries);
   renderJudgeSubmissionSummary();
   syncJudgeFullViewFromSelection();
 }
@@ -1878,6 +1897,7 @@ function getJudgeReviewEntries() {
       sub: sub || null,
       assignedJudge: "",
       assignedIndex: -1,
+      scoredBy: scoredJudgeNamesForRow(r),
     });
   });
 
@@ -1923,26 +1943,34 @@ function refreshJudgeSubmissionSelect() {
   const totalAll = allEntries.length;
   const totalMine = mineEntries.length;
   const unscoredCount = entries.filter((e) => !e.scored).length;
+  const totalConfiguredJudges = getJudgePool().length;
   let placeholder;
   if (!total) {
     placeholder = "— no submissions in queue —";
   } else if (mineOnly) {
     placeholder = `— pick yours (${totalMine} assigned, ${unscoredCount} unscored, ${totalAll} total) —`;
   } else if (hasAssignment) {
-    placeholder = `— pick any (${totalMine} mine, ${totalAll} total, ${unscoredCount} unscored) —`;
+    placeholder = `— pick a submission (${totalAll} in queue, ${unscoredCount} unscored) —`;
   } else {
     placeholder = `— pick a submission (${total} in queue, ${unscoredCount} unscored) —`;
   }
   const options = [`<option value="">${escapeHtml(placeholder)}</option>`];
   entries.forEach((e, idx) => {
-    const statusBit = e.scored ? "scored" : "unscored";
-    const mineTag = hasAssignment && isAssignedToCurrentJudge(e) ? " · mine" : "";
-    const assignedBit = !mineOnly && e.assignedJudge ? ` → ${e.assignedJudge}` : "";
-    const optTitle = `${idx + 1}/${total} · ${e.name} — ${e.trackLabel} (${statusBit})${mineTag}${assignedBit}`;
+    const statusBit = e.scored ? "you scored" : "unscored by you";
+    const scoredCount = (e.scoredBy || []).length;
+    const coverageBit = scoredCount
+      ? ` · ${scoredCount}/${totalConfiguredJudges || scoredCount} scored`
+      : " · 0 scored";
+    const scorers = (e.scoredBy || []).slice(0, 6).join(", ");
+    const optTitle = `${idx + 1}/${total} · ${e.name} — ${e.trackLabel} · ${statusBit}${coverageBit}${
+      scorers ? ` · by ${scorers}` : ""
+    }`;
     options.push(
       `<option value="${escapeAttr(e.id)}" title="${escapeAttr(optTitle)}">${escapeHtml(
         `${idx + 1}/${total}`
-      )} · ${escapeHtml(e.name)} · ${escapeHtml(statusBit)}${escapeHtml(mineTag)}</option>`
+      )} · ${escapeHtml(e.name)}${escapeHtml(coverageBit)}${escapeHtml(
+        scorers ? ` (${scorers})` : ""
+      )}</option>`
     );
   });
 
@@ -1965,8 +1993,88 @@ function refreshJudgeSubmissionSelect() {
   }
   if (picker) picker.value = select.value;
   updateJudgeQueueStatsUi({ totalAll, totalMine, hasAssignment, mineOnly });
+  renderJudgeCoverageChips(allEntries);
   renderJudgeSubmissionSummary();
   syncJudgeFullViewFromSelection();
+}
+
+function renderJudgeCoverageChips(allEntries) {
+  const host = document.getElementById("judge-coverage-chips");
+  if (!host) return;
+  const select = document.getElementById("judge-submission-select");
+  const selectedId = select && select.value ? select.value : "";
+  const selected = selectedId ? allEntries.find((e) => e.id === selectedId) : null;
+
+  const pool = getJudgePool();
+  const chips = [];
+
+  if (selected) {
+    const scoredSet = new Set((selected.scoredBy || []).map(normalizeJudgeName));
+    pool.forEach((j) => {
+      const has = scoredSet.has(normalizeJudgeName(j.name));
+      chips.push(
+        `<span class="judge-cov-chip ${has ? "is-scored" : "is-pending"}" title="${escapeAttr(
+          (has ? "Scored: " : "Awaiting: ") + j.name
+        )}">${has ? "✓ " : ""}${escapeHtml(j.name)}</span>`
+      );
+    });
+    // Walk-in (non-configured) judges who scored this submission
+    const poolNorm = new Set(pool.map((j) => normalizeJudgeName(j.name)));
+    (selected.scoredBy || []).forEach((name) => {
+      if (!poolNorm.has(normalizeJudgeName(name))) {
+        chips.push(
+          `<span class="judge-cov-chip is-extra" title="${escapeAttr(
+            "Scored (walk-in): " + name
+          )}">+ ${escapeHtml(name)}</span>`
+        );
+      }
+    });
+    const totalConfigured = pool.length;
+    const scoredFromPool = pool.filter((j) =>
+      scoredSet.has(normalizeJudgeName(j.name))
+    ).length;
+    host.innerHTML = `<span class="judge-cov-meta">${escapeHtml(selected.name)} · ${scoredFromPool}/${totalConfigured} of panel scored</span>${chips.join(
+      ""
+    )}`;
+  } else {
+    // Aggregate coverage across the whole queue
+    const totalSubs = allEntries.length;
+    if (!totalSubs) {
+      host.innerHTML = "";
+      return;
+    }
+    const counts = {};
+    pool.forEach((j) => {
+      counts[normalizeJudgeName(j.name)] = 0;
+    });
+    let walkIn = 0;
+    const poolNorm = new Set(pool.map((j) => normalizeJudgeName(j.name)));
+    allEntries.forEach((e) => {
+      (e.scoredBy || []).forEach((nm) => {
+        const k = normalizeJudgeName(nm);
+        if (k in counts) counts[k] += 1;
+        else if (!poolNorm.has(k)) walkIn += 1;
+      });
+    });
+    pool.forEach((j) => {
+      const k = normalizeJudgeName(j.name);
+      const c = counts[k];
+      chips.push(
+        `<span class="judge-cov-chip ${c > 0 ? "is-scored" : "is-pending"}" title="${escapeAttr(
+          `${j.name}: ${c}/${totalSubs} scored`
+        )}">${escapeHtml(j.name)} <em>${c}/${totalSubs}</em></span>`
+      );
+    });
+    host.innerHTML = `<span class="judge-cov-meta">Pick a submission to see who scored it. Across ${totalSubs}:</span>${chips.join(
+      ""
+    )}${
+      walkIn
+        ? `<span class="judge-cov-chip is-extra" title="${escapeAttr(
+            "Walk-in scores: " + walkIn
+          )}">+ ${walkIn} walk-in</span>`
+        : ""
+    }`;
+  }
 }
 
 function updateJudgeQueueStatsUi({ totalAll, totalMine, hasAssignment, mineOnly }) {
@@ -1985,11 +2093,12 @@ function updateJudgeQueueStatsUi({ totalAll, totalMine, hasAssignment, mineOnly 
   }
   if (cb && !hasAssignment) cb.checked = false;
   if (stats) {
-    if (hasAssignment) {
-      const scope = mineOnly ? "yours" : "all";
-      stats.textContent = `${judgeName}: ${totalMine} assigned of ${totalAll} total · viewing ${scope}`;
+    if (hasAssignment && mineOnly) {
+      stats.textContent = `${judgeName}: viewing your assigned slice (${totalMine} of ${totalAll}). Untick to see everyone's queue.`;
+    } else if (hasAssignment) {
+      stats.textContent = `${judgeName} · viewing all ${totalAll}. (Your suggested slice would be ${totalMine}.)`;
     } else if (judgeName) {
-      stats.textContent = `Hi ${judgeName} — your name isn't in the configured judge panel; showing all ${totalAll}.`;
+      stats.textContent = `${judgeName} · viewing all ${totalAll}.`;
     } else {
       stats.textContent = "";
     }

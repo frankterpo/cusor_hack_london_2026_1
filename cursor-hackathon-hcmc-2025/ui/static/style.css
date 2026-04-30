@@ -2917,23 +2917,89 @@ html {
   font-size: 1rem;
   line-height: 1;
 }
-.judge-mine-toggle-wrap {
+.judge-coverage-wrap {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
   padding: 10px 12px;
   border: 1px solid rgba(109, 201, 219, 0.35);
   border-radius: 10px;
   background: rgba(109, 201, 219, 0.06);
 }
+.judge-coverage-label {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+}
+.judge-coverage-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.judge-cov-meta {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.7);
+  width: 100%;
+}
+.judge-cov-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.78);
+  white-space: nowrap;
+}
+.judge-cov-chip em {
+  font-style: normal;
+  opacity: 0.65;
+  font-variant-numeric: tabular-nums;
+}
+.judge-cov-chip.is-scored {
+  border-color: rgba(120, 220, 150, 0.55);
+  background: rgba(120, 220, 150, 0.14);
+  color: rgba(190, 245, 200, 1);
+}
+.judge-cov-chip.is-pending {
+  border-color: rgba(255, 200, 100, 0.45);
+  background: rgba(255, 200, 100, 0.08);
+  color: rgba(255, 220, 160, 0.95);
+}
+.judge-cov-chip.is-extra {
+  border-color: rgba(200, 200, 200, 0.35);
+  background: rgba(200, 200, 200, 0.06);
+  font-style: italic;
+}
+.judge-mine-toggle-wrap {
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+}
 .judge-mine-toggle-wrap[hidden] {
   display: none;
+}
+.judge-mine-toggle-summary {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  user-select: none;
+}
+.judge-mine-toggle-summary:hover {
+  color: rgba(255, 255, 255, 0.85);
 }
 .judge-mine-toggle {
   display: flex;
   gap: 8px;
   align-items: center;
-  font-size: 0.9rem;
+  margin-top: 8px;
+  font-size: 0.85rem;
   cursor: pointer;
   user-select: none;
 }
@@ -2945,7 +3011,7 @@ html {
 }
 .judge-queue-stats {
   margin: 0;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   color: rgba(255, 255, 255, 0.7);
 }
 .judge-nav-btn--refresh.is-loading {
