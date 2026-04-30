@@ -29,9 +29,11 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
       setName(attendee.name);
       setCurrentStep('email');
       setExpectedEmail(attendee.email);
+      setEmail(attendee.email);
     } else {
       setCurrentStep('name');
       setExpectedEmail(null);
+      setEmail('');
     }
   };
 
@@ -75,7 +77,9 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
       }
       const resolved = validationData.resolvedName?.trim();
       if (resolved) setName(resolved);
-      setExpectedEmail(validationData.expectedEmail || null);
+      const resolvedEmail = validationData.expectedEmail || selectedAttendee?.email || '';
+      setExpectedEmail(resolvedEmail || null);
+      if (resolvedEmail) setEmail(resolvedEmail);
       setCurrentStep('email');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Validation failed');
@@ -85,12 +89,9 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
   };
 
   const validateEmailStep = async () => {
-    if (!email.trim()) {
+    const emailForValidation = (expectedEmail || email).toLowerCase().trim();
+    if (!emailForValidation) {
       setError('Please enter your email address');
-      return;
-    }
-    if (expectedEmail && email.toLowerCase().trim() !== expectedEmail.toLowerCase()) {
-      setError('Email does not match the expected address.');
       return;
     }
     setIsLoading(true);
@@ -102,7 +103,7 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
         body: JSON.stringify({
           step: 'email',
           name: name.trim(),
-          email: email.toLowerCase().trim(),
+          email: emailForValidation,
           projectId: effectiveProjectId,
           eventId: effectiveProjectId ? undefined : 'sample-event-1',
         }),
@@ -132,6 +133,7 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
   };
 
   const handleRedemption = async () => {
+    const emailForRedemption = (expectedEmail || email).toLowerCase().trim();
     setIsLoading(true);
     setError(null);
     try {
@@ -140,7 +142,7 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: name.trim(),
-          email: email.toLowerCase().trim(),
+          email: emailForRedemption,
           projectId: effectiveProjectId,
           eventId: effectiveProjectId ? undefined : 'sample-event-1',
         }),
@@ -226,7 +228,10 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
               autoComplete="email"
               placeholder="Enter your email address"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                if (!expectedEmail) setEmail(e.target.value);
+              }}
+              readOnly={!!expectedEmail}
               disabled={currentStep === 'ready' || isLoading}
               className={inputClass}
             />
