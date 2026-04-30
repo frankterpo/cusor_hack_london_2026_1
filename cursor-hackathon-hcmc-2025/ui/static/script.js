@@ -1398,6 +1398,40 @@ function openModal(id) {
   if (id === "judge-modal") {
     openJudgeSidePanel();
     refreshJudgeSubmissionSelect();
+    refreshJudgeSubmissions({ silent: true });
+  }
+}
+
+/**
+ * Pull fresh submissions from the API and re-render the judge picker.
+ * Without this, anyone who opened the page before submissions came in
+ * would forever see "1 / 1" — there's no other refresh trigger.
+ */
+async function refreshJudgeSubmissions({ silent = false } = {}) {
+  const btn = document.getElementById("judge-refresh-submissions");
+  if (btn) {
+    btn.disabled = true;
+    btn.classList.add("is-loading");
+  }
+  try {
+    await loadSummary();
+    const before = (document.getElementById("judge-submission-select")?.options.length || 1) - 1;
+    refreshJudgeSubmissionSelect();
+    const after = (document.getElementById("judge-submission-select")?.options.length || 1) - 1;
+    updateSubmissionsCount(window.__summaryRows || []);
+    if (!silent) {
+      const delta = after - before;
+      if (delta > 0) toast(`+${delta} new submission${delta === 1 ? "" : "s"} loaded`);
+      else toast(`${after} submissions — list up to date`);
+    }
+  } catch (err) {
+    if (!silent) toast("Could not refresh submissions");
+    console.error("refreshJudgeSubmissions", err);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.classList.remove("is-loading");
+    }
   }
 }
 function getJudgeApiRepoId() {
@@ -3071,6 +3105,8 @@ document.addEventListener("DOMContentLoaded", () => {
   if (prevJudge) prevJudge.addEventListener("click", () => moveJudgeSubmission(-1));
   const nextJudge = document.getElementById("judge-next-submission");
   if (nextJudge) nextJudge.addEventListener("click", () => moveJudgeSubmission(1));
+  const refreshJudge = document.getElementById("judge-refresh-submissions");
+  if (refreshJudge) refreshJudge.addEventListener("click", () => refreshJudgeSubmissions({ silent: false }));
   const moreInfo = document.getElementById("judge-more-info");
   if (moreInfo) {
     moreInfo.addEventListener("click", () => {

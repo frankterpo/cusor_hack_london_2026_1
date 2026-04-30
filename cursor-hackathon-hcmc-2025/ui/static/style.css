@@ -2909,6 +2909,22 @@ html {
   color: #fff;
   transform: none;
 }
+.judge-nav-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.judge-nav-btn--refresh {
+  font-size: 1rem;
+  line-height: 1;
+}
+.judge-nav-btn--refresh.is-loading {
+  animation: judge-refresh-spin 0.8s linear infinite;
+  color: rgba(109, 201, 219, 0.95);
+  border-color: rgba(109, 201, 219, 0.55);
+}
+@keyframes judge-refresh-spin {
+  to { transform: rotate(360deg); }
+}
 .judge-video-title-wrap {
   min-width: 0;
   text-align: center;
