@@ -1,6 +1,8 @@
 import { RedemptionForm } from '@/features/attendees/components/RedemptionForm';
 import { EventMarketingHeader } from '@/components/event/EventMarketingHeader';
 
+const LONDON_2026_FIRESTORE_PROJECT_ID = 'nynsjuhYRTQhxTNZgywQ';
+
 /** Legacy sample redeem route — prefer `/credits/event/[slug]/redeem`. */
 export default function RedeemPage() {
   return (
@@ -13,7 +15,7 @@ export default function RedeemPage() {
           <p className="mt-2 text-sm text-muted-foreground">Demo project — use event slug URLs in production.</p>
         </div>
         <div className="panel-event">
-          <RedemptionForm projectId="cursor-hackathon-london-2026-1" />
+          <RedemptionForm projectId={LONDON_2026_FIRESTORE_PROJECT_ID} />
         </div>
       </div>
     </div>

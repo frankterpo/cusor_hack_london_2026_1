@@ -20,6 +20,7 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
   const [email, setEmail] = useState('');
   const [selectedAttendee, setSelectedAttendee] = useState<AttendeeForSuggestion | null>(null);
   const [expectedEmail, setExpectedEmail] = useState<string | null>(null);
+  const effectiveProjectId = selectedAttendee?.projectId || projectId;
 
   const handleAttendeeSelect = (attendee: AttendeeForSuggestion | null) => {
     setSelectedAttendee(attendee);
@@ -52,8 +53,8 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
         body: JSON.stringify({
           step: 'name',
           name: name.trim(),
-          projectId,
-          eventId: projectId ? undefined : 'sample-event-1',
+          projectId: effectiveProjectId,
+          eventId: effectiveProjectId ? undefined : 'sample-event-1',
         }),
       });
       const result = await response.json();
@@ -102,8 +103,8 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
           step: 'email',
           name: name.trim(),
           email: email.toLowerCase().trim(),
-          projectId,
-          eventId: projectId ? undefined : 'sample-event-1',
+          projectId: effectiveProjectId,
+          eventId: effectiveProjectId ? undefined : 'sample-event-1',
         }),
       });
       const result = await response.json();
@@ -140,8 +141,8 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
         body: JSON.stringify({
           name: name.trim(),
           email: email.toLowerCase().trim(),
-          projectId,
-          eventId: projectId ? undefined : 'sample-event-1',
+          projectId: effectiveProjectId,
+          eventId: effectiveProjectId ? undefined : 'sample-event-1',
         }),
       });
       const result = await response.json();

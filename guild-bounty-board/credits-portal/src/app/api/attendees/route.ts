@@ -3,6 +3,8 @@ import { db } from '@/lib/firebase';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { hasMeaningfulCheckedIn } from '@/lib/attendee-checked-in';
 
+const LONDON_2026_FIRESTORE_PROJECT_ID = 'nynsjuhYRTQhxTNZgywQ';
+
 /**
  * Public API route for fetching attendees during redemption flow
  * This is separate from the admin attendees API and handles the public redemption process
@@ -25,6 +27,7 @@ export async function GET(request: NextRequest) {
               id: doc.id,
               name: data.name,
               email: data.email,
+              projectId: data.projectId || null,
               hasRedeemed: data.hasRedeemedCode || false,
               hasCheckedIn:
                 hasMeaningfulCheckedIn(data as Record<string, unknown>) ||
@@ -52,13 +55,28 @@ export async function GET(request: NextRequest) {
       query(collection(db, 'attendees'), where('projectId', '==', projectId))
     );
 
+    let attendeeDocs = attendeesSnapshot.docs;
+
+    // London hotfix: the public project route can pass an old slug/id while ops imported
+    // the checked-in Luma attendees under the Firestore doc id below.
+    if (attendeeDocs.length === 0 && projectId !== LONDON_2026_FIRESTORE_PROJECT_ID) {
+      const fallbackSnapshot = await getDocs(
+        query(
+          collection(db, 'attendees'),
+          where('projectId', '==', LONDON_2026_FIRESTORE_PROJECT_ID)
+        )
+      );
+      attendeeDocs = fallbackSnapshot.docs;
+    }
+
     // Process attendees
-    const attendees = attendeesSnapshot.docs.map((doc) => {
+    const attendees = attendeeDocs.map((doc) => {
       const data = doc.data();
       return {
         id: doc.id,
         name: data.name,
         email: data.email,
+        projectId: data.projectId || projectId,
         hasRedeemed: data.hasRedeemedCode || false,
         hasCheckedIn:
           hasMeaningfulCheckedIn(data as Record<string, unknown>) ||
