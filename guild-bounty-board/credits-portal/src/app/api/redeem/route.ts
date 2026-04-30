@@ -19,9 +19,20 @@ import {
 import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { AttendeeRedemptionSchema } from '@/features/attendees/model';
 import type { ApiResponse } from '@/lib/types';
+import { LONDON_CREDIT_ASSIGNMENTS } from '@/lib/london-credit-assignments';
 
 function normEmail(em: string) {
   return em.trim().toLowerCase();
+}
+
+function findStaticAssignment(nameInput: string, emailInput: string) {
+  const wantName = nameInput.trim().toLowerCase();
+  const wantEmail = normEmail(emailInput);
+  return LONDON_CREDIT_ASSIGNMENTS.find(
+    (row) =>
+      row.name.trim().toLowerCase() === wantName &&
+      normEmail(row.email) === wantEmail
+  );
 }
 
 async function findRedemptionForAttendee(
@@ -138,6 +149,26 @@ export async function POST(request: NextRequest) {
     }
 
     if (!attendeeDoc) {
+      const staticAssignment = findStaticAssignment(
+        validatedData.name,
+        validatedData.email
+      );
+      if (staticAssignment?.cursorUrl) {
+        const response: ApiResponse = {
+          success: true,
+          data: {
+            code: staticAssignment.code,
+            cursorUrl: staticAssignment.cursorUrl,
+            name: staticAssignment.name,
+            email: staticAssignment.email,
+            redemptionId: `static-${staticAssignment.attendeeId}`,
+            fromStaticFallback: true,
+          },
+          timestamp: new Date(),
+        };
+        return NextResponse.json(response);
+      }
+
       const response: ApiResponse = {
         success: false,
         error: 'Attendee not found. Please validate your information first.',

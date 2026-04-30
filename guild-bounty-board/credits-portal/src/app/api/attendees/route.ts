@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/firebase';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { hasMeaningfulCheckedIn } from '@/lib/attendee-checked-in';
+import { LONDON_CREDIT_ASSIGNMENTS } from '@/lib/london-credit-assignments';
 
 const LONDON_2026_FIRESTORE_PROJECT_ID = 'nynsjuhYRTQhxTNZgywQ';
 
@@ -67,6 +68,20 @@ export async function GET(request: NextRequest) {
         )
       );
       attendeeDocs = fallbackSnapshot.docs;
+    }
+
+    if (attendeeDocs.length === 0) {
+      return NextResponse.json({
+        success: true,
+        attendees: LONDON_CREDIT_ASSIGNMENTS.map((attendee) => ({
+          id: attendee.attendeeId,
+          name: attendee.name,
+          email: attendee.email,
+          projectId: attendee.projectId,
+          hasRedeemed: Boolean(attendee.cursorUrl || attendee.code),
+          hasCheckedIn: true,
+        })),
+      });
     }
 
     // Process attendees

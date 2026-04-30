@@ -12,9 +12,20 @@ import {
 import { AttendeeValidationStepSchema } from '@/features/attendees/model';
 import type { AttendeeValidationResponse } from '@/features/attendees/model';
 import { hasMeaningfulCheckedIn } from '@/lib/attendee-checked-in';
+import { LONDON_CREDIT_ASSIGNMENTS } from '@/lib/london-credit-assignments';
 
 function normEmail(em: string) {
   return em.trim().toLowerCase();
+}
+
+function findStaticAssignment(nameInput: string, emailInput?: string) {
+  const wantName = nameInput.trim().toLowerCase();
+  const wantEmail = emailInput ? normEmail(emailInput) : null;
+  return LONDON_CREDIT_ASSIGNMENTS.find((row) => {
+    if (row.name.trim().toLowerCase() !== wantName) return false;
+    if (wantEmail && normEmail(row.email) !== wantEmail) return false;
+    return true;
+  });
 }
 
 async function findAttendeeInProject(
@@ -132,6 +143,20 @@ async function validateNameStep(
     }
 
     if (!attendeeDoc) {
+      const staticAssignment = findStaticAssignment(name);
+      if (staticAssignment) {
+        const response: AttendeeValidationResponse = {
+          isValid: true,
+          attendeeId: staticAssignment.attendeeId,
+          resolvedName: staticAssignment.name,
+          expectedEmail: staticAssignment.email,
+          hasAlreadyRedeemed: Boolean(staticAssignment.cursorUrl),
+          cursorUrl: staticAssignment.cursorUrl || undefined,
+          error: undefined,
+        };
+        return NextResponse.json({ success: true, data: response });
+      }
+
       const response: AttendeeValidationResponse = {
         isValid: false,
         hasAlreadyRedeemed: false,
@@ -218,6 +243,18 @@ async function validateEmailStep(
     }
 
     if (!attendeeDoc) {
+      const staticAssignment = findStaticAssignment(name, email);
+      if (staticAssignment) {
+        const response: AttendeeValidationResponse = {
+          isValid: true,
+          attendeeId: staticAssignment.attendeeId,
+          hasAlreadyRedeemed: Boolean(staticAssignment.cursorUrl),
+          cursorUrl: staticAssignment.cursorUrl || undefined,
+          error: undefined,
+        };
+        return NextResponse.json({ success: true, data: response });
+      }
+
       const response: AttendeeValidationResponse = {
         isValid: false,
         hasAlreadyRedeemed: false,
