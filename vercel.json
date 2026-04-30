@@ -7,13 +7,11 @@
   "routes": [
     {
       "src": "/credits-portal/(.*)",
-      "dest": "${CREDITS_APP_URL}/credits/$1",
-      "env": ["CREDITS_APP_URL"]
+      "dest": "https://credits-portal.vercel.app/credits/$1"
     },
     {
       "src": "/credits-portal",
-      "dest": "${CREDITS_APP_URL}/credits/event/cursor-hackathon-london-2026/redeem",
-      "env": ["CREDITS_APP_URL"]
+      "dest": "https://credits-portal.vercel.app/credits/event/cursor-hackathon-london-2026/redeem"
     }
   ],
   "headers": [
