@@ -6,6 +6,20 @@ import { RedemptionForm } from '@/features/attendees/components/RedemptionForm';
 import { EventMarketingHeader } from '@/components/event/EventMarketingHeader';
 import Link from 'next/link';
 
+const LONDON_PROJECT = {
+  id: 'nynsjuhYRTQhxTNZgywQ',
+  name: 'Cursor x Briefcase — London 2026',
+  slug: 'cursor-hackathon-london-2026',
+};
+
+function isLondonRedeemSlug(slug: string) {
+  return [
+    'cursor-hackathon-london-2026',
+    'cursor-hackathon-london-2026-1',
+    'london-2026',
+  ].includes(slug);
+}
+
 export default function ProjectRedeemPage() {
   const params = useParams();
   const slug = params.slug as string;
@@ -14,6 +28,13 @@ export default function ProjectRedeemPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    if (isLondonRedeemSlug(slug)) {
+      setProject(LONDON_PROJECT);
+      setError('');
+      setIsLoading(false);
+      return;
+    }
+
     fetchProjectBySlug();
   }, [slug]);
 
