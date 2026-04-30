@@ -146,7 +146,11 @@ async function validateNameStep(
     }
 
     const attendeeData = attendeeDoc.data();
-    if (!hasMeaningfulCheckedIn(attendeeData as Record<string, unknown>)) {
+    const hasAlreadyRedeemed = !!(attendeeData.hasRedeemedCode || false);
+    if (
+      !hasAlreadyRedeemed &&
+      !hasMeaningfulCheckedIn(attendeeData as Record<string, unknown>)
+    ) {
       const response: AttendeeValidationResponse = {
         isValid: false,
         hasAlreadyRedeemed: false,
@@ -156,7 +160,6 @@ async function validateNameStep(
       return NextResponse.json({ success: true, data: response });
     }
 
-    const hasAlreadyRedeemed = !!(attendeeData.hasRedeemedCode || false);
     const cursorUrl = hasAlreadyRedeemed
       ? await cursorUrlAlreadyAssigned(attendeeDoc.id, attendeeData as Record<string, unknown>)
       : undefined;
@@ -228,7 +231,11 @@ async function validateEmailStep(
     }
 
     const attendeeData = attendeeDoc.data();
-    if (!hasMeaningfulCheckedIn(attendeeData as Record<string, unknown>)) {
+    const hasAlreadyRedeemed = !!(attendeeData.hasRedeemedCode || false);
+    if (
+      !hasAlreadyRedeemed &&
+      !hasMeaningfulCheckedIn(attendeeData as Record<string, unknown>)
+    ) {
       const response: AttendeeValidationResponse = {
         isValid: false,
         hasAlreadyRedeemed: false,
@@ -238,7 +245,6 @@ async function validateEmailStep(
       return NextResponse.json({ success: true, data: response });
     }
 
-    const hasAlreadyRedeemed = !!(attendeeData.hasRedeemedCode || false);
     const cursorUrl = hasAlreadyRedeemed
       ? await cursorUrlAlreadyAssigned(attendeeDoc.id, attendeeData as Record<string, unknown>)
       : undefined;

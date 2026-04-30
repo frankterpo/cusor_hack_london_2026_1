@@ -26,7 +26,9 @@ export async function GET(request: NextRequest) {
               name: data.name,
               email: data.email,
               hasRedeemed: data.hasRedeemedCode || false,
-              hasCheckedIn: hasMeaningfulCheckedIn(data as Record<string, unknown>),
+              hasCheckedIn:
+                hasMeaningfulCheckedIn(data as Record<string, unknown>) ||
+                !!data.hasRedeemedCode,
             };
           })
           .filter(attendee => attendee.name && attendee.email);
@@ -58,7 +60,9 @@ export async function GET(request: NextRequest) {
         name: data.name,
         email: data.email,
         hasRedeemed: data.hasRedeemedCode || false,
-        hasCheckedIn: hasMeaningfulCheckedIn(data as Record<string, unknown>),
+        hasCheckedIn:
+          hasMeaningfulCheckedIn(data as Record<string, unknown>) ||
+          !!data.hasRedeemedCode,
       };
     }).filter((attendee) => attendee.name && attendee.email);
 

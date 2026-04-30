@@ -1,8 +1,22 @@
 /**
- * Whether an attendee record has a real Luma / ops check-in timestamp (string or Firestore Timestamp).
+ * Whether an attendee record has a real Luma / ops check-in marker.
+ * Supports both normalized Firestore fields and raw Luma CSV/API shapes.
  */
 export function hasMeaningfulCheckedIn(data: Record<string, unknown>): boolean {
-  const c = data.checkedInAt;
+  if (
+    data.hasCheckedIn === true ||
+    data.checkedIn === true ||
+    data.isCheckedIn === true ||
+    data.checked_in === true
+  ) {
+    return true;
+  }
+
+  const c =
+    data.checkedInAt ??
+    data.checked_in_at ??
+    data.checkedInAtIso ??
+    data.checkedInTime;
   if (c == null || c === "") return false;
   if (
     typeof c === "object" &&
@@ -15,8 +29,11 @@ export function hasMeaningfulCheckedIn(data: Record<string, unknown>): boolean {
     return d.getFullYear() >= 1900;
   }
   if (typeof c === "string") {
-    if (c.startsWith("0001")) return false;
-    return c.trim().length > 4;
+    const trimmed = c.trim();
+    if (!trimmed || trimmed.startsWith("0001")) return false;
+    if (["false", "no", "null", "undefined"].includes(trimmed.toLowerCase()))
+      return false;
+    return trimmed.length > 4;
   }
   return Boolean(c);
 }

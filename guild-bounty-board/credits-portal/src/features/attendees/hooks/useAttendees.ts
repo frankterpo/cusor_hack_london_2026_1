@@ -46,15 +46,17 @@ export function useAttendees(projectId?: string) {
     }
   };
 
-  /** Checked-in guests only (for redeem name search). Legacy rows without flag still show. */
-  const checkedInForRedeem = attendees.filter(
-    (a) => a.hasCheckedIn !== false
+  /** Checked-in or already assigned guests. Fallback to all rows if the API has legacy check-in flags. */
+  const eligibleAttendees = attendees.filter(
+    (a) => a.hasCheckedIn !== false || a.hasRedeemed
   );
+  const redeemSearchPool =
+    eligibleAttendees.length > 0 ? eligibleAttendees : attendees;
 
   // Find attendee by exact name match (checked-in pool so ops pre-assign does not hide names)
   const findAttendeeByName = (name: string): AttendeeForSuggestion | null => {
     const trimmedName = name.trim();
-    return checkedInForRedeem.find(
+    return redeemSearchPool.find(
       attendee => attendee.name.toLowerCase() === trimmedName.toLowerCase()
     ) || null;
   };
@@ -64,7 +66,7 @@ export function useAttendees(projectId?: string) {
     if (!input || input.length < 1) return [];
 
     const searchWords = input.toLowerCase().trim().split(/\s+/).filter(w => w.length > 0);
-    return checkedInForRedeem
+    return redeemSearchPool
       .filter(attendee => {
         const name = attendee.name.toLowerCase();
         return searchWords.every(word => name.includes(word));
