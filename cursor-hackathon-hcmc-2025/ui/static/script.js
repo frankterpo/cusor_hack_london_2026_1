@@ -650,13 +650,18 @@ async function loadSummary() {
     loadSubmissionData(),
   ]);
   const summaryRows = summaryData.rows || [];
-  const dedupApi = Array.from(submissionMap.values()).filter((value, index, array) => {
-    return (
-      array.findIndex(
-        (candidate) => candidate.submission_id === value.submission_id
-      ) === index
-    );
-  });
+  const seenSubKeys = new Set();
+  const dedupApi = [];
+  for (const value of submissionMap.values()) {
+    const key =
+      normalizeRepoKey(value.repo_url || "") ||
+      (value.submission_id ? `sid:${value.submission_id}` : "") ||
+      slugify(value.project_name || "") ||
+      slugify(value.team_name || "");
+    if (!key || seenSubKeys.has(key)) continue;
+    seenSubKeys.add(key);
+    dedupApi.push(value);
+  }
   const merged = mergeRows(summaryRows, dedupApi);
   window.__summaryRows = merged;
   maybeRenderSummaryTable();
