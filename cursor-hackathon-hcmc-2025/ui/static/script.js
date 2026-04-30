@@ -102,6 +102,105 @@ function getActiveHackId() {
   );
 }
 
+// ---------- Judge delegation (deterministic hash-based assignment) ----------
+//
+// Each submission is deterministically assigned to one judge in the configured
+// judge pool via `djb2(repo_url) % numJudges`. With N judges and S submissions,
+// each judge gets roughly S/N (e.g. 60/5 = 12). The current judge identifies
+// themselves by typing their name into the auth gate; we fuzzy-match it
+// against the judge pool from `event-format.json`.
+
+function djb2Hash(str) {
+  let h = 5381;
+  const s = String(str || "");
+  for (let i = 0; i < s.length; i++) {
+    h = (((h << 5) + h) ^ s.charCodeAt(i)) >>> 0;
+  }
+  return h >>> 0;
+}
+
+function normalizeJudgeName(s) {
+  return String(s || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
+function getJudgePool() {
+  const list = eventFormat && Array.isArray(eventFormat.judges) ? eventFormat.judges : [];
+  return list.filter((j) => j && j.name);
+}
+
+/** -1 if the typed name doesn't match any configured judge. */
+function getJudgeIndex(judgeName) {
+  const pool = getJudgePool();
+  if (!pool.length) return -1;
+  const target = normalizeJudgeName(judgeName);
+  if (!target) return -1;
+  const exact = pool.findIndex((j) => normalizeJudgeName(j.name) === target);
+  if (exact !== -1) return exact;
+  const partial = pool.findIndex((j) => {
+    const n = normalizeJudgeName(j.name);
+    return n.includes(target) || target.includes(n);
+  });
+  return partial;
+}
+
+function entryAssignmentKey(entry) {
+  const row = entry && entry.row;
+  const sub = entry && entry.sub;
+  return (
+    normalizeRepoKey((sub && sub.repo_url) || (row && row.repo) || "") ||
+    (sub && sub.submission_id) ||
+    (sub && sub.project_name) ||
+    (entry && entry.id) ||
+    ""
+  );
+}
+
+/**
+ * Balanced round-robin assignment: sort all entries by stable key, then
+ * assign sortedIndex(i) → judges[i % N]. Each judge gets ⌈S/N⌉ or ⌊S/N⌋
+ * submissions (e.g. 60/5 = 12 each). Mutates entries in-place to attach
+ * `assignedJudge` and `assignedIndex`.
+ */
+function assignJudgesBalanced(entries) {
+  const pool = getJudgePool();
+  if (!pool.length || !entries.length) {
+    entries.forEach((e) => {
+      e.assignedJudge = "";
+      e.assignedIndex = -1;
+    });
+    return;
+  }
+  // Stable sort by assignment key (alphabetical) — deterministic across reloads.
+  const sorted = entries
+    .map((entry, originalIdx) => ({ entry, originalIdx, key: entryAssignmentKey(entry) }))
+    .sort((a, b) => {
+      if (a.key < b.key) return -1;
+      if (a.key > b.key) return 1;
+      return a.originalIdx - b.originalIdx;
+    });
+  sorted.forEach((s, sortedIdx) => {
+    const judgeIdx = sortedIdx % pool.length;
+    s.entry.assignedIndex = judgeIdx;
+    s.entry.assignedJudge = pool[judgeIdx]?.name || "";
+  });
+}
+
+function isAssignedToCurrentJudge(entry) {
+  const me = getJudgeIndex(getJudgeNameForUi());
+  if (me === -1) return true; // Unknown judge → don't filter (managers, guests)
+  return entry && entry.assignedIndex === me;
+}
+
+function isJudgeMineOnlyChecked() {
+  const cb = document.getElementById("judge-mine-only");
+  if (!cb) return true; // Default ON before checkbox renders
+  return !!cb.checked;
+}
+
 /**
  * Belt-and-braces cutoff: even if a stale row was tagged with the active
  * hack_id, drop it unless `submitted_at` is on/after the event start.
@@ -1777,6 +1876,8 @@ function getJudgeReviewEntries() {
       isLocal: false,
       row: r,
       sub: sub || null,
+      assignedJudge: "",
+      assignedIndex: -1,
     });
   });
 
@@ -1787,6 +1888,14 @@ function getJudgeReviewEntries() {
     if (key && seen.has(key)) continue;
     if (key) seen.add(key);
     deduped.push(entry);
+  }
+
+  // Compute balanced round-robin judge assignment AFTER dedup so each judge
+  // gets ⌈S/N⌉ or ⌊S/N⌋ unique submissions (e.g. 60/5 = 12 each).
+  try {
+    assignJudgesBalanced(deduped);
+  } catch (err) {
+    console.warn("Judge assignment failed; falling back to no-assignment view", err);
   }
 
   return deduped.sort((a, b) => {
@@ -1800,21 +1909,40 @@ function refreshJudgeSubmissionSelect() {
   if (!select) return;
   const picker = document.getElementById("judge-submission-picker");
   const previous = select.value;
-  const entries = getJudgeReviewEntries();
+  const allEntries = getJudgeReviewEntries();
+
+  const judgeIdx = getJudgeIndex(getJudgeNameForUi());
+  const hasAssignment = judgeIdx !== -1;
+  const mineOnly = hasAssignment && isJudgeMineOnlyChecked();
+  const mineEntries = hasAssignment
+    ? allEntries.filter((e) => isAssignedToCurrentJudge(e))
+    : allEntries;
+  const entries = mineOnly ? mineEntries : allEntries;
 
   const total = entries.length;
+  const totalAll = allEntries.length;
+  const totalMine = mineEntries.length;
   const unscoredCount = entries.filter((e) => !e.scored).length;
-  const placeholder = total
-    ? `— pick a submission (${total} in queue, ${unscoredCount} unscored) —`
-    : "— pick a submission —";
+  let placeholder;
+  if (!total) {
+    placeholder = "— no submissions in queue —";
+  } else if (mineOnly) {
+    placeholder = `— pick yours (${totalMine} assigned, ${unscoredCount} unscored, ${totalAll} total) —`;
+  } else if (hasAssignment) {
+    placeholder = `— pick any (${totalMine} mine, ${totalAll} total, ${unscoredCount} unscored) —`;
+  } else {
+    placeholder = `— pick a submission (${total} in queue, ${unscoredCount} unscored) —`;
+  }
   const options = [`<option value="">${escapeHtml(placeholder)}</option>`];
   entries.forEach((e, idx) => {
     const statusBit = e.scored ? "scored" : "unscored";
-    const optTitle = `${idx + 1}/${total} · ${e.name} — ${e.trackLabel} (${statusBit})`;
+    const mineTag = hasAssignment && isAssignedToCurrentJudge(e) ? " · mine" : "";
+    const assignedBit = !mineOnly && e.assignedJudge ? ` → ${e.assignedJudge}` : "";
+    const optTitle = `${idx + 1}/${total} · ${e.name} — ${e.trackLabel} (${statusBit})${mineTag}${assignedBit}`;
     options.push(
       `<option value="${escapeAttr(e.id)}" title="${escapeAttr(optTitle)}">${escapeHtml(
         `${idx + 1}/${total}`
-      )} · ${escapeHtml(e.name)} · ${escapeHtml(statusBit)}</option>`
+      )} · ${escapeHtml(e.name)} · ${escapeHtml(statusBit)}${escapeHtml(mineTag)}</option>`
     );
   });
 
@@ -1836,8 +1964,36 @@ function refreshJudgeSubmissionSelect() {
     judgeCurrentIndex = 0;
   }
   if (picker) picker.value = select.value;
+  updateJudgeQueueStatsUi({ totalAll, totalMine, hasAssignment, mineOnly });
   renderJudgeSubmissionSummary();
   syncJudgeFullViewFromSelection();
+}
+
+function updateJudgeQueueStatsUi({ totalAll, totalMine, hasAssignment, mineOnly }) {
+  const stats = document.getElementById("judge-queue-stats");
+  const wrap = document.getElementById("judge-mine-toggle-wrap");
+  const cb = document.getElementById("judge-mine-only");
+  const judgeName = getJudgeNameForUi();
+  if (wrap) {
+    if (hasAssignment) {
+      wrap.hidden = false;
+      wrap.removeAttribute("aria-hidden");
+    } else {
+      wrap.hidden = true;
+      wrap.setAttribute("aria-hidden", "true");
+    }
+  }
+  if (cb && !hasAssignment) cb.checked = false;
+  if (stats) {
+    if (hasAssignment) {
+      const scope = mineOnly ? "yours" : "all";
+      stats.textContent = `${judgeName}: ${totalMine} assigned of ${totalAll} total · viewing ${scope}`;
+    } else if (judgeName) {
+      stats.textContent = `Hi ${judgeName} — your name isn't in the configured judge panel; showing all ${totalAll}.`;
+    } else {
+      stats.textContent = "";
+    }
+  }
 }
 
 function findSubmissionById(id) {
@@ -3136,6 +3292,14 @@ document.addEventListener("DOMContentLoaded", () => {
   if (nextJudge) nextJudge.addEventListener("click", () => moveJudgeSubmission(1));
   const refreshJudge = document.getElementById("judge-refresh-submissions");
   if (refreshJudge) refreshJudge.addEventListener("click", () => refreshJudgeSubmissions({ silent: false }));
+  const mineOnlyCb = document.getElementById("judge-mine-only");
+  if (mineOnlyCb) {
+    mineOnlyCb.addEventListener("change", () => {
+      refreshJudgeSubmissionSelect();
+      const sel = document.getElementById("judge-submission-select");
+      if (sel) onJudgeSubmissionSelectChanged();
+    });
+  }
   const moreInfo = document.getElementById("judge-more-info");
   if (moreInfo) {
     moreInfo.addEventListener("click", () => {

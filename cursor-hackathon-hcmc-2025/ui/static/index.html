@@ -1009,6 +1009,22 @@
             <span class="field-label">Submission</span>
             <select id="judge-submission-picker" class="judge-submission-picker"></select>
           </label>
+          <div
+            id="judge-mine-toggle-wrap"
+            class="judge-mine-toggle-wrap"
+            hidden
+            aria-hidden="true"
+          >
+            <label class="judge-mine-toggle">
+              <input type="checkbox" id="judge-mine-only" checked />
+              <span>Show only my assigned submissions</span>
+            </label>
+            <p
+              id="judge-queue-stats"
+              class="judge-queue-stats"
+              aria-live="polite"
+            ></p>
+          </div>
           <div class="field judge-session-field">
             <span class="field-label">Judging as</span>
             <p
@@ -1715,6 +1731,6 @@
       </div>
     </div>
 
-    <script src="script.js?v=97"></script>
+    <script src="script.js?v=98"></script>
   </body>
 </html>

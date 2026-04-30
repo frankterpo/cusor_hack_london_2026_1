@@ -2917,6 +2917,37 @@ html {
   font-size: 1rem;
   line-height: 1;
 }
+.judge-mine-toggle-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid rgba(109, 201, 219, 0.35);
+  border-radius: 10px;
+  background: rgba(109, 201, 219, 0.06);
+}
+.judge-mine-toggle-wrap[hidden] {
+  display: none;
+}
+.judge-mine-toggle {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 0.9rem;
+  cursor: pointer;
+  user-select: none;
+}
+.judge-mine-toggle input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #6dc9db;
+  cursor: pointer;
+}
+.judge-queue-stats {
+  margin: 0;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+}
 .judge-nav-btn--refresh.is-loading {
   animation: judge-refresh-spin 0.8s linear infinite;
   color: rgba(109, 201, 219, 0.95);
