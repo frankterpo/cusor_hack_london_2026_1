@@ -1468,6 +1468,18 @@ function closeModal(id) {
 }
 
 // ---------- Submit form ----------
+function setSubmitFormLoading(form, loading) {
+  if (!form) return;
+  const btn = form.querySelector(".btn-submit-project, button[type='submit']");
+  const cancel = form.querySelector(".modal-foot [data-close-modal]");
+  form.setAttribute("aria-busy", loading ? "true" : "false");
+  if (btn) {
+    btn.classList.toggle("is-loading", loading);
+    btn.disabled = !!loading;
+  }
+  if (cancel) cancel.disabled = !!loading;
+}
+
 async function handleSubmitForm(e) {
   e.preventDefault();
   const form = e.target;
@@ -1484,6 +1496,7 @@ async function handleSubmitForm(e) {
     description: data.description || "",
     notes: data.notes || "",
   };
+  setSubmitFormLoading(form, true);
   try {
     const res = await fetch("/api/submissions", {
       method: "POST",
@@ -1495,6 +1508,8 @@ async function handleSubmitForm(e) {
   } catch (err) {
     toast(err.message || "Submission failed. Supabase did not save it.");
     return;
+  } finally {
+    setSubmitFormLoading(form, false);
   }
   form.reset();
   closeModal("submit-modal");
@@ -1508,7 +1523,9 @@ async function handleSubmitForm(e) {
     }`,
     meta: "Your entry is saved. Judges and organizers can see it on the live board.",
   });
-  launchConfetti();
+  requestAnimationFrame(() => {
+    setTimeout(() => launchConfetti(), 90);
+  });
 }
 
 // ---------- Judge form ----------
@@ -2682,7 +2699,7 @@ function toast(message, options) {
     typeof opts.duration === "number"
       ? opts.duration
       : variant === "success"
-        ? 5200
+        ? 5800
         : 3500;
 
   let el = document.getElementById("toast-stack");
@@ -2703,8 +2720,9 @@ function toast(message, options) {
     const meta = String(opts.meta || "").trim();
     wrap.innerHTML =
       '<span class="toast-glow" aria-hidden="true"></span>' +
+      '<span class="toast-shine" aria-hidden="true"></span>' +
       '<div class="toast-surface">' +
-      '<span class="toast-check" aria-hidden="true">✓</span>' +
+      '<span class="toast-check" aria-hidden="true"><span class="toast-check-mark">✓</span></span>' +
       '<div class="toast-text">' +
       '<div class="toast-title"></div>' +
       (detail
@@ -2724,12 +2742,22 @@ function toast(message, options) {
   }
 
   el.appendChild(wrap);
-  setTimeout(() => {
-    wrap.style.opacity = "0";
-    wrap.style.transform = "translateY(8px)";
-    wrap.style.transition = "opacity 0.28s ease, transform 0.28s ease";
-    setTimeout(() => wrap.remove(), 320);
-  }, duration);
+  const dismiss = () => {
+    if (!wrap.isConnected) return;
+    const done = () => {
+      wrap.removeEventListener("animationend", onEnd);
+      clearTimeout(fallback);
+      wrap.remove();
+    };
+    const onEnd = (ev) => {
+      if (ev.target !== wrap || ev.animationName !== "toast-exit") return;
+      done();
+    };
+    wrap.addEventListener("animationend", onEnd);
+    wrap.classList.add("toast--exit");
+    const fallback = setTimeout(done, 650);
+  };
+  setTimeout(dismiss, duration);
 }
 
 const CONFETTI_COLORS = [
@@ -2745,6 +2773,35 @@ const CONFETTI_COLORS = [
   "#f87171",
 ];
 
+function spawnConfettiBurst(root, originX, originY, count, velocityScale, delayBase) {
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement("div");
+    p.className = "confetti-piece";
+    const angle = Math.random() * Math.PI * 2;
+    const speed = (5 + Math.random() * 14) * velocityScale;
+    const dx = Math.cos(angle) * speed * (12 + Math.random() * 12);
+    const dy =
+      Math.sin(angle) * speed * (9 + Math.random() * 9) - (32 + Math.random() * 55) * velocityScale;
+    const rot = (Math.random() - 0.5) * 1080;
+    const w = 4 + Math.random() * 8;
+    const h = 2.5 + Math.random() * 5.5;
+    const color =
+      CONFETTI_COLORS[(i + Math.floor(Math.random() * 5)) % CONFETTI_COLORS.length];
+    p.style.background = color;
+    p.style.width = `${w}px`;
+    p.style.height = `${h}px`;
+    p.style.left = `${originX}px`;
+    p.style.top = `${originY}px`;
+    p.style.borderRadius = Math.random() > 0.55 ? "50%" : "2px";
+    p.style.setProperty("--dx", `${dx}px`);
+    p.style.setProperty("--dy", `${dy}px`);
+    p.style.setProperty("--rot", `${rot}deg`);
+    const delay = delayBase + Math.random() * 0.14;
+    p.style.animationDelay = `${delay}s`;
+    root.appendChild(p);
+  }
+}
+
 function launchConfetti() {
   if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
     return;
@@ -2753,43 +2810,20 @@ function launchConfetti() {
   root.className = "confetti-layer";
   root.setAttribute("aria-hidden", "true");
   document.body.appendChild(root);
+  requestAnimationFrame(() => root.classList.add("confetti-layer--active"));
 
   const vw = window.innerWidth;
   const vh = window.innerHeight;
   const originX = vw / 2;
-  const originY = Math.min(vh * 0.38, vh * 0.5);
-  const count = 78;
+  const originY = Math.min(vh * 0.36, vh * 0.48);
 
-  for (let i = 0; i < count; i++) {
-    const p = document.createElement("div");
-    p.className = "confetti-piece";
-    const angle = Math.random() * Math.PI * 2;
-    const speed = 6 + Math.random() * 16;
-    const dx = Math.cos(angle) * speed * (14 + Math.random() * 10);
-    const dy =
-      Math.sin(angle) * speed * (10 + Math.random() * 8) - (40 + Math.random() * 60);
-    const rot = (Math.random() - 0.5) * 1440;
-    const w = 5 + Math.random() * 9;
-    const h = 3 + Math.random() * 6;
-    const color = CONFETTI_COLORS[(i + Math.floor(Math.random() * 5)) % CONFETTI_COLORS.length];
-    p.style.background = color;
-    p.style.width = `${w}px`;
-    p.style.height = `${h}px`;
-    p.style.left = `${originX}px`;
-    p.style.top = `${originY}px`;
-    p.style.setProperty("--dx", `${dx}px`);
-    p.style.setProperty("--dy", `${dy}px`);
-    p.style.setProperty("--rot", `${rot}deg`);
-    const delay = Math.random() * 0.12;
-    p.style.animationDelay = `${delay}s`;
-    root.appendChild(p);
-  }
+  spawnConfettiBurst(root, originX, originY, 56, 1, 0);
+  spawnConfettiBurst(root, originX, originY, 36, 0.72, 0.1);
 
   setTimeout(() => {
-    root.style.transition = "opacity 0.45s ease";
-    root.style.opacity = "0";
-    setTimeout(() => root.remove(), 480);
-  }, 2100);
+    root.classList.add("confetti-layer--fade");
+    setTimeout(() => root.remove(), 720);
+  }, 2680);
 }
 
 // ---------- Update submissions count after load ----------
