@@ -13,6 +13,11 @@ import { AttendeeValidationStepSchema } from '@/features/attendees/model';
 import type { AttendeeValidationResponse } from '@/features/attendees/model';
 import { hasMeaningfulCheckedIn } from '@/lib/attendee-checked-in';
 import { LONDON_CREDIT_ASSIGNMENTS } from '@/lib/london-credit-assignments';
+import {
+  findAttendeeInCache,
+  getProjectAttendees,
+  type CachedAttendee,
+} from '@/lib/attendee-cache';
 
 function normEmail(em: string) {
   return em.trim().toLowerCase();
@@ -45,20 +50,9 @@ async function findAttendeeInProject(
   projectId: string,
   nameInput: string,
   emailInput?: string
-) {
-  const snap = await getDocs(
-    query(collection(db, 'attendees'), where('projectId', '==', projectId))
-  );
-  const wantName = nameInput.trim().toLowerCase();
-  const wantEmail = emailInput != null ? normEmail(emailInput) : null;
-  for (const d of snap.docs) {
-    const x = d.data();
-    if ((String(x.name || '').trim().toLowerCase() !== wantName)) continue;
-    if (wantEmail != null && normEmail(String(x.email || '')) !== wantEmail)
-      continue;
-    return d;
-  }
-  return null;
+): Promise<CachedAttendee | null> {
+  const cached = await getProjectAttendees(projectId);
+  return findAttendeeInCache(cached, nameInput, emailInput ?? null);
 }
 
 async function cursorUrlAlreadyAssigned(
@@ -140,7 +134,10 @@ async function validateNameStep(
   validatedData?: { projectId?: string; eventId?: string }
 ) {
   try {
-    let attendeeDoc = await findAttendeeInProject(projectId, name);
+    let attendeeDoc: CachedAttendee | null = await findAttendeeInProject(
+      projectId,
+      name
+    );
 
     // Legacy fallback
     if (
@@ -152,7 +149,16 @@ async function validateNameStep(
       const legacy = await getDocs(
         query(collection(db, 'attendees'), where('name', '==', name.trim()))
       );
-      attendeeDoc = legacy.docs[0] || null;
+      const d = legacy.docs[0];
+      if (d) {
+        const data = d.data() as Record<string, unknown>;
+        attendeeDoc = {
+          id: d.id,
+          data,
+          nameKey: String(data.name ?? '').trim().toLowerCase(),
+          emailKey: String(data.email ?? '').trim().toLowerCase(),
+        };
+      }
     }
 
     if (!attendeeDoc) {
@@ -182,11 +188,11 @@ async function validateNameStep(
       });
     }
 
-    const attendeeData = attendeeDoc.data();
+    const attendeeData = attendeeDoc.data;
     const hasAlreadyRedeemed = !!(attendeeData.hasRedeemedCode || false);
     if (
       !hasAlreadyRedeemed &&
-      !hasMeaningfulCheckedIn(attendeeData as Record<string, unknown>)
+      !hasMeaningfulCheckedIn(attendeeData)
     ) {
       const response: AttendeeValidationResponse = {
         isValid: false,
@@ -230,7 +236,11 @@ async function validateEmailStep(
   validatedData?: { projectId?: string; eventId?: string }
 ) {
   try {
-    let attendeeDoc = await findAttendeeInProject(projectId, name, email);
+    let attendeeDoc: CachedAttendee | null = await findAttendeeInProject(
+      projectId,
+      name,
+      email
+    );
 
     if (
       !attendeeDoc &&
@@ -246,7 +256,16 @@ async function validateEmailStep(
           where('email', '==', email.toLowerCase().trim())
         )
       );
-      attendeeDoc = legacy.docs[0] || null;
+      const d = legacy.docs[0];
+      if (d) {
+        const data = d.data() as Record<string, unknown>;
+        attendeeDoc = {
+          id: d.id,
+          data,
+          nameKey: String(data.name ?? '').trim().toLowerCase(),
+          emailKey: String(data.email ?? '').trim().toLowerCase(),
+        };
+      }
     }
 
     if (!attendeeDoc) {
@@ -274,11 +293,11 @@ async function validateEmailStep(
       });
     }
 
-    const attendeeData = attendeeDoc.data();
+    const attendeeData = attendeeDoc.data;
     const hasAlreadyRedeemed = !!(attendeeData.hasRedeemedCode || false);
     if (
       !hasAlreadyRedeemed &&
-      !hasMeaningfulCheckedIn(attendeeData as Record<string, unknown>)
+      !hasMeaningfulCheckedIn(attendeeData)
     ) {
       const response: AttendeeValidationResponse = {
         isValid: false,
@@ -290,7 +309,7 @@ async function validateEmailStep(
     }
 
     const cursorUrl = hasAlreadyRedeemed
-      ? await cursorUrlAlreadyAssigned(attendeeDoc.id, attendeeData as Record<string, unknown>)
+      ? await cursorUrlAlreadyAssigned(attendeeDoc.id, attendeeData)
       : undefined;
 
     const response: AttendeeValidationResponse = {
