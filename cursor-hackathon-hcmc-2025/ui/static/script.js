@@ -1403,7 +1403,7 @@ function openModal(id) {
   if (id === "judge-modal") {
     openJudgeSidePanel();
     refreshJudgeSubmissionSelect();
-    refreshJudgeSubmissions({ silent: true });
+    refreshJudgeSubmissions({ silent: false });
   }
 }
 
@@ -1783,14 +1783,19 @@ function refreshJudgeSubmissionSelect() {
   const previous = select.value;
   const entries = getJudgeReviewEntries();
 
-  const options = ['<option value="">— pick a submission —</option>'];
-  entries.forEach((e) => {
+  const total = entries.length;
+  const unscoredCount = entries.filter((e) => !e.scored).length;
+  const placeholder = total
+    ? `— pick a submission (${total} in queue, ${unscoredCount} unscored) —`
+    : "— pick a submission —";
+  const options = [`<option value="">${escapeHtml(placeholder)}</option>`];
+  entries.forEach((e, idx) => {
     const statusBit = e.scored ? "scored" : "unscored";
-    const optTitle = `${e.name} — ${e.trackLabel} (${statusBit})`;
+    const optTitle = `${idx + 1}/${total} · ${e.name} — ${e.trackLabel} (${statusBit})`;
     options.push(
       `<option value="${escapeAttr(e.id)}" title="${escapeAttr(optTitle)}">${escapeHtml(
-        e.name
-      )} · ${escapeHtml(statusBit)}</option>`
+        `${idx + 1}/${total}`
+      )} · ${escapeHtml(e.name)} · ${escapeHtml(statusBit)}</option>`
     );
   });
 
