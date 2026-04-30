@@ -27,7 +27,7 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
     setError(null);
     if (attendee) {
       setName(attendee.name);
-      setCurrentStep('email');
+      setCurrentStep('name');
       setExpectedEmail(attendee.email);
       setEmail(attendee.email);
     } else {
@@ -75,12 +75,35 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
           'A code is already assigned to this guest, but the referral link could not be loaded. Ask an organizer.'
         );
       }
-      const resolved = validationData.resolvedName?.trim();
-      if (resolved) setName(resolved);
+      const resolved = validationData.resolvedName?.trim() || name.trim();
       const resolvedEmail = validationData.expectedEmail || selectedAttendee?.email || '';
+      setName(resolved);
       setExpectedEmail(resolvedEmail || null);
       if (resolvedEmail) setEmail(resolvedEmail);
-      setCurrentStep('email');
+
+      if (!resolvedEmail) {
+        throw new Error('This attendee is missing an email in the checked-in guest list. Ask an organizer.');
+      }
+
+      const redeemResponse = await fetch('/credits/api/redeem', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: resolved,
+          email: resolvedEmail.toLowerCase().trim(),
+          projectId: effectiveProjectId,
+          eventId: effectiveProjectId ? undefined : 'sample-event-1',
+        }),
+      });
+      const redeemResult = await redeemResponse.json();
+      if (!redeemResult.success) {
+        throw new Error(redeemResult.error || 'Failed to claim code');
+      }
+      const params = new URLSearchParams({
+        cursorUrl: redeemResult.data.cursorUrl,
+        name: redeemResult.data.name || resolved,
+      });
+      window.location.href = `/credits/success?${params.toString()}`;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Validation failed');
     } finally {
@@ -173,7 +196,7 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
       <div>
         <h3 className="font-display text-sm font-semibold text-primary">Attendee info</h3>
         <p className="mt-1 text-sm text-muted-foreground">
-          {currentStep === 'name' && 'Step 1: Enter your name'}
+          {currentStep === 'name' && 'Select your checked-in name'}
           {currentStep === 'email' && 'Step 2: Confirm your email'}
           {currentStep === 'ready' && 'Ready to claim your code'}
         </p>
@@ -197,7 +220,7 @@ export function RedemptionForm({ projectId }: RedemptionFormProps = {}) {
                 disabled={!selectedAttendee || isLoading}
                 className="btn-event-primary w-full py-3 text-sm disabled:opacity-50"
               >
-                {isLoading ? 'Validating…' : 'Continue'}
+                {isLoading ? 'Claiming…' : 'Claim my Cursor credits'}
               </button>
             </>
           ) : (
