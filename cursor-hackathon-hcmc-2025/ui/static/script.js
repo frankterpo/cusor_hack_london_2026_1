@@ -102,14 +102,33 @@ function getActiveHackId() {
   );
 }
 
+/**
+ * Belt-and-braces cutoff: even if a stale row was tagged with the active
+ * hack_id, drop it unless `submitted_at` is on/after the event start.
+ * Today's London event opened 2026-04-30 UTC. Earlier London hackathon
+ * (April 2, 2026) rows live in the same table and must be excluded.
+ */
+const EVENT_CUTOFF_AT_MS = Date.UTC(2026, 3, 30, 0, 0, 0); // 2026-04-30T00:00:00Z
+
+function submissionWithinEventWindow(sub) {
+  const t = sub && (sub.submitted_at || sub.timestamp);
+  if (!t) return true; // missing timestamp → don't drop
+  const ms = Date.parse(t);
+  if (Number.isNaN(ms)) return true;
+  return ms >= EVENT_CUTOFF_AT_MS;
+}
+
 function submissionMatchesActiveHack(sub) {
   if (!sub || typeof sub !== "object") return false;
   const active = String(getActiveHackId() || "").trim();
   const h = String(sub.hack_id || "").trim();
-  if (h) return h === active;
+  let hackOk;
+  if (h) hackOk = h === active;
   // Legacy rows from API: only `hackathon_id` (UUID). GET is scoped to the default hackathon.
-  if (String(sub.hackathon_id || "").trim()) return !!active;
-  return false;
+  else if (String(sub.hackathon_id || "").trim()) hackOk = !!active;
+  else hackOk = false;
+  if (!hackOk) return false;
+  return submissionWithinEventWindow(sub);
 }
 
 function hackStorageSlug() {

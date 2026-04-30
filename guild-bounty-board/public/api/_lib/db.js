@@ -13,6 +13,16 @@ const DEFAULT_HACKATHON_ID =
 const ACTIVE_HACK_SLUG =
   process.env.ACTIVE_HACK_SLUG || "cursor-live-london-q3-2026";
 
+/**
+ * Cutoff: only consider submissions received on/after the event start.
+ * Today's event: London hackathon kicked off 2026-04-30 (UK day).
+ * Earlier rows in the same Supabase project belong to a different London
+ * hackathon (April 2, 2026) that was retagged to this hackathon_id by mistake.
+ * Override via env if the next event needs a different cutoff.
+ */
+const EVENT_CUTOFF_AT =
+  process.env.EVENT_CUTOFF_AT || "2026-04-30T00:00:00+00:00";
+
 function withClientHackFields(row) {
   if (!row) return row;
   return { ...row, hack_id: ACTIVE_HACK_SLUG, timestamp: row.submitted_at };
@@ -42,8 +52,9 @@ async function supabaseRest(path, options = {}) {
 
 async function getSubmissions() {
   const hid = encodeURIComponent(DEFAULT_HACKATHON_ID);
+  const cutoff = encodeURIComponent(EVENT_CUTOFF_AT);
   const rows = await supabaseRest(
-    `/submissions?hackathon_id=eq.${hid}&order=submitted_at.desc.nullsfirst`
+    `/submissions?hackathon_id=eq.${hid}&submitted_at=gte.${cutoff}&order=submitted_at.desc.nullsfirst`
   );
   return (rows || []).map((r) => withClientHackFields(r));
 }
